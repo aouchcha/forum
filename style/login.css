@@ -1,4 +1,4 @@
-* {
+/* * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -98,4 +98,90 @@ body {
 .btn-home:hover {
     background: #e9ecef;
     transform: translateY(-1px);
+} */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #080000;
+}
+.login-container {
+    margin-top: 100px;
+    background-color: white;
+    width: 300px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgb(255, 255, 255);
+    text-align: center;
+    animation: scaleIn 0.8s ease forwards;
+    transform: scale(0.5);
+}
+
+.login-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+
+}
+.login-container input[type="text"],
+.login-container input[type="password"],
+.login-container input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+
+}
+
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    border: #080000;
+}
+
+img {
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    border: 1px solid black;
+
+}
+.btn {
+    padding: 12px 30px;
+    text-decoration: none;
+    color: #000;
+    background: #f1f1f1;
+    border: 1px solid #f1f1f1;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+.btn a  {
+    text-decoration: none;
+    color: black
+}
+.btn a:hover {
+    text-decoration: none;
+    color: white;
+}
+.btn:hover {
+    background-color: #000;
+    color: #ffffff;
+    border-color: #666666;
+}
+@keyframes scaleIn {
+    to {
+        transform: scale(1);
+    }
 }
