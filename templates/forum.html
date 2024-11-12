@@ -12,14 +12,15 @@
             Hello Mr {{.Currenuser}}
             <form action="/logout" method="post">
                 <input type="text" name="username" value="{{.Currenuser}}" style="visibility: hidden;">
-                <button type="submit" class="btn btn-logout">Log Out</button>
+                <button type="submit" class="bttn" >Log Out</button>
             </form>
         </div>
         <br>
+        <h2>YOUR FEED</h2>
         <div class="postcreation" id="postcreation"></div>
         <div class="temp" id="temp">
             <div class="creation">
-                <button type="submit" class="oo" id="Create">Create Post</button>
+                <button type="submit" class="bttn" id="Create">Create Post</button>
             </div>
             <form action="/forum?user={{.Currenuser}}" method="post">
                 <div class="filter">
@@ -32,16 +33,19 @@
                     <input type="radio" name="categories" id="enteairtement" value="enteairtement">
                     <label for="enteairtement">Enteairtement</label>
                     <pre>    </pre>
-                    <button type="submit" class="oo" id="filter">Filter</button>
+                    <button type="submit" class="bttn" id="filter">Filter</button>
                 </div>
             </form>
         </div>
     </header>
+    <h2 style="color: aliceblue;text-align: center;">Check the Newest Of your FEED!</h2>
     {{range .Posts}}
         <div class="postcontainer">
-            <h3>title: {{.Title}}</h3>
+            <h3>Title: {{.Title}}</h3>
             <h4>categorie: {{.Categorie}}</h4>
-            <p>{{.Body}}</p>
+            <div class="body-container">
+                <h5>{{.Body}}</h5>
+            </div>
             <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
                <sub class="comment_container">
                     {{range .Comments}}
@@ -56,7 +60,7 @@
                         <div class="bb">
                             <textarea name="comments" id="comments" placeholder="Add your comments..."></textarea>
                             <br>
-                            <button type="submit" class="btn">Comment</button>
+                            <button type="submit" class="bttn">Comment</button>
                        </div>
                     </form>
                 </sub>

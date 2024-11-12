@@ -1,8 +1,9 @@
 package handler
 
 import (
-	data "main/dataBase"
 	"net/http"
+
+	data "main/dataBase"
 )
 
 func HandleRegistration(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +35,12 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 		data.Db.Exec(`
             INSERT INTO users (email, username, password)
             VALUES (?, ?, ?)`, email, username, password)
-
+		// expiration := time.Now().Add(4 * time.Hour)
+		// SessionCookie(w, username, expiration)
+		// _, err = data.Db.Exec("INSERT INTO sessions (session_id, user_id, expires_at) VALUES (?, ?, ?)", username, user, expiration)
+		// if err != nil {
+		// fmt.Println("db error!", err)
+		// }
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

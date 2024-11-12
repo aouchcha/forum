@@ -36,7 +36,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// dataE := Exist{Exist: true}
-	template := template.Must(template.ParseFiles("templates/login.html"))
+	template, err := template.ParseFiles("templates/login.html")
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
@@ -52,7 +56,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// session := string(session(username))
-		expiration := time.Now().Add(4 * time.Minute)
+		expiration := time.Now().Add(4 * time.Hour)
 		SessionCookie(w, username, expiration)
 		_, err = data.Db.Exec("INSERT INTO sessions (session_id, user_id, expires_at) VALUES (?, ?, ?)", username, user, expiration)
 		if err != nil {
