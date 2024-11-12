@@ -6,11 +6,17 @@ body {
 
 .header {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     width: 100%;
+    /* justify-content: flex-end; */
 }
 
-.btn {
+.header h2 {
+    margin-top: 0;
+}
+
+/* .btn {
     margin: 10px;
     padding: 10px;
     margin: 5px 0;
@@ -18,12 +24,12 @@ body {
     border-radius: 5px; 
     font-size: 1rem;
     cursor: pointer;
-}
+} */
 
-.btn-logout {
+/* .btn-logout {
     background-color: beige;
     color: black;
-}
+} */
 
 .postcreation textarea {
     resize: none;
@@ -83,7 +89,8 @@ body {
     justify-content: space-between;
     align-items: center;
 }
-.bb{
+
+.bb {
     background-color: #F0FFFF;
     display: flex;
     flex-direction: column;
@@ -99,11 +106,13 @@ body {
     background-color: rgb(63, 63, 63);
     padding-bottom: 1%;
 }
+
 .body-container {
     border: 1px solid black;
     padding: 10px 10px 10px 10px;
     margin-right: 4%;
 }
+
 .postcontainer {
     display: flex;
     flex-direction: column;
@@ -149,6 +158,7 @@ body {
     flex-direction: column;
     padding-bottom: 7px;
 }
+
 .bttn {
     padding: 12px 30px;
     text-decoration: none;
@@ -164,14 +174,17 @@ body {
     cursor: pointer;
     border: 1px solid #000;
 }
-.bttn a  {
+
+.bttn a {
     text-decoration: none;
     color: black
 }
+
 .bttn a:hover {
     text-decoration: none;
     color: white;
 }
+
 .bttn:hover {
     background-color: #000;
     color: #ffffff;

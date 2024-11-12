@@ -9,7 +9,7 @@
 <body>
     <header class="name">
         <div class="header">
-            Hello Mr {{.Currenuser}}
+            <h2>Hello Mr {{.Currenuser}}</h2>
             <form action="/logout" method="post">
                 <input type="text" name="username" value="{{.Currenuser}}" style="visibility: hidden;">
                 <button type="submit" class="bttn" >Log Out</button>

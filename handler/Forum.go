@@ -51,6 +51,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "You need to log in", http.StatusNotFound)
 		return
 	}
+	//to get filtered posts
 	var post_rows *sql.Rows
 	if cat_to_filter != "all" && cat_to_filter != "" {
 		post_rows, err = data.Db.Query("SELECT * FROM posts WHERE categorie = ?;", cat_to_filter)
@@ -70,7 +71,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer post_rows.Close()
-
+	//to get comments
 	var posts_toshow []Post
 	for post_rows.Next() {
 		var comments_toshow []Comment
