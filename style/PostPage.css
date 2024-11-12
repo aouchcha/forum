@@ -11,7 +11,11 @@ body {
     width: 100%;
     /* justify-content: flex-end; */
 }
-
+.react {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
 .header h2 {
     margin-top: 0;
 }

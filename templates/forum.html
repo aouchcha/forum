@@ -43,8 +43,13 @@
         <div class="postcontainer">
             <h3>Title: {{.Title}}</h3>
             <h4>categorie: {{.Categorie}}</h4>
-            <div class="body-container">
+            <div >
                 <h5>{{.Body}}</h5>
+            </div>
+            <div id="reactions">
+                <button class="react" name="reaction" value="like">Like</button>
+                <button class="react" name="reaction" value="dislike">Disike</button>
+                <button class="react" name="reaction" value="share">Share</button>
             </div>
             <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
                <sub class="comment_container">
@@ -55,11 +60,13 @@
                             <sub><span>{{.Comment_time}}</span> ago </sub>
                         </div>
                     {{end}}
+                    
                     <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
                         <br>
                         <div class="bb">
                             <textarea name="comments" id="comments" placeholder="Add your comments..."></textarea>
                             <br>
+
                             <button type="submit" class="bttn">Comment</button>
                        </div>
                     </form>
@@ -107,5 +114,21 @@
         </form>
     `
     })
+    const likes = document.querySelectorAll('.react')
+    count = 0
+    likes.forEach(ele => ele.addEventListener('click' ,(event) => {
+        count++
+        let reaction = event.target.value
+        let user = "{{.Currenuser}}"
+        console.log(reaction)
+        console.log(user)
+        console.log(count)
+        if (event.target.value == "like") {
+            event.target.style.backgroundColor = "green"
+        } else if (event.target.value == "dislike") {
+            event.target.style.backgroundColor = "red"
+        }
+        // return
+    }))
 </script>
 </html>

@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	data "main/dataBase"
 	"net/http"
 	"text/template"
+
+	data "main/dataBase"
 )
 
 type Post struct {
@@ -51,7 +52,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "You need to log in", http.StatusNotFound)
 		return
 	}
-	//to get filtered posts
+	// to get filtered posts
 	var post_rows *sql.Rows
 	if cat_to_filter != "all" && cat_to_filter != "" {
 		post_rows, err = data.Db.Query("SELECT * FROM posts WHERE categorie = ?;", cat_to_filter)
@@ -71,7 +72,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer post_rows.Close()
-	//to get comments
+	// to get comments
 	var posts_toshow []Post
 	for post_rows.Next() {
 		var comments_toshow []Comment
@@ -123,7 +124,10 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			Categorie:         categorie,
 		})
 	}
-
+	like := r.FormValue("like")
+	dislike := r.FormValue("dislike")
+	fmt.Println("like :", like)
+	fmt.Println("dislike :", dislike)
 	if err := post_rows.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -139,7 +143,6 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		Currenuser: CurrentUser,
 		Posts:      posts_toshow,
 	})
-
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Internal Server", http.StatusInternalServerError)
