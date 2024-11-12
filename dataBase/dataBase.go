@@ -72,5 +72,13 @@ func init() {
 		fmt.Println(err)
 		return
 	}
-
+	// const LikesTable string = `
+	// CREATE TABLE IF NOT EXISTS likes (
+	// 	like_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	// 	user_like_id INTEGER NOT NULL,
+	// 	liked_post_id INTEGER NOT NULL,
+	// 	FOREIGN KEY (liked_post_id) REFERENCES posts(id),
+	// 	FOREIGN KEY (user_id) REFERENCES users(id),
+	// 	UNIQUE (user_id, post_id)
+	// )`
 }

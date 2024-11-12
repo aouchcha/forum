@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-var port = "3434"
+var port = "8080"
 
 func main() {
 	http.HandleFunc("/", handler.Home)

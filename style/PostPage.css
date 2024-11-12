@@ -12,9 +12,14 @@ body {
     /* justify-content: flex-end; */
 }
 .react {
-    height: 50px;
-    width: 50px;
+    height: 60px;
+    width: 60px;
     border-radius: 50%;
+}
+.reactions {
+    padding: 10px 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 .header h2 {
     margin-top: 0;

@@ -12,6 +12,7 @@ import (
 
 type Post struct {
 	Comments          []Comment
+	Likes             []Likes
 	Postid            int
 	Usernamepublished string
 	CurrentUsser      string
@@ -27,6 +28,11 @@ type Comment struct {
 	Comment_writer    string
 	Post_commented_id int
 	Comment_time      any
+}
+type Likes struct {
+	Post_id  int
+	User_id  int
+	UserName string
 }
 
 func Forum(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +111,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 				continue
 			}
-			fmt.Println(comment_id, comment_body, comment_writer, post_commented_id)
+			fmt.Println("comment Data :", comment_id, comment_body, comment_writer, post_commented_id)
 			comments_toshow = append(comments_toshow, Comment{
 				Comment_id:     comment_id,
 				Comment_body:   comment_body,
