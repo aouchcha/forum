@@ -2,9 +2,11 @@ package handler
 
 import (
 	"fmt"
-	data "main/dataBase"
 	"net/http"
+	"text/template"
 	"time"
+
+	data "main/dataBase"
 )
 
 //	func session(username string) []byte {
@@ -15,6 +17,10 @@ import (
 //		}
 //		return b
 //	}
+type Exist struct {
+	Exist bool
+}
+
 func SessionCookie(w http.ResponseWriter, session string, expiration time.Time) {
 	cookie := &http.Cookie{
 		Name:    "session_token_" + session,
@@ -29,6 +35,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page not found", http.StatusNotFound)
 		return
 	}
+	// dataE := Exist{Exist: true}
+	template := template.Must(template.ParseFiles("templates/login.html"))
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
@@ -36,7 +44,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		var user int
 		err := data.Db.QueryRow("SELECT id FROM users WHERE username = ? AND password = ?", username, password).Scan(&user)
 		if err != nil {
-			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			// Exist.Exist = false
+			fmt.Println("dataE : ", Exist{Exist: false})
+			template.Execute(w, Exist{Exist: false})
+			// http.Error(w,template.Execute(w, Exist{Exist: false}), http.StatusUnauthorized)
 			return
 		}
 		// session := string(session(username))
@@ -46,11 +58,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("db error!", err)
 		}
+		// template.Execute(w, Exist{Exist: false}))
 		fmt.Println("loging success")
 		http.Redirect(w, r, "/forum?user="+username, http.StatusFound)
 		return
 	} else if r.Method == http.MethodGet {
-		http.ServeFile(w, r, "./templates/login.html")
+		fmt.Println("Exist{Exist: false})", Exist{Exist: false})
+		template.Execute(w, Exist{Exist: true})
 		return
 	}
 	http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
