@@ -143,19 +143,15 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			posts_toshow[i], posts_toshow[j] = posts_toshow[j], posts_toshow[i]
 		}
 	}
-	// if r.Method == "POST" {
-	likes := r.PostFormValue("like")
-	dislikes := r.PostFormValue("dislike")
-	if likes == "KAFKA_like" {
-		fmt.Println("something in here")
+	if r.Method == "POST" {
+		fmt.Println("current user :", CurrentUser)
+		curr := r.FormValue("user")
+		reaction := r.FormValue("reaction")
+		postName := r.FormValue("postid")
+		fmt.Println("current :", curr)
+		fmt.Println("reaction :", reaction)
+		fmt.Println("post name :", postName)
 	}
-	fmt.Println("PostFormValue like :", likes)
-	fmt.Println("PostFormValue dislike :", dislikes)
-	fmt.Println("current user :", CurrentUser)
-	like := r.FormValue("like")
-	// dislike := r.FormValue("dislike")
-	fmt.Println("like :", like)
-	// }
 	err = tmpl.Execute(w, struct {
 		Currenuser string
 		Posts      []Post

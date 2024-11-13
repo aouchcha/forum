@@ -50,9 +50,9 @@
         </div>
         <div>
             <label for="likes">likes :</label>
-                <button type="submit" id="likes" class="react" value="{{$.Currenuser}}_like" name="like">0</button>
+            <button type="submit" id="likes" class="react" data-reaction="like" name="like">0</button>
             <label for="dislikes">dislikes :</label>
-                <button type="submit" id="dislikes" class="react" value="{{$.Currenuser}}_dislike" name="like">0</button>
+            <button type="submit" id="dislikes" class="react" data-reaction="dislike" name="like">0</button>
         </div>
         <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
         <sub class="comment_container">
@@ -122,12 +122,13 @@
 
     likes.forEach(ele => ele.addEventListener('click', (event) => {
         const reaction = event.target.value;
-        console.log(reaction)
+        const user = "{{$.Currenuser}}"
+        console.log(user)
         const parent = ele.closest('.postcontainer');  // buttons are inside a post container
 
-        const likeButton = parent.querySelector(".react[value={{$.Currenuser}}_like]");
-        const dislikeButton = parent.querySelector(".react[value={{$.Currenuser}}_dislike]");
-        if (reaction === "{{$.Currenuser}}_like") {
+        const likeButton = parent.querySelector(".react[value=like]");
+        const dislikeButton = parent.querySelector(".react[value=dislike]");
+        if (reaction === "like") {
             count1 = parseInt(ele.innerHTML);
             likeButton.style.backgroundColor = "green";
             likeButton.innerHTML = count1 + 1;
@@ -135,7 +136,7 @@
             dislikeButton.innerHTML = 0;
             likeButton.disabled = true
             dislikeButton.disabled = false
-        } else if (reaction === "{{$.Currenuser}}_dislike") {
+        } else if (reaction === "dislike") {
             count2 = parseInt(ele.innerHTML);
             dislikeButton.innerHTML = count2 + 1;
             dislikeButton.style.backgroundColor = "red";
@@ -144,9 +145,34 @@
             dislikeButton.disabled = true
             likeButton.disabled = false
         }
-        
-        console.log("Reaction:", reaction);
-        // console.log("User:", user);
+        const currentUser = "{{.Currenuser}}";
+
+        likes.forEach(button => {
+            button.addEventListener('click', event => {
+                const reaction = event.target.getAttribute('data-reaction');
+                const postID = event.target.getAttribute('data-postid');
+
+                fetch('/forum', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        reaction: reaction,
+                        user: currentUser,
+                        postid: postID
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Response:", data);
+                        // Update the button counts based on response data if needed
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            });
+        });
     }));
 
 </script>
