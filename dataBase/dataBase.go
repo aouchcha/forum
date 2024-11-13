@@ -74,11 +74,10 @@ func init() {
 	}
 	// const LikesTable string = `
 	// CREATE TABLE IF NOT EXISTS likes (
-	// 	like_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	// 	user_like_id INTEGER NOT NULL,
+	// 	user_name_like INTEGER NOT NULL,
 	// 	liked_post_id INTEGER NOT NULL,
 	// 	FOREIGN KEY (liked_post_id) REFERENCES posts(id),
-	// 	FOREIGN KEY (user_id) REFERENCES users(id),
-	// 	UNIQUE (user_id, post_id)
+	// 	FOREIGN KEY (user_name_like) REFERENCES users(username),
+	// 	UNIQUE (user_name_like, liked_post_id)
 	// )`
 }

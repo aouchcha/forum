@@ -31,7 +31,6 @@ type Comment struct {
 }
 type Likes struct {
 	Post_id  int
-	User_id  int
 	UserName string
 }
 
@@ -89,7 +88,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err)
 			continue
 		}
-		fmt.Println("POST id :", id)
+		// fmt.Println("POST id :", id)
 		comm_rows, err := data.Db.Query("SELECT * FROM comments WHERE post_commented_id = ?;", id)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -111,7 +110,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 				continue
 			}
-			fmt.Println("comment Data :", comment_id, comment_body, comment_writer, post_commented_id)
+			// fmt.Println("comment Data :", comment_id, comment_body, comment_writer, post_commented_id)
 			comments_toshow = append(comments_toshow, Comment{
 				Comment_id:     comment_id,
 				Comment_body:   comment_body,
@@ -119,6 +118,8 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 				Comment_time:   time,
 			})
 		}
+		// like := r.FormValue("like")
+		// fmt.Println("like :", like)
 		posts_toshow = append(posts_toshow, Post{
 			Comments:          comments_toshow,
 			Postid:            id,
@@ -130,10 +131,10 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			Categorie:         categorie,
 		})
 	}
-	like := r.FormValue("like")
-	dislike := r.FormValue("dislike")
-	fmt.Println("like :", like)
-	fmt.Println("dislike :", dislike)
+	// like := r.FormValue("like")
+	// dislike := r.FormValue("dislike")
+	// fmt.Println("like :", like)
+	// fmt.Println("dislike :", dislike)
 	if err := post_rows.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -142,9 +143,23 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			posts_toshow[i], posts_toshow[j] = posts_toshow[j], posts_toshow[i]
 		}
 	}
+	// if r.Method == "POST" {
+	likes := r.PostFormValue("like")
+	dislikes := r.PostFormValue("dislike")
+	if likes == "KAFKA_like" {
+		fmt.Println("something in here")
+	}
+	fmt.Println("PostFormValue like :", likes)
+	fmt.Println("PostFormValue dislike :", dislikes)
+	fmt.Println("current user :", CurrentUser)
+	like := r.FormValue("like")
+	// dislike := r.FormValue("dislike")
+	fmt.Println("like :", like)
+	// }
 	err = tmpl.Execute(w, struct {
 		Currenuser string
 		Posts      []Post
+		// Likes      []Likes
 	}{
 		Currenuser: CurrentUser,
 		Posts:      posts_toshow,

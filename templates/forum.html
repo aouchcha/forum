@@ -48,10 +48,11 @@
         <div>
             <h5>{{.Body}}</h5>
         </div>
-        <div class="reactions">
-            <button class="react" name="reaction" value="like">Like</button>
-            <button class="react" name="reaction" value="dislike">Disike</button>
-            <button class="react" name="reaction" value="share">Share</button>
+        <div>
+            <label for="likes">likes :</label>
+                <button type="submit" id="likes" class="react" value="{{$.Currenuser}}_like" name="like">0</button>
+            <label for="dislikes">dislikes :</label>
+                <button type="submit" id="dislikes" class="react" value="{{$.Currenuser}}_dislike" name="like">0</button>
         </div>
         <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
         <sub class="comment_container">
@@ -121,38 +122,31 @@
 
     likes.forEach(ele => ele.addEventListener('click', (event) => {
         const reaction = event.target.value;
-        const user = "{{.Currenuser}}";
-        const parent = ele.closest('.postcontainer');  // Assuming buttons are inside a post container
+        console.log(reaction)
+        const parent = ele.closest('.postcontainer');  // buttons are inside a post container
 
-        // Get references to both buttons
-        const likeButton = parent.querySelector('.react[value="like"]');
-        const dislikeButton = parent.querySelector('.react[value="dislike"]');
-
-        // Toggle the states
-        if (reaction === "like") {
-            // Activate like, deactivate dislike
+        const likeButton = parent.querySelector(".react[value={{$.Currenuser}}_like]");
+        const dislikeButton = parent.querySelector(".react[value={{$.Currenuser}}_dislike]");
+        if (reaction === "{{$.Currenuser}}_like") {
+            count1 = parseInt(ele.innerHTML);
             likeButton.style.backgroundColor = "green";
-            likeButton.innerHTML = "1 .Liked";
-            likeButton.style.fontSize = "11px";
-
-            // Reset dislike button
+            likeButton.innerHTML = count1 + 1;
             dislikeButton.style.backgroundColor = "";
-            dislikeButton.innerHTML = "Dislike";
-            dislikeButton.style.fontSize = "11px";
-        } else if (reaction === "dislike") {
-            // Activate dislike, deactivate like
+            dislikeButton.innerHTML = 0;
+            likeButton.disabled = true
+            dislikeButton.disabled = false
+        } else if (reaction === "{{$.Currenuser}}_dislike") {
+            count2 = parseInt(ele.innerHTML);
+            dislikeButton.innerHTML = count2 + 1;
             dislikeButton.style.backgroundColor = "red";
-            dislikeButton.innerHTML = "1 .Disliked";
-            dislikeButton.style.fontSize = "9px";
-
-            // Reset like button
             likeButton.style.backgroundColor = "";
-            likeButton.innerHTML = "Like";
-            likeButton.style.fontSize = "11px";
+            likeButton.innerHTML = 0;
+            dislikeButton.disabled = true
+            likeButton.disabled = false
         }
-
+        
         console.log("Reaction:", reaction);
-        console.log("User:", user);
+        // console.log("User:", user);
     }));
 
 </script>
