@@ -30,8 +30,9 @@ type Comment struct {
 	Comment_time      any
 }
 type Likes struct {
-	Post_id  int
-	UserName string
+	Like_id       int
+	Liked_Post_id int
+	UserName      string
 }
 
 func Forum(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +47,8 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	}
 	cat_to_filter := r.FormValue("categories")
 	CurrentUser := r.URL.Query().Get("user")
+	fmt.Println("current user :", CurrentUser)
+	fmt.Println("URL : ", r.URL.Query())
 	_, err = r.Cookie("session_token_" + CurrentUser)
 	if err != nil {
 		http.Error(w, "Your session is expaired login again", http.StatusNotFound)
@@ -81,6 +84,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	var posts_toshow []Post
 	for post_rows.Next() {
 		var comments_toshow []Comment
+		var likes_Post []Likes
 		var id int
 		var title, body, usernamepublished, categorie string
 		var time any
@@ -118,10 +122,37 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 				Comment_time:   time,
 			})
 		}
-		// like := r.FormValue("like")
-		// fmt.Println("like :", like)
+		likesRow, err := data.Db.Query("SELECT * FROM likes WHERE liked_post_id = ?;", id)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				if err := tmpl.Execute(w, CurrentUser); err != nil {
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					log.Printf("Template execution error: %v", err)
+					return
+				}
+			}
+			http.Error(w, "ana hna Internal server error", http.StatusInternalServerError)
+			return
+		}
+		defer likesRow.Close()
+		for likesRow.Next() {
+			var like_id, liked_post_id int
+			var user_name string
+			if err := likesRow.Scan(&like_id, &liked_post_id, &user_name); err != nil {
+				fmt.Println("Scan ::::  ==> ", err)
+				continue
+			}
+			likes_Post = append(likes_Post, Likes{
+				Like_id:       like_id,
+				Liked_Post_id: liked_post_id,
+				UserName:      user_name,
+			})
+			fmt.Println("likes :", like_id, liked_post_id, user_name)
+		}
+
 		posts_toshow = append(posts_toshow, Post{
 			Comments:          comments_toshow,
+			Likes:             likes_Post,
 			Postid:            id,
 			Usernamepublished: usernamepublished,
 			CurrentUsser:      CurrentUser,
@@ -131,10 +162,6 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			Categorie:         categorie,
 		})
 	}
-	// like := r.FormValue("like")
-	// dislike := r.FormValue("dislike")
-	// fmt.Println("like :", like)
-	// fmt.Println("dislike :", dislike)
 	if err := post_rows.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -143,15 +170,15 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			posts_toshow[i], posts_toshow[j] = posts_toshow[j], posts_toshow[i]
 		}
 	}
-	if r.Method == "POST" {
-		fmt.Println("current user :", CurrentUser)
-		curr := r.FormValue("user")
-		reaction := r.FormValue("reaction")
-		postName := r.FormValue("postid")
-		fmt.Println("current :", curr)
-		fmt.Println("reaction :", reaction)
-		fmt.Println("post name :", postName)
-	}
+	// if r.Method == "POST" {
+	// 	fmt.Println("current user :", CurrentUser)
+	// 	curr := r.FormValue("user")
+	// 	reaction := r.FormValue("reaction")
+	// 	postName := r.FormValue("postid")
+	// 	fmt.Println("current :", curr)
+	// 	fmt.Println("reaction :", reaction)
+	// 	fmt.Println("post name :", postName)
+	// }
 	err = tmpl.Execute(w, struct {
 		Currenuser string
 		Posts      []Post
@@ -159,6 +186,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	}{
 		Currenuser: CurrentUser,
 		Posts:      posts_toshow,
+		// Likes:      likes_Post,
 	})
 	if err != nil {
 		fmt.Println(err)

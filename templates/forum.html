@@ -48,12 +48,14 @@
         <div>
             <h5>{{.Body}}</h5>
         </div>
-        <div>
-            <label for="likes">likes :</label>
-            <button type="submit" id="likes" class="react" data-reaction="like" name="like">0</button>
-            <label for="dislikes">dislikes :</label>
-            <button type="submit" id="dislikes" class="react" data-reaction="dislike" name="like">0</button>
-        </div>
+            <form action="/Likes?Liked_Post_id={{.Postid}}&user={{.CurrentUsser}}" method="post">
+                <div>
+                    <label>Likes:</label>
+                    <button type="submit" data-postid="{{.Postid}}" class="react" name="reaction" value="like">👍 0</button>
+                    <!-- <label>Dislikes:</label> -->
+                    <!-- <button type="submit" class="react" name="reaction" value="dislike">👎 0</button> -->
+                </div>
+            </form>
         <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
         <sub class="comment_container">
             <h2>Comments : </h2>
@@ -145,35 +147,19 @@
             dislikeButton.disabled = true
             likeButton.disabled = false
         }
-        const currentUser = "{{.Currenuser}}";
-
-        likes.forEach(button => {
-            button.addEventListener('click', event => {
-                const reaction = event.target.getAttribute('data-reaction');
-                const postID = event.target.getAttribute('data-postid');
-
-                fetch('/forum', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        reaction: reaction,
-                        user: currentUser,
-                        postid: postID
-                    }),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Response:", data);
-                        // Update the button counts based on response data if needed
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
-            });
-        });
     }));
+    // const currentUser = "{{.Currenuser}}";
+    // const likesButton = document.getElementsByClassName(".react")
+    // likeButton.forEach(button => {
+    //     button.addEventListener('click', async () => {
+    //         // const reaction = document.getAttribute('reaction');
+    //         const postID = document.getAttribute('data-postid');
+    //         const user = "{{$.Currenuser}}"
+    //         await fetch(`/like?postid=${postId}&user=${user}`, {
+    //             method: 'POST'
+    //         })
+    //     })
+    // })
 
 </script>
 

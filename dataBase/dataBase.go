@@ -55,7 +55,7 @@ func init() {
 		FOREIGN KEY (post_creator) REFERENCES users(username)
 	);`
 	if _, err := Db.Exec(CreatPosts); err != nil {
-		fmt.Println(err)
+		fmt.Println("posts error : \n", err)
 		return
 	}
 
@@ -69,15 +69,20 @@ func init() {
 		FOREIGN KEY (post_commented_id) REFERENCES posts(id)
 	)`
 	if _, err := Db.Exec(CommentsTable); err != nil {
-		fmt.Println(err)
+		fmt.Println("comments error : \n", err)
 		return
 	}
-	// const LikesTable string = `
-	// CREATE TABLE IF NOT EXISTS likes (
-	// 	user_name_like INTEGER NOT NULL,
-	// 	liked_post_id INTEGER NOT NULL,
-	// 	FOREIGN KEY (liked_post_id) REFERENCES posts(id),
-	// 	FOREIGN KEY (user_name_like) REFERENCES users(username),
-	// 	UNIQUE (user_name_like, liked_post_id)
-	// )`
+	const LikesTable string = `
+	CREATE TABLE IF NOT EXISTS likes (
+		like_id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_name_like TEXT NOT NULL,
+		liked_post_id INTEGER NOT NULL,
+		FOREIGN KEY (liked_post_id) REFERENCES posts(id),
+		FOREIGN KEY (user_name_like) REFERENCES users(username),
+		UNIQUE (user_name_like, liked_post_id)
+	)`
+	if _, err := Db.Exec(LikesTable); err != nil {
+		fmt.Println("likes error : \n", err)
+		return
+	}
 }
