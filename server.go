@@ -7,7 +7,7 @@ import (
 	handler "main/handler"
 )
 
-var port = "8080"
+var port = "9090"
 
 func main() {
 	http.HandleFunc("/", handler.Home)

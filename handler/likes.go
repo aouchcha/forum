@@ -12,8 +12,8 @@ import (
 func Like(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.URL.Query().Get("Liked_Post_id"))
 	fmt.Println(r.URL.Query().Get("user"))
-	liked_post_id, err := strconv.Atoi(r.URL.Query().Get("Liked_Post_id"))
 	user := r.URL.Query().Get("user")
+	liked_post_id, err := strconv.Atoi(r.URL.Query().Get("Liked_Post_id"))
 	if err != nil {
 		http.Error(w, "Internal server Error", http.StatusInternalServerError)
 		return

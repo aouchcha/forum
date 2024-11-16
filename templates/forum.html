@@ -24,7 +24,7 @@
             <div class="creation">
                 <button type="submit" class="bttn" id="Create">Create Post</button>
             </div>
-            <form action="/forum?user={{.Currenuser}}" method="post">
+            <form action="/forum?user={{.Currenuser}}" method="get">
                 <div class="filter">
                     <input type="radio" name="categories" id="sport" value="sport">
                     <label for="sport">Sport</label>
@@ -48,14 +48,14 @@
         <div>
             <h5>{{.Body}}</h5>
         </div>
-            <form action="/Likes?Liked_Post_id={{.Postid}}&user={{.CurrentUsser}}" method="post">
-                <div>
-                    <label>Likes:</label>
-                    <button type="submit" data-postid="{{.Postid}}" class="react" name="reaction" value="like">👍 0</button>
-                    <!-- <label>Dislikes:</label> -->
-                    <!-- <button type="submit" class="react" name="reaction" value="dislike">👎 0</button> -->
-                </div>
-            </form>
+        <form action="/Likes?Liked_Post_id={{.Postid}}&user={{.CurrentUsser}}" method="post">
+            <div>
+                <label>Likes:</label>
+                <button type="submit" data-postid="{{.Postid}}" class="react" name="reaction" value="like">0</button>
+                <!-- <label>Dislikes:</label> -->
+                <!-- <button type="submit" class="react" name="reaction" value="dislike">👎 0</button> -->
+            </div>
+        </form>
         <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
         <sub class="comment_container">
             <h2>Comments : </h2>
@@ -120,47 +120,28 @@
         </form>
     `
     })
-    const likes = document.querySelectorAll('.react');
-
-    likes.forEach(ele => ele.addEventListener('click', (event) => {
-        const reaction = event.target.value;
-        const user = "{{$.Currenuser}}"
-        console.log(user)
-        const parent = ele.closest('.postcontainer');  // buttons are inside a post container
-
-        const likeButton = parent.querySelector(".react[value=like]");
-        const dislikeButton = parent.querySelector(".react[value=dislike]");
-        if (reaction === "like") {
-            count1 = parseInt(ele.innerHTML);
-            likeButton.style.backgroundColor = "green";
-            likeButton.innerHTML = count1 + 1;
-            dislikeButton.style.backgroundColor = "";
-            dislikeButton.innerHTML = 0;
-            likeButton.disabled = true
-            dislikeButton.disabled = false
-        } else if (reaction === "dislike") {
-            count2 = parseInt(ele.innerHTML);
-            dislikeButton.innerHTML = count2 + 1;
-            dislikeButton.style.backgroundColor = "red";
-            likeButton.style.backgroundColor = "";
-            likeButton.innerHTML = 0;
-            dislikeButton.disabled = true
-            likeButton.disabled = false
+    // const parent = document.querySelector('.postcontainer');
+    // console.log("parent", parent)
+    const likeButton = document.getElementsByClassName('react');
+    window.addEventListener("beforeunload", () => {
+        sessionStorage.setItem("scrollPos", window.scrollY);
+    });
+    window.addEventListener('load', () => {
+        const savedPosition = sessionStorage.getItem('scrollPos');
+        if (savedPosition) {
+            window.scrollTo(0, parseInt(savedPosition, 10));
         }
-    }));
-    // const currentUser = "{{.Currenuser}}";
-    // const likesButton = document.getElementsByClassName(".react")
-    // likeButton.forEach(button => {
-    //     button.addEventListener('click', async () => {
-    //         // const reaction = document.getAttribute('reaction');
-    //         const postID = document.getAttribute('data-postid');
-    //         const user = "{{$.Currenuser}}"
-    //         await fetch(`/like?postid=${postId}&user=${user}`, {
-    //             method: 'POST'
-    //         })
-    //     })
-    // })
-
+    });
+    likeButton.addEventListener('click', (event) => {
+        let count1 = parseInt(ele.innerHTML, 10) || 0;
+        event.preventDefault();
+        const reaction = event.target.value;
+        console.log("count1", count1)
+        if (reaction === "like") {
+            event.target.style.backgroundColor = "green";
+            event.target.innerHTML = count1 + 1;
+        }
+    });
 </script>
 
 </html>

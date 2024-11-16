@@ -138,7 +138,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		for likesRow.Next() {
 			var like_id, liked_post_id int
 			var user_name string
-			if err := likesRow.Scan(&like_id, &liked_post_id, &user_name); err != nil {
+			if err := likesRow.Scan(&like_id, &user_name, &liked_post_id); err != nil {
 				fmt.Println("Scan ::::  ==> ", err)
 				continue
 			}
@@ -170,15 +170,6 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			posts_toshow[i], posts_toshow[j] = posts_toshow[j], posts_toshow[i]
 		}
 	}
-	// if r.Method == "POST" {
-	// 	fmt.Println("current user :", CurrentUser)
-	// 	curr := r.FormValue("user")
-	// 	reaction := r.FormValue("reaction")
-	// 	postName := r.FormValue("postid")
-	// 	fmt.Println("current :", curr)
-	// 	fmt.Println("reaction :", reaction)
-	// 	fmt.Println("post name :", postName)
-	// }
 	err = tmpl.Execute(w, struct {
 		Currenuser string
 		Posts      []Post
