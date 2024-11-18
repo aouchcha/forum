@@ -122,13 +122,10 @@
     window.addEventListener("beforeunload", () => {
         sessionStorage.setItem("scrollPos", window.scrollY);
         likeButton.forEach(ele => ele.addEventListener('click', (button) => {
-            event.preventDefault()
+            button.preventDefault()
             let counter = ele.textContent
-            if (button.style.backgroundColor === "") {
-                ele.textContent = parseInt(counter) + 1
-                button.style.backgroundColor = "green"
-            }
-            button.style.backgroundColor = "green"
+            ele.innerHTML = parseInt(counter) + 1
+            consolee.log(counter)
         }));
 
     });
