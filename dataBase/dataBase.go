@@ -74,13 +74,16 @@ func init() {
 	}
 	const LikesTable string = `
 	CREATE TABLE IF NOT EXISTS likes (
-		like_id INTEGER PRIMARY KEY AUTOINCREMENT,
-		user_name_like TEXT NOT NULL,
-		liked_post_id INTEGER NOT NULL,
-		FOREIGN KEY (liked_post_id) REFERENCES posts(id),
-		FOREIGN KEY (user_name_like) REFERENCES users(username),
-		UNIQUE (user_name_like, liked_post_id)
-	)`
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_id INTEGER NOT NULL,             
+    post_id INTEGER NOT NULL,
+	liked_comment_id INTEGER ,             
+    username TEXT NOT NULL,
+    FOREIGN KEY (liked_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE, 
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, 
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, 
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE  
+);`
 	if _, err := Db.Exec(LikesTable); err != nil {
 		fmt.Println("likes error : \n", err)
 		return

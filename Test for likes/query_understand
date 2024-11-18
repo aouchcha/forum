@@ -1,0 +1,66 @@
+-- Create the users table to store user information
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, -- Unique identifier for each user
+    name TEXT NOT NULL,                  -- Name of the user
+    email TEXT NOT NULL,                 -- Email of the user (should be unique, but not enforced here)
+    password TEXT NOT NULL               -- Hashed password of the user
+);
+
+-- Create the posts table to store posts created by users
+CREATE TABLE IF NOT EXISTS posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, -- Unique identifier for each post
+    title TEXT NOT NULL,                  -- Title of the post
+    content TEXT NOT NULL,                -- Content (body) of the post
+    author INTEGER NOT NULL,              -- User ID of the post's author
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp of when the post was created
+    FOREIGN KEY (author) REFERENCES users(id) -- Establishes a relationship with the users table
+);
+
+-- Create the likes table to store likes for posts
+CREATE TABLE IF NOT EXISTS likes (
+    user_id INTEGER NOT NULL,             -- ID of the user who liked the post
+    post_id INTEGER NOT NULL,             -- ID of the post that was liked
+    username TEXT NOT NULL,             -- Username of the user who liked the post
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, -- Relationship with users
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, -- Relationship with users
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE  -- Relationship with posts
+);
+
+-- Insert sample data into the users table
+INSERT INTO users (name, email, password) VALUES
+('John Doe', 'john@example.com', 'hashedpassword1'),
+('Jane Smith', 'jane@example.com', 'hashedpassword2');
+
+-- Insert sample data into the posts table
+INSERT INTO posts (title, content, author) VALUES
+('First Post', 'Hello World!', 1),
+('Second Post', 'Another update!', 2);
+
+-- Insert sample data into the likes table
+INSERT INTO likes (user_id, post_id) VALUES
+(1, 1), -- User 1 likes Post 1
+(2, 1), -- User 2 likes Post 1
+(1, 2); -- User 1 likes Post 2
+
+-- Query to fetch all posts with their like counts
+SELECT posts.id, posts.title, posts.content, COUNT(likes.post_id) AS like_count
+FROM posts
+LEFT JOIN likes ON posts.id = likes.post_id 
+GROUP BY posts.id; 
+-- Joins the posts and likes tables
+-- Groups results by each post to calculate like counts
+/*************************************************/
+-- Query to add a like to a post
+-- Replace :user_id and :post_id with actual values when running this query
+INSERT INTO likes (user_id, post_id) VALUES (:user_id, :post_id);
+
+-- Query to remove a like from a post
+-- Replace :user_id and :post_id with actual values when running this query
+DELETE FROM likes
+WHERE user_id = :user_id AND post_id = :post_id;
+
+-- Query to fetch the number of likes for a specific post
+-- Replace :post_id with the actual post ID
+SELECT COUNT(*) AS like_count
+FROM likes
+WHERE post_id = :post_id;

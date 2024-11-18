@@ -48,12 +48,11 @@
         <div>
             <h5>{{.Body}}</h5>
         </div>
-        <form action="/Likes?Liked_Post_id={{.Postid}}&user={{.CurrentUsser}}" method="post">
+        <form action="/Likes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+            method="post">
             <div>
                 <label>Likes:</label>
-                <button type="submit" data-postid="{{.Postid}}" class="react" name="reaction" value="like">0</button>
-                <!-- <label>Dislikes:</label> -->
-                <!-- <button type="submit" class="react" name="reaction" value="dislike">👎 0</button> -->
+                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
             </div>
         </form>
         <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
@@ -66,7 +65,6 @@
                 <sub><span>{{.Comment_time}}</span> ago </sub>
             </div>
             {{end}}
-
             <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
                 <br>
                 <div class="bb">
@@ -120,11 +118,19 @@
         </form>
     `
     })
-    // const parent = document.querySelector('.postcontainer');
-    // console.log("parent", parent)
-    const likeButton = document.getElementsByClassName('react');
+    const likeButton = document.querySelectorAll('.react')
     window.addEventListener("beforeunload", () => {
         sessionStorage.setItem("scrollPos", window.scrollY);
+        likeButton.forEach(ele => ele.addEventListener('click', (button) => {
+            event.preventDefault()
+            let counter = ele.textContent
+            if (button.style.backgroundColor === "") {
+                ele.textContent = parseInt(counter) + 1
+                button.style.backgroundColor = "green"
+            }
+            button.style.backgroundColor = "green"
+        }));
+
     });
     window.addEventListener('load', () => {
         const savedPosition = sessionStorage.getItem('scrollPos');
@@ -132,16 +138,7 @@
             window.scrollTo(0, parseInt(savedPosition, 10));
         }
     });
-    likeButton.addEventListener('click', (event) => {
-        let count1 = parseInt(ele.innerHTML, 10) || 0;
-        event.preventDefault();
-        const reaction = event.target.value;
-        console.log("count1", count1)
-        if (reaction === "like") {
-            event.target.style.backgroundColor = "green";
-            event.target.innerHTML = count1 + 1;
-        }
-    });
+
 </script>
 
 </html>

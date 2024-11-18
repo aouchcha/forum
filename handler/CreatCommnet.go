@@ -12,7 +12,7 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.FormValue("comments"))
 	fmt.Println(r.URL.Query().Get("postid"))
 	fmt.Println(r.URL.Query().Get("writer"))
-
+	
 	comment_body := r.FormValue("comments")
 	comment_writer := r.URL.Query().Get("writer")
 

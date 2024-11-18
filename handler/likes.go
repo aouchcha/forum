@@ -1,28 +1,47 @@
 package handler
 
 import (
+	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
 	data "main/dataBase"
 )
 
+// var post []Post
+
 func Like(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.Query().Get("Liked_Post_id"))
-	fmt.Println(r.URL.Query().Get("user"))
 	user := r.URL.Query().Get("user")
-	liked_post_id, err := strconv.Atoi(r.URL.Query().Get("Liked_Post_id"))
+	postid := r.URL.Query().Get("Liked_Post_id")
+	user_id, err := strconv.Atoi(r.URL.Query().Get("user_id"))
 	if err != nil {
 		http.Error(w, "Internal server Error", http.StatusInternalServerError)
 		return
 	}
-	_, err = data.Db.Exec("INSERT INTO likes (liked_post_id, user_name_like) VALUES (?, ?)", liked_post_id, user)
+	liked_post_id, err := strconv.Atoi(r.URL.Query().Get("Liked_Post_id"))
 	if err != nil {
-		log.Println("Error inserting user:", err)
-		http.Error(w, "Internal server error", 500)
+		fmt.Println("Error converting liked_post_id to int")
+		http.Error(w, "Internal server Error", http.StatusInternalServerError)
 		return
+	}
+	fmt.Println("liked_post_id :", liked_post_id)
+	fmt.Println("user_id :", user_id)
+	var exists bool
+	err = data.Db.QueryRow("SELECT id FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
+	if err == sql.ErrNoRows {
+		_, err = data.Db.Exec("INSERT INTO likes (user_id, post_id, username) VALUES (?, ?, ?)", user_id, postid, user)
+		if err != nil {
+			fmt.Println("Error liking post", err)
+			http.Error(w, "Error liking post", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		_, err = data.Db.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
+		if err != nil {
+			http.Error(w, "Error unliking post", http.StatusInternalServerError)
+			return
+		}
 	}
 	http.Redirect(w, r, "/forum?user="+user, http.StatusSeeOther)
 }
