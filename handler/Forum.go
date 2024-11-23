@@ -28,9 +28,7 @@ type Reactions struct {
 	DislikeCount int
 }
 
-var (
-	postt     Post
-)
+var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
@@ -48,7 +46,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	cat_to_filter := r.FormValue("categories")
 	cookie1, err1 := r.Cookie("session_token")
 	cookie2, err2 := r.Cookie("user_token")
-	
+
 	if err1 != nil || err2 != nil {
 		cookie3, err3 := r.Cookie("guest_token")
 		if err3 != nil {
@@ -68,17 +66,19 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	posts_toshow, post_id := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
+	posts_toshow, comment_id, post_id := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
 	// if posts_toshow == nil {
 	// 	http.Error(w,"Internal Server You Droped a table while the code runing",http.StatusInternalServerError)
 	// 	return
 	// }
 	err = tmpl.Execute(w, struct {
 		Currenuser string
+		comment_id int
 		Post_id    int
 		Posts      []Post
 	}{
 		Currenuser: CurrentUser,
+		comment_id: comment_id,
 		Post_id:    post_id,
 		Posts:      posts_toshow,
 	})
@@ -90,7 +90,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string) ([]Post, int) {
+func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string) ([]Post, int, int) {
 	var post_rows *sql.Rows
 	var err error
 	if cat_to_filter != "all" && cat_to_filter != "" {
@@ -99,12 +99,12 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			SELECT posts.* FROM posts
 			JOIN categories ON posts.id = categories.post_id
 			WHERE categories.categorie = ?`, cat_to_filter)
-			if err != nil {
-				fmt.Println("ERR",err)
-				if err == sql.ErrNoRows{
-					return nil,0
-				}
+		if err != nil {
+			fmt.Println("ERR", err)
+			if err == sql.ErrNoRows {
+				return nil, 0, 0
 			}
+		}
 	} else {
 		post_rows, err = data.Db.Query("SELECT * FROM posts;")
 	}
@@ -114,11 +114,11 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				log.Printf("Template execution error: %v", err)
 			}
-		}else {
+		} else {
 
-			fmt.Println("ERR==>",err)
+			fmt.Println("ERR==>", err)
 			http.Error(w, "ana hna Internal server error", http.StatusInternalServerError)
-			return nil, 0
+			return nil, 0, 0
 		}
 	}
 	defer post_rows.Close()
@@ -136,18 +136,18 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		post_id = id
 		var likee Reactions
 		var dislikee Reactions
-		err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE post_id = ?`, post_id).Scan(&likee.LikeCount)
-		if err != nil {
-			fmt.Println("Error fetching like count ==>", err)
-			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
-			return nil, 0
-		}
-		err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE post_id = ?`, post_id).Scan(&dislikee.DislikeCount)
-		if err != nil {
-			fmt.Println("Error fetching like count ==>", err)
-			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
-			return nil, 0
-		}
+		// err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE post_id = ?`, post_id).Scan(&likee.LikeCount)
+		// if err != nil {
+		// 	fmt.Println("Error fetching like count ==>", err)
+		// 	http.Error(w, "Error fetching like count", http.StatusInternalServerError)
+		// 	return nil, 0
+		// }
+		// err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE post_id = ?`, post_id).Scan(&dislikee.DislikeCount)
+		// if err != nil {
+		// 	fmt.Println("Error fetching like count ==>", err)
+		// 	http.Error(w, "Error fetching like count", http.StatusInternalServerError)
+		// 	return nil, 0
+		// }
 		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
@@ -171,7 +171,5 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			posts_toshow[i], posts_toshow[j] = posts_toshow[j], posts_toshow[i]
 		}
 	}
-	return posts_toshow, comment_id
+	return posts_toshow, comment_id, post_id
 }
-
-

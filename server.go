@@ -21,11 +21,12 @@ func main() {
 	http.HandleFunc("/create_post", creations.CreatePost)
 	http.HandleFunc("/InsertPost", creations.InsertPost)
 	http.HandleFunc("/Likes", reactions.Like)
+	http.HandleFunc("/api/likes", reactions.LikesCounterWithApi)
 	http.HandleFunc("/Dislikes", reactions.Dislikes)
 	http.HandleFunc("/logout", userData.Logout)
 	http.HandleFunc("/style/", handler.Style)
 	http.HandleFunc("/create_comment", creations.CreatCommnet)
-	http.HandleFunc("/showcomments",creations.ShowComments)
+	http.HandleFunc("/showcomments", creations.ShowComments)
 	fmt.Println("Server started on http://localhost:" + port)
 	http.ListenAndServe(":"+port, nil)
 }

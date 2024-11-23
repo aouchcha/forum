@@ -52,6 +52,7 @@
         <p>{{.Body}}</p>
         <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
         <div class="reactions-container">
+            <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
             <form id="like_post"
                 action="/Likes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
@@ -135,25 +136,6 @@
     }
     const CreateButton = document.getElementById('Create')
     const HiddenDiv = document.getElementById('temp')
-    // window.addEventListener("beforeunload", () => {
-    // sessionStorage.setItem("scrollPos", window.scrollY);
-    // const forms = document.getElementById('like_post')
-
-    // forms.forEach(form => {
-    // forms.addEventListener("submit", (e) => {
-    //     e.preventDefault()
-    //     const path = forms.getAttribute("action")
-    //     const formData = new FormData(forms)
-    //     fetch(path, {
-    //         method: "post",
-    //         body: formData
-    //     })
-    //         .then(response => response.text()
-    //         )
-    //         .then(data => console.log("server response :", data))
-    //         .catch(error => console.log("error", error))
-    // })
-    // })
 
     const commentForms = document.querySelectorAll(".comment_container form")
     commentForms.forEach(cForm => {
@@ -173,9 +155,12 @@
 
 
 
-    const likeForms = document.querySelectorAll("#like_post")
-    likeForms.forEach(cForm => {
-        cForm.addEventListener("submit", (e) => {
+    const Forms = document.querySelectorAll(".reactions-container form")
+    // const likes = document.querySelectorAll(".reactions-container input[id='postidValue']")
+    postid = document.getElementById("postidValue").value
+    console.log("postid : ", postid)
+    Forms.forEach(Form => {
+        Form.addEventListener("submit", (e) => {
             e.preventDefault()
             const path = e.currentTarget.getAttribute("action")
             const formData = new FormData(e.currentTarget)
@@ -183,32 +168,23 @@
                 method: "post",
                 body: formData
             })
-            console.log("formData", formData)
-            console.log("path", path)
-            // e.currentTarget.querySelector("textarea").value = ""
+            let LikesCounter = e.currentTarget.querySelector(".react").innerHTML
+            console.log("LikesCounter ==>", LikesCounter)
+            console.log("postid in fetch : ", postid)
+            fetch("/api/likes?postid=${postid}")
+                console.log()
+                    .then(response => {
+                        return response.json()
+                    })
+                    .then(data => {
+                        console.log("LikeCount ==>", data.LikeCount)
+                        console.log("DislikeCount ==>", data.DislikeCount)
+                        LikesCounter = parseInt(LikesCounter) + parseInt(data.LikeCount) + " like!"
+                        console.log("LikesCounter2 ==>", LikesCounter)
+                    })
+                    .catch(err => console.log("err :", err))
         })
     })
-    // GetResponse()
-    // });
-    // window.addEventListener('load', () => {
-    //     const savedPosition = sessionStorage.getItem('scrollPos');
-    //     if (savedPosition) {
-    //         window.scrollTo(0, parseInt(savedPosition, 10));
-    //     }
-    // });
-    // const commentForms = document.querySelectorAll(".comment_container form")
-    // commentForms.forEach(cForm => {
-    //     cForm.addEventListener("submit", (e) => {
-    //         e.preventDefault()
-    //         const path = e.currentTarget.getAttribute("action")
-    //         const formData = new FormData(e.currentTarget)
-    //         fetch(path, {
-    //             method: "post",
-    //             body: formData
-    //         })
-    //         e.currentTarget.querySelector("textarea").value = ""
-    //     })
-    // })
 
 </script>
 
