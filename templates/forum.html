@@ -1,107 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post Pages</title>
     <link rel="stylesheet" href="../style/PostPage.css">
 </head>
+
 <body>
     <header class="name">
         <div class="header">
             Hello Mr {{.Currenuser}}
             <form action="/logout" method="post">
-                <input type="text" name="username" value="{{.Currenuser}}" style="visibility: hidden;">
-                <button type="submit" class="btn btn-logout">Log Out</button>
+                <button type="submit" class="btn">Log Out</button>
             </form>
         </div>
         <br>
-        <div class="postcreation" id="postcreation"></div>
         <div class="temp" id="temp">
             <div class="creation">
-                <button type="submit" class="oo" id="Create">Create Post</button>
+                <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create">Create
+                        Post</button></a>
             </div>
-            <form action="/forum?user={{.Currenuser}}" method="post">
+            <form action="/forum" method="get">
                 <div class="filter">
+                    <input type="radio" name="categories" id="all" value="all">
+                    <label for="all">All</label>
                     <input type="radio" name="categories" id="sport" value="sport">
                     <label for="sport">Sport</label>
                     <input type="radio" name="categories" id="politic" value="politic">
                     <label for="politic">Politic</label>
-                    <input type="radio" name="categories" id="all" value="all">
-                    <label for="all">All</label>
                     <input type="radio" name="categories" id="enteairtement" value="enteairtement">
                     <label for="enteairtement">Enteairtement</label>
+                    <input type="radio" name="categories" id="economie" value="economie">
+                    <label for="economie">Economie</label>
+                    <input type="radio" name="categories" id="it" value="it">
+                    <label for="it">IT</label>
                     <pre>    </pre>
-                    <button type="submit" class="oo" id="filter">Filter</button>
+                    <button type="submit" class="btn" id="filter">Filter</button>
                 </div>
             </form>
         </div>
     </header>
+    <h2 style="color: aliceblue;text-align: center;">Check the Newest Of your FEED!</h2>
+    {{if not .Posts}}
+    <h1 style="color: aliceblue;text-align: center;">No Posts Available!</h1>
+    {{end}}
     {{range .Posts}}
-        <div class="postcontainer">
-            <h3>title: {{.Title}}</h3>
-            <h4>categorie: {{.Categorie}}</h4>
-            <p>{{.Body}}</p>
-            <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
-               <sub class="comment_container">
-                    {{range .Comments}}
-                        <div class="one_comment">
-                            <h4>by {{.Comment_writer}}</h4>
-                            <p>{{.Comment_body}}</p>
-                            <sub><span>{{.Comment_time}}</span> ago </sub>
-                        </div>
-                    {{end}}
-                    <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
-                        <br>
-                        <div class="bb">
-                            <textarea name="comments" id="comments" placeholder="Add your comments..."></textarea>
-                            <br>
-                            <button type="submit" class="btn">Comment</button>
-                       </div>
-                    </form>
-                </sub>
+    <div class="postcontainer">
+        <h3>title: {{.Title}}</h3>
+        <p>{{.Body}}</p>
+        <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
+        <div class="reactions-container">
+            <form id="like_post"
+                action="/Likes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                method="post">
+
+                <label>Likes:</label>
+                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
+
+            </form>
+            <form action="/Dislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                method="post">
+
+                <label>Dislikes:</label>
+                <button type="submit" class="react" name="reaction" value="dislike">{{.DislikeCounter}}</button>
+
+            </form>
         </div>
+        <div class="comment_container">
+            <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
+                <br>
+                <div class="bb">
+                    <textarea name="comments" id="comments" placeholder="Add your comments..."></textarea>
+                    <br>
+                    <button type="submit" class="bttn" id="comment">Comment</button>
+                </div>
+            </form>
+            <br>
+        </div>
+        <form action="/showcomments" method="get" class="jj">
+            <input type="hidden" value="{{.Postid}}" name="postid">
+            <input type="hidden" value="{{.CurrentUsser}}" name="writer">
+
+            <button type="submit" class="bttn">See All Comments</button>
+        </form>
+    </div>
     {{end}}
 </body>
 <script>
+    const comment = document.getElementsByClassName("bttn")
+    const create = document.getElementById("Create")
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+    let username = getCookie("guest_token");
+    console.log(username);
+
+    if (username == "guest") {
+        create.disabled = true
+        for (let cm of comment) {
+            // console.log(cm)
+            cm.disabled = true
+        }
+    }
+
     const times = document.querySelectorAll('span')
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
     function timeAffi(time) {
         let now = new Date()
         let then = new Date(time)
-        let min = ((now-then)/(1000*60)).toFixed()
-        let hours = ((now-then)/(1000*3600)).toFixed()
-        let days  = ((now-then)/(1000*3600*24)).toFixed()
+        let min = ((now - then) / (1000 * 60)).toFixed()
+        let hours = ((now - then) / (1000 * 3600)).toFixed()
+        let days = ((now - then) / (1000 * 3600 * 24)).toFixed()
         if (min < 60) {
             return min + " minutes"
-        }else if (hours < 24) {
+        } else if (hours < 24) {
             return hours + " hours"
-        }else {
+        } else {
             return days + " day"
         }
     }
     const CreateButton = document.getElementById('Create')
     const HiddenDiv = document.getElementById('temp')
-        CreateButton.addEventListener('click' ,(event) => {
-        HiddenDiv.style.visibility = "hidden"
-        const CreatePost = document.getElementById('postcreation')
-        CreatePost.innerHTML = `
-        <form action="/create_post?user={{.Currenuser}}" method="post">
-            <h3 class="jj">Title</h3>
-            <textarea name="title" id="title" placeholder="Enter your title ..."></textarea>
-            <h3 class="jj">Body</h3>
-            <textarea name="body" id="body" placeholder="Enter your body ..."></textarea><br>
-            <label for="categories" class="jj">Choose a chategorie:</label>
-            <select name="categories" id="categories">
-                <option value="sport">sport</option>
-                <option value="politic">politic</option>
-                <option value="enteairtement">enteairtement</option>
-                <option value="random">random</option>
-            </select>
-            <br><br>
-            <button type="submit" class="oo">Publish The Post</button>
-        </form>
-    `
+    // window.addEventListener("beforeunload", () => {
+    // sessionStorage.setItem("scrollPos", window.scrollY);
+    // const forms = document.getElementById('like_post')
+
+    // forms.forEach(form => {
+    // forms.addEventListener("submit", (e) => {
+    //     e.preventDefault()
+    //     const path = forms.getAttribute("action")
+    //     const formData = new FormData(forms)
+    //     fetch(path, {
+    //         method: "post",
+    //         body: formData
+    //     })
+    //         .then(response => response.text()
+    //         )
+    //         .then(data => console.log("server response :", data))
+    //         .catch(error => console.log("error", error))
+    // })
+    // })
+
+    const commentForms = document.querySelectorAll(".comment_container form")
+    commentForms.forEach(cForm => {
+        cForm.addEventListener("submit", (e) => {
+            e.preventDefault()
+            const path = e.currentTarget.getAttribute("action")
+            const formData = new FormData(e.currentTarget)
+            fetch(path, {
+                method: "post",
+                body: formData
+            })
+            e.currentTarget.querySelector("textarea").value = ""
+        })
     })
+
+
+
+
+
+    const likeForms = document.querySelectorAll("#like_post")
+    likeForms.forEach(cForm => {
+        cForm.addEventListener("submit", (e) => {
+            e.preventDefault()
+            const path = e.currentTarget.getAttribute("action")
+            const formData = new FormData(e.currentTarget)
+            fetch(path, {
+                method: "post",
+                body: formData
+            })
+            console.log("formData", formData)
+            console.log("path", path)
+            // e.currentTarget.querySelector("textarea").value = ""
+        })
+    })
+    // GetResponse()
+    // });
+    // window.addEventListener('load', () => {
+    //     const savedPosition = sessionStorage.getItem('scrollPos');
+    //     if (savedPosition) {
+    //         window.scrollTo(0, parseInt(savedPosition, 10));
+    //     }
+    // });
+    // const commentForms = document.querySelectorAll(".comment_container form")
+    // commentForms.forEach(cForm => {
+    //     cForm.addEventListener("submit", (e) => {
+    //         e.preventDefault()
+    //         const path = e.currentTarget.getAttribute("action")
+    //         const formData = new FormData(e.currentTarget)
+    //         fetch(path, {
+    //             method: "post",
+    //             body: formData
+    //         })
+    //         e.currentTarget.querySelector("textarea").value = ""
+    //     })
+    // })
+
 </script>
+
 </html>

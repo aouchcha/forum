@@ -1,25 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/login.css">
     <title>Login</title>
 </head>
+
 <body>
     <form action="/login" method="post">
-        <div class="login-container">
+        <div class="login-container" id="login-container">
             <h1>Welcome Back</h1>
+            {{ if not .Exist}}
+            <p style="color: tomato;">Incorrect password/username</p>
+            {{end}}
             <img src="../style/programmer.png" alt="Profile" class="profile-img">
             <div class="input-group">
-                <input type="text" name="username" placeholder="Username" required>
+                <input type="text" name="username" placeholder="Username" autocomplete="off" required>
             </div>
             <div class="input-group">
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="password" name="password" placeholder="Password" autocomplete="off" required>
             </div>
             <button class="btn btn-login" type="submit">Sign In</button>
+            <button class="btn btn-login" type="submit" onclick="window.location.href='/register';">Sign Up</button>
+            <button class="btn btn-login" type="submit" onclick="window.location.href='/guest';">Continue as
+                Guest</button>
             <button class="btn btn-home" type="button" onclick="window.location.href='/';">Back to Home</button>
         </div>
     </form>
 </body>
+<script>
+        // const parent = document.getElementById('login-container');
+        // const inputs = parent.getElementsByTagName('input');
+        // for (let inp of inputs) {
+        //     console.log("inp.textContent : ", inp.textContent);
+        //     if (inp.value != '') {
+        //         inp.value = '';
+        //     }
+        // }
+</script>
+
 </html>

@@ -26,18 +26,18 @@ func init() {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );`
 
-	createSessionsTable := `
-    CREATE TABLE IF NOT EXISTS sessions (
-        user_id INTEGER NOT NULL,
-        session_id TEXT PRIMARY KEY,
-        expires_at DATETIME NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );`
-
 	_, err = Db.Exec(createUsersTable)
 	if err != nil {
 		fmt.Println("Error creating users table:", err)
 	}
+
+	createSessionsTable := `
+	CREATE TABLE IF NOT EXISTS sessions (
+		user_id INTEGER NOT NULL,
+		session_id TEXT PRIMARY KEY,
+		expires_at DATETIME NOT NULL,
+		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+	);`
 
 	_, err = Db.Exec(createSessionsTable)
 	if err != nil {
@@ -50,11 +50,24 @@ func init() {
 		post_creator TEXT NOT NULL,
 		title TEXT NOT NULL,
 		body TEXT NOT NULL,
-		categorie TEXT NOT NULL,
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (post_creator) REFERENCES users(username)
 	);`
+
 	if _, err := Db.Exec(CreatPosts); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	const CreatCategories string = `
+	CREATE TABLE IF NOT EXISTS categories (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		post_id INTEGER NOT NULL,
+		categorie TEXT NOT NULL,
+		FOREIGN KEY (post_id) REFERENCES posts(id)
+	)`
+
+	if _, err := Db.Exec(CreatCategories); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -68,9 +81,41 @@ func init() {
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (post_commented_id) REFERENCES posts(id)
 	)`
+
 	if _, err := Db.Exec(CommentsTable); err != nil {
 		fmt.Println(err)
 		return
 	}
-
+	const LikesTable string = `
+	CREATE TABLE IF NOT EXISTS likes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_id INTEGER NOT NULL,             
+    post_id INTEGER ,
+	liked_comment_id INTEGER ,             
+    username TEXT NOT NULL,
+    FOREIGN KEY (liked_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE, 
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, 
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, 
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE  
+);`
+	if _, err := Db.Exec(LikesTable); err != nil {
+		fmt.Println("likes error : \n", err)
+		return
+	}
+	const DislikeTable string = `
+	CREATE TABLE IF NOT EXISTS dislikes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_id INTEGER NOT NULL,             
+    post_id INTEGER ,
+	disliked_comment_id INTEGER ,             
+    username TEXT NOT NULL,
+    FOREIGN KEY (disliked_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE, 
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE, 
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, 
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE  
+);`
+	if _, err := Db.Exec(DislikeTable); err != nil {
+		fmt.Println("dislikes error : \n", err)
+		return
+	}
 }

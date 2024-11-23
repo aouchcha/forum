@@ -35,7 +35,7 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
             INSERT INTO users (email, username, password)
             VALUES (?, ?, ?)`, email, username, password)
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

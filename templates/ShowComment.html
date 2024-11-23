@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Comments</title>
+    <link rel="stylesheet" href="../style/PostPage.css">
+</head>
+
+<body>
+    <div class="comment_container">
+        {{range .}}
+        <div class="one_comment">
+            <h4>by {{.Comment_writer}}</h4>
+            <p>{{.Comment_body}}</p>
+            <sub><span>{{.Comment_time}}</span> ago </sub>
+            <div>
+                <form action="/Likes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post">
+                    <label>Likes:</label>
+                    <button type="submit" class="react" name="reaction" value="likeComment">
+                        {{.Comment_likes_count}} </button>
+                </form>
+                <form
+                    action="/Dislikes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post">
+                    <label>Dislikes:</label>
+                    <button type="submit" class="react" name="reaction"
+                        value="dislike">{{.Comment_dislikes_count}}</button>
+
+                </form>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</body>
+
+</html>
