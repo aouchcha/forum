@@ -2,12 +2,12 @@ package handler
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
-	"log"
+	data "main/dataBase"
+	// handler "main/handler"
 	"net/http"
 	"text/template"
-
-	data "main/dataBase"
 )
 
 type Post struct {
@@ -32,12 +32,12 @@ var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
-		http.Error(w, "page not found", http.StatusNotFound)
+		ChooseError(w, "Tpage not found", 404)
 		return
 	}
 	tmpl, err := template.ParseFiles("templates/forum.html")
 	if err != nil {
-		http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
+		ChooseError(w, "Internal Server Error", 500)
 		return
 	}
 
@@ -50,8 +50,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	if err1 != nil || err2 != nil {
 		cookie3, err3 := r.Cookie("guest_token")
 		if err3 != nil {
-			fmt.Println("ana hna mouchkil fl cookie : ", err3)
-			http.Error(w, "Bad Request if you want to continue as a guest choose it", http.StatusBadRequest)
+			ChooseError(w, "Bad Request if you want to continue as a guest choose it", 400)
 			return
 		}
 		CurrentUser = cookie3.Value
@@ -66,11 +65,11 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	posts_toshow, comment_id, post_id := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
-	// if posts_toshow == nil {
-	// 	http.Error(w,"Internal Server You Droped a table while the code runing",http.StatusInternalServerError)
-	// 	return
-	// }
+	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
+	if err != nil {
+		ChooseError(w, err.Error(), 500)
+		return
+	}
 	err = tmpl.Execute(w, struct {
 		Currenuser string
 		comment_id int
@@ -82,43 +81,40 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		Post_id:    post_id,
 		Posts:      posts_toshow,
 	})
-	fmt.Println("LikesCount :", postt.LikesCounter)
+	// fmt.Println("LikesCount :", postt.LikesCounter)
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Internal Server", http.StatusInternalServerError)
+		ChooseError(w, "Internal Server Error", 500)
 		return
 	}
 }
 
-func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string) ([]Post, int, int) {
+func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string) ([]Post, int, int, error) {
 	var post_rows *sql.Rows
 	var err error
 	if cat_to_filter != "all" && cat_to_filter != "" {
 		// post_rows, err = data.Db.Query("SELECT post_id FROM categories WHERE categorie = ?;", cat_to_filter)
-		post_rows, err = data.Db.Query(`
-			SELECT posts.* FROM posts
-			JOIN categories ON posts.id = categories.post_id
-			WHERE categories.categorie = ?`, cat_to_filter)
-		if err != nil {
-			fmt.Println("ERR", err)
-			if err == sql.ErrNoRows {
-				return nil, 0, 0
-			}
+		if cat_to_filter == "myposts" {
+			post_rows, err = data.Db.Query(`SELECT * FROM posts WHERE post_creator = ?`, CurrentUser)
+		} else if cat_to_filter == "likedposts" {
+			fmt.Println("liked posts")
+			post_rows, err = data.Db.Query(`
+				SELECT posts.* FROM posts 
+				JOIN likes ON posts.id = likes.post_id 
+				WHERE likes.username = ?`, CurrentUser)
+		} else {
+			post_rows, err = data.Db.Query(`
+				SELECT p.* FROM posts p
+				JOIN categories c ON p.id = c.post_id
+				WHERE c.categorie = ?`, cat_to_filter)
 		}
 	} else {
 		post_rows, err = data.Db.Query("SELECT * FROM posts;")
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
-			if err := tmpl.Execute(w, CurrentUser); err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				log.Printf("Template execution error: %v", err)
-			}
+			return nil, 0, 0, errors.New("no Feild in data base")
 		} else {
-
-			fmt.Println("ERR==>", err)
-			http.Error(w, "ana hna Internal server error", http.StatusInternalServerError)
-			return nil, 0, 0
+			return nil, 0, 0, errors.New("internal server error you deleted a table from the data base shut down the server and restar it again")
 		}
 	}
 	defer post_rows.Close()
@@ -133,6 +129,7 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			fmt.Println(err)
 			continue
 		}
+		// fmt.Println(usernamepublished, title, body)
 		post_id = id
 		var likee Reactions
 		var dislikee Reactions
@@ -164,12 +161,12 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 	// fmt.Println("postt.CurrentUser_id : ", postt.CurrentUser_id)
 	// fmt.Println("LikesCounter in posttt : ", postt.LikesCounter)
 	if err := post_rows.Err(); err != nil {
-		log.Fatal(err)
+		return nil, 0, 0, errors.New("Error ma3reftch fin")
 	}
 	for i := 0; i < len(posts_toshow)-1; i++ {
 		for j := i + 1; j < len(posts_toshow); j++ {
 			posts_toshow[i], posts_toshow[j] = posts_toshow[j], posts_toshow[i]
 		}
 	}
-	return posts_toshow, comment_id, post_id
+	return posts_toshow, comment_id, post_id, nil
 }

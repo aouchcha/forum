@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OUPS!!</title>
+    <link rel="stylesheet" href="style/error.css">
 </head>
 <body>
-    <h1>
-        ERREUR 404 | PAGE NON TROUVEE
-    </h1>
+   <div class="Err">
+        <h1>{{.ErrMessage}}</h1>
+        <h2>{{.ErrCode}}</h2>
+   </div>
 </body>
 </html>

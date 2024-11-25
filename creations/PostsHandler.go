@@ -1,4 +1,4 @@
-package handler
+package creation
 
 import (
 	"database/sql"
@@ -17,7 +17,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error in Create page", http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("PATH:", r.URL.Path)
+	// fmt.Println("PATH:", r.URL.Path)
 	post_id := r.URL.Query().Get("postid")
 	username := r.URL.Query().Get("user")
 
@@ -25,7 +25,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		Post_id  string
 		Username string
 	}{
-		Post_id: post_id,
+		Post_id:  post_id,
 		Username: username,
 	})
 }
@@ -42,12 +42,12 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 
 	CurrentUser := r.URL.Query().Get("user")
 	Post_id, _ := strconv.Atoi(r.URL.Query().Get("postid"))
-	fmt.Println("Create post function post id is :", Post_id+1, "and the writer is :", CurrentUser)
+	// fmt.Println("Create post function post id is :", Post_id, "and the writer is :", CurrentUser)
 	title := r.FormValue("title")
 	body := r.FormValue("body")
 	// categories := r.FormValue("categories")
 	categories := r.Form["categories"]
-	fmt.Println(categories)
+	// fmt.Println(categories)
 	if len(categories) == 0 {
 		categories = append(categories, "All")
 	}
@@ -83,5 +83,5 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	http.Redirect(w,r,"/forum",http.StatusSeeOther)
+	http.Redirect(w, r, "/forum", http.StatusSeeOther)
 }

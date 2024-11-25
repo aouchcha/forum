@@ -12,6 +12,15 @@ body {
     color: #F0FFFF;
     /* justify-content: flex-end; */
 }
+
+.post_content{
+    color: #F0FFFF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
 .react {
     height: 30px;
     width: 30px;

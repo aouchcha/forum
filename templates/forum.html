@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Pages</title>
+    <title>Forum</title>
     <link rel="stylesheet" href="../style/PostPage.css">
 </head>
 
@@ -19,23 +19,26 @@
         <br>
         <div class="temp" id="temp">
             <div class="creation">
-                <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create">Create
-                        Post</button></a>
+                <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create">Create Post</button></a>
             </div>
             <form action="/forum" method="get">
                 <div class="filter">
-                    <input type="radio" name="categories" id="all" value="all">
                     <label for="all">All</label>
-                    <input type="radio" name="categories" id="sport" value="sport">
+                    <input type="radio" name="categories" id="all" value="all">
                     <label for="sport">Sport</label>
-                    <input type="radio" name="categories" id="politic" value="politic">
+                    <input type="radio" name="categories" id="sport" value="sport">
                     <label for="politic">Politic</label>
-                    <input type="radio" name="categories" id="enteairtement" value="enteairtement">
+                    <input type="radio" name="categories" id="politic" value="politic">
                     <label for="enteairtement">Enteairtement</label>
-                    <input type="radio" name="categories" id="economie" value="economie">
+                    <input type="radio" name="categories" id="enteairtement" value="enteairtement">
                     <label for="economie">Economie</label>
-                    <input type="radio" name="categories" id="it" value="it">
+                    <input type="radio" name="categories" id="economie" value="economie">
                     <label for="it">IT</label>
+                    <input type="radio" name="categories" id="it" value="it">
+                    <label for="myposts">My Own Posts</label>
+                    <input type="radio" name="categories" id="myposts" value="myposts">
+                    <label for="likedposts">The Posts That I Liked</label>
+                    <input type="radio" name="categories" id="likedposts" value="likedposts">
                     <pre>    </pre>
                     <button type="submit" class="btn" id="filter">Filter</button>
                 </div>

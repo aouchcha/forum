@@ -9,8 +9,26 @@
 </head>
 
 <body>
+    <header class="name">
+        <div class="header">
+            Hello Mr {{.CurrentUser}}
+            <form action="/logout" method="post">
+                <button type="submit" class="btn">Log Out</button>
+            </form>
+        </div>
+        <br>
+    </header>
+    <div class="post_content">
+        <h1>Title: {{.Title}}</h1>
+        <h2>Body: {{.Body}}</h2>
+        <sub>written by: {{.Post_writer}}</sub>
+        <br>
+    </div>
     <div class="comment_container">
-        {{range .}}
+        {{if not .Comments}}
+        <h1 style="color: aliceblue;text-align: center;">No Comments Available!</h1>
+        {{end}}
+        {{range .Comments}}
         <div class="one_comment">
             <h4>by {{.Comment_writer}}</h4>
             <p>{{.Comment_body}}</p>
@@ -33,6 +51,7 @@
             </div>
         </div>
         {{end}}
+        <a href="/forum"><button class="bttn">Return</button></a>
     </div>
 </body>
 
