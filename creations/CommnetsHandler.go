@@ -54,12 +54,14 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 
 	// fmt.Println(comments_toshow)
 	tmpl.Execute(w, struct {
+		Post_Id     int
 		CurrentUser string
 		Title       string
 		Post_writer string
 		Body        string
 		Comments    []Comment
 	}{
+		Post_Id:     post_id,
 		CurrentUser: username,
 		Title:       title,
 		Post_writer: post_creator,
@@ -147,6 +149,7 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 			Comment_time:           time,
 			Comment_likes_count:    commented.Comment_likes_count,
 			Comment_dislikes_count: commented.Comment_dislikes_count,
+			Post_commented_id:      id,
 		})
 	}
 	for i := 0; i < len(comments_toshow)-1; i++ {

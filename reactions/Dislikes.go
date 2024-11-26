@@ -90,8 +90,6 @@ func Dislikes(w http.ResponseWriter, r *http.Request) {
 			}
 
 		}
-		http.Redirect(w, r, "/forum", http.StatusSeeOther)
-		return
 	} else {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

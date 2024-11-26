@@ -22,4 +22,5 @@ func ChooseError(w http.ResponseWriter, ErrMessage string, ErrCode int) {
 		http.Error(w, "Internal server error in exuting error page", http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(ErrCode)
 }

@@ -133,19 +133,19 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		post_id = id
 		var likee Reactions
 		var dislikee Reactions
-		// err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE post_id = ?`, post_id).Scan(&likee.LikeCount)
-		// if err != nil {
-		// 	fmt.Println("Error fetching like count ==>", err)
-		// 	http.Error(w, "Error fetching like count", http.StatusInternalServerError)
-		// 	return nil, 0
-		// }
-		// err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE post_id = ?`, post_id).Scan(&dislikee.DislikeCount)
-		// if err != nil {
-		// 	fmt.Println("Error fetching like count ==>", err)
-		// 	http.Error(w, "Error fetching like count", http.StatusInternalServerError)
-		// 	return nil, 0
-		// }
-		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
+		err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE post_id = ?`, post_id).Scan(&likee.LikeCount)
+		if err != nil {
+			fmt.Println("Error fetching like count ==>", err)
+			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
+			return nil, 0, 0, errors.New("Internal server error")
+		}
+		err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE post_id = ?`, post_id).Scan(&dislikee.DislikeCount)
+		if err != nil {
+			fmt.Println("Error fetching like count ==>", err)
+			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
+			return nil, 0, 0, errors.New("Internal server error")
+		}
+		fmt.Println("comments id= ", comment_id, "post id= ", post_id)
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
 			LikesCounter:      likee.LikeCount,

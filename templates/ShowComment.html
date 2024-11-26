@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Show Comments</title>
     <link rel="stylesheet" href="../style/PostPage.css">
+    <script type="module" src=""></script>
 </head>
 
 <body>
@@ -21,6 +22,7 @@
     <div class="post_content">
         <h1>Title: {{.Title}}</h1>
         <h2>Body: {{.Body}}</h2>
+        <h3>POST ID: {{.Post_Id}}</h3>
         <sub>written by: {{.Post_writer}}</sub>
         <br>
     </div>
@@ -33,20 +35,24 @@
             <h4>by {{.Comment_writer}}</h4>
             <p>{{.Comment_body}}</p>
             <sub><span>{{.Comment_time}}</span> ago </sub>
-            <div>
-                <form action="/Likes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+            <div class="reaction_section">
+                <!-- Likes Form -->
+                <form action="/Likes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
                     method="post">
                     <label>Likes:</label>
                     <button type="submit" class="react" name="reaction" value="likeComment">
-                        {{.Comment_likes_count}} </button>
+                        {{.Comment_likes_count}}
+                    </button>
                 </form>
+
+                <!-- Dislikes Form -->
                 <form
-                    action="/Dislikes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    action="/Dislikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
                     method="post">
                     <label>Dislikes:</label>
-                    <button type="submit" class="react" name="reaction"
-                        value="dislike">{{.Comment_dislikes_count}}</button>
-
+                    <button type="submit" class="react" name="reaction" value="dislike">
+                        {{.Comment_dislikes_count}}
+                    </button>
                 </form>
             </div>
         </div>
@@ -54,5 +60,32 @@
         <a href="/forum"><button class="bttn">Return</button></a>
     </div>
 </body>
+
+<!-- <script>
+    const ReactionSection = document.querySelectorAll('.reaction_section form')
+    ReactionSection.forEach(ReactionForm => {
+        ReactionForm.addEventListener("submit", (e) => {
+            e.preventDefault()
+            
+            const PathAction = e.currentTarget.getAttribute("action")
+            let temp = PathAction.split('?')
+
+            const result = getdata(Path, commentId)
+            console.log(temp[1])
+        })
+    })
+
+    async function getdata(path, CID) {
+        let res = await fetch(path)
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        let json = await res.json()
+        if (json.error) {
+            throw new Error(json.error)
+        }
+        return json.data
+    }
+</script> -->
 
 </html>
