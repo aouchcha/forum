@@ -58,7 +58,7 @@
                 method="post">
 
                 <label>Likes:</label>
-                <button type="submit" class="react" name="reaction" value="like"></button>
+                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
 
             </form>
             <form action="/Dislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
@@ -173,7 +173,8 @@
                 method: "post",
                 body: formData
             })
-            let LikesButton = e.currentTarget.querySelector(".react")
+            let LikesButton = e.currentTarget.querySelector(".react value='like'")
+            let DislikesButtons = e.currentTarget.querySelector(".react value='dislike'")
             let likesCounter = parseInt(LikesButton.innerHTML) || 0
             // console.log("LikesCounter ==>", LikesCounter)
             // console.log("postid in fetch : ", postid)
