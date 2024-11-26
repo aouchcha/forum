@@ -9,6 +9,8 @@ import (
 	data "main/dataBase"
 )
 
+// var like = data.Jaime{}
+
 func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/api/likes" {
 		var LikeCount, DislikeCount int

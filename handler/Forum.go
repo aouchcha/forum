@@ -30,6 +30,8 @@ type Reactions struct {
 
 var postt Post
 
+// likeee = data.Jaime{}
+
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
 		http.Error(w, "page not found", http.StatusNotFound)

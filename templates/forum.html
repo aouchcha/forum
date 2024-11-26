@@ -58,7 +58,7 @@
                 method="post">
 
                 <label>Likes:</label>
-                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
+                <button type="submit" class="react" name="reaction" value="like"></button>
 
             </form>
             <form action="/Dislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
@@ -157,30 +157,37 @@
 
     const Forms = document.querySelectorAll(".reactions-container form")
     // const likes = document.querySelectorAll(".reactions-container input[id='postidValue']")
-    postid = document.getElementById("postidValue").value
-    console.log("postid : ", postid)
+    let postid;
+    let commentid; 
+    // console.log("postid : ", postid)
     Forms.forEach(Form => {
         Form.addEventListener("submit", (e) => {
             e.preventDefault()
             const path = e.currentTarget.getAttribute("action")
+            params = path.split("?")
+            const Queries = new URLSearchParams(params[1])
+            postid = Queries.get("Liked_Post_id")
+            console.log("postid : ", postid)
             const formData = new FormData(e.currentTarget)
-            fetch(path, {
+            fetch(params[0]+"?"+params[1], {
                 method: "post",
                 body: formData
             })
-            let LikesCounter = e.currentTarget.querySelector(".react").innerHTML
-            console.log("LikesCounter ==>", LikesCounter)
-            console.log("postid in fetch : ", postid)
-            fetch("/api/likes?postid=${postid}")
-                console.log()
+            let LikesButton = e.currentTarget.querySelector(".react")
+            let likesCounter = parseInt(LikesButton.innerHTML) || 0
+            // console.log("LikesCounter ==>", LikesCounter)
+            // console.log("postid in fetch : ", postid)
+            path1 = "/api/likes?postid=" + postid
+            fetch(path1)
                     .then(response => {
                         return response.json()
                     })
                     .then(data => {
+                        console.log("------------------")
                         console.log("LikeCount ==>", data.LikeCount)
-                        console.log("DislikeCount ==>", data.DislikeCount)
-                        LikesCounter = parseInt(LikesCounter) + parseInt(data.LikeCount) + " like!"
-                        console.log("LikesCounter2 ==>", LikesCounter)
+                        likesCounter = parseInt(data.LikeCount) || 0
+                        LikesButton.innerHTML = data.LikeCount
+                        LikesButton.style.color = "green"
                     })
                     .catch(err => console.log("err :", err))
         })
