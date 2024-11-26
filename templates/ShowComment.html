@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Comments</title>
+    <link rel="stylesheet" href="../style/PostPage.css">
+</head>
+
+<body>
+    <header class="name">
+        <div class="header">
+            Hello Mr {{.CurrentUser}}
+            <form action="/logout" method="post">
+                <button type="submit" class="btn">Log Out</button>
+            </form>
+        </div>
+        <br>
+    </header>
+    <div class="post_content">
+        <h1>Title: {{.Title}}</h1>
+        <h2>Body: {{.Body}}</h2>
+        <sub>written by: {{.Post_writer}}</sub>
+        <br>
+    </div>
+    <div class="comment_container">
+        {{if not .Comments}}
+        <h1 style="color: aliceblue;text-align: center;">No Comments Available!</h1>
+        {{end}}
+        {{range .Comments}}
+        <div class="one_comment">
+            <h4>by {{.Comment_writer}}</h4>
+            <p>{{.Comment_body}}</p>
+            <sub><span>{{.Comment_time}}</span> ago </sub>
+            <div>
+                <form action="/Likes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post">
+                    <label>Likes:</label>
+                    <button type="submit" class="react" name="reaction" value="likeComment">
+                        {{.Comment_likes_count}} </button>
+                </form>
+                <form
+                    action="/Dislikes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post">
+                    <label>Dislikes:</label>
+                    <button type="submit" class="react" name="reaction"
+                        value="dislike">{{.Comment_dislikes_count}}</button>
+
+                </form>
+            </div>
+        </div>
+        {{end}}
+        <a href="/forum"><button class="bttn">Return</button></a>
+    </div>
+</body>
+
+</html>

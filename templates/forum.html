@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link rel="stylesheet" href="../style/PostPage.css">
+</head>
+
+<body>
+    <header class="name">
+        <div class="header">
+            Hello Mr {{.Currenuser}}
+            <form action="/logout" method="post">
+                <button type="submit" class="btn">Log Out</button>
+            </form>
+        </div>
+        <br>
+        <div class="temp" id="temp">
+            <div class="creation">
+                <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create">Create Post</button></a>
+            </div>
+            <form action="/forum" method="get">
+                <div class="filter">
+                    <label for="all">All</label>
+                    <input type="radio" name="categories" id="all" value="all">
+                    <label for="sport">Sport</label>
+                    <input type="radio" name="categories" id="sport" value="sport">
+                    <label for="politic">Politic</label>
+                    <input type="radio" name="categories" id="politic" value="politic">
+                    <label for="enteairtement">Enteairtement</label>
+                    <input type="radio" name="categories" id="enteairtement" value="enteairtement">
+                    <label for="economie">Economie</label>
+                    <input type="radio" name="categories" id="economie" value="economie">
+                    <label for="it">IT</label>
+                    <input type="radio" name="categories" id="it" value="it">
+                    <label for="myposts">My Own Posts</label>
+                    <input type="radio" name="categories" id="myposts" value="myposts">
+                    <label for="likedposts">The Posts That I Liked</label>
+                    <input type="radio" name="categories" id="likedposts" value="likedposts">
+                    <pre>    </pre>
+                    <button type="submit" class="btn" id="filter">Filter</button>
+                </div>
+            </form>
+        </div>
+    </header>
+    <h2 style="color: aliceblue;text-align: center;">Check the Newest Of your FEED!</h2>
+    {{if not .Posts}}
+    <h1 style="color: aliceblue;text-align: center;">No Posts Available!</h1>
+    {{end}}
+    {{range .Posts}}
+    <div class="postcontainer">
+        <h3>title: {{.Title}}</h3>
+        <p>{{.Body}}</p>
+        <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
+        <div class="reactions-container">
+            <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
+            <form id="like_post"
+                action="/Likes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                method="post">
+
+                <label>Likes:</label>
+                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
+
+            </form>
+            <form action="/Dislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                method="post">
+
+                <label>Dislikes:</label>
+                <button type="submit" class="react" name="reaction" value="dislike">{{.DislikeCounter}}</button>
+
+            </form>
+        </div>
+        <div class="comment_container">
+            <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
+                <br>
+                <div class="bb">
+                    <textarea name="comments" id="comments" placeholder="Add your comments..."></textarea>
+                    <br>
+                    <button type="submit" class="bttn" id="comment">Comment</button>
+                </div>
+            </form>
+            <br>
+        </div>
+        <form action="/showcomments" method="get" class="jj">
+            <input type="hidden" value="{{.Postid}}" name="postid">
+            <input type="hidden" value="{{.CurrentUsser}}" name="writer">
+
+            <button type="submit" class="bttn">See All Comments</button>
+        </form>
+    </div>
+    {{end}}
+</body>
+<script>
+    const comment = document.getElementsByClassName("bttn")
+    const create = document.getElementById("Create")
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+    let username = getCookie("guest_token");
+    console.log(username);
+
+    if (username == "guest") {
+        create.disabled = true
+        for (let cm of comment) {
+            // console.log(cm)
+            cm.disabled = true
+        }
+    }
+
+    const times = document.querySelectorAll('span')
+    times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
+    function timeAffi(time) {
+        let now = new Date()
+        let then = new Date(time)
+        let min = ((now - then) / (1000 * 60)).toFixed()
+        let hours = ((now - then) / (1000 * 3600)).toFixed()
+        let days = ((now - then) / (1000 * 3600 * 24)).toFixed()
+        if (min < 60) {
+            return min + " minutes"
+        } else if (hours < 24) {
+            return hours + " hours"
+        } else {
+            return days + " day"
+        }
+    }
+    const CreateButton = document.getElementById('Create')
+    const HiddenDiv = document.getElementById('temp')
+
+    const commentForms = document.querySelectorAll(".comment_container form")
+    commentForms.forEach(cForm => {
+        cForm.addEventListener("submit", (e) => {
+            e.preventDefault()
+            const path = e.currentTarget.getAttribute("action")
+            const formData = new FormData(e.currentTarget)
+            fetch(path, {
+                method: "post",
+                body: formData
+            })
+            e.currentTarget.querySelector("textarea").value = ""
+        })
+    })
+
+    const Forms = document.querySelectorAll(".reactions-container form")
+    // const likes = document.querySelectorAll(".reactions-container input[id='postidValue']")
+    let postid;
+    let commentid; 
+    // console.log("postid : ", postid)
+    Forms.forEach(Form => {
+        Form.addEventListener("submit", (e) => {
+            e.preventDefault()
+            const path = e.currentTarget.getAttribute("action")
+            params = path.split("?")
+            const Queries = new URLSearchParams(params[1])
+            postid = Queries.get("Liked_Post_id")
+            console.log("postid : ", postid)
+            const formData = new FormData(e.currentTarget)
+            fetch(params[0]+"?"+params[1], {
+                method: "post",
+                body: formData
+            })
+            let LikesButton = e.currentTarget.querySelector(".react")
+            let likesCounter = parseInt(LikesButton.innerHTML) || 0
+            // console.log("LikesCounter ==>", LikesCounter)
+            // console.log("postid in fetch : ", postid)
+            path1 = "/api/likes?postid=" + postid
+            fetch(path1)
+                    .then(response => {
+                        return response.json()
+                    })
+                    .then(data => {
+                        console.log("------------------")
+                        console.log("LikeCount ==>", data.LikeCount)
+                        likesCounter = parseInt(data.LikeCount) || 0
+                        LikesButton.innerHTML = data.LikeCount
+                        LikesButton.style.color = "green"
+                    })
+                    .catch(err => console.log("err :", err))
+        })
+    })
+
+</script>
+
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style/login.css">
+    <title>Create Account</title>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Create Account</h1>
+        <form action="/register" method="post">
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Username"  autocomplete="off" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="email" name="email" placeholder="Email Address" autocomplete="off" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Password" autocomplete="off"  required>
+            </div>
+    
+            
+            <button class="btn btn-register" type="submit">Create Account</button>
+            <button class="btn btn-login" type="submit" onclick="window.location.href='/login';">Sign In</button>
+            <button class="btn btn-login" type="submit" onclick="window.location.href='/guest';">Continue as Guest</button>
+            <button class="btn btn-login" type="submit"><a href="/" >Back to Home</a></button>
+        </form>
+    </div>
+</body>
+</html>
