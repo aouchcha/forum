@@ -32,6 +32,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	temp := r.FormValue("postid")
+	fmt.Println("temp ====> ", temp)
 	post_id, err := strconv.Atoi(temp)
 	if err != nil {
 		http.Error(w, "Internal server error in SHow coment castion post id", http.StatusInternalServerError)
