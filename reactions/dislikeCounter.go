@@ -14,6 +14,11 @@ func DislikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
 		post_id := r.URL.Query().Get("postid")
 		comment_id := r.URL.Query().Get("comment_id")
 		LikeCount, DislikeCount, LikeComment, DislikeComment, err := GetReactionsCounts(post_id, comment_id)
+		fmt.Println("/--------------the dislikes Counter----------------/ ")
+		fmt.Println("post_id =====>", post_id)
+		fmt.Println("comment_id =====>", comment_id)
+		fmt.Println("LikeCount =====>", LikeCount)
+		fmt.Println("DislikeCount =====>", DislikeCount)
 		if err != nil {
 			http.Error(w, "Error fetching like and dislike count", http.StatusInternalServerError)
 			return

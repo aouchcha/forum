@@ -151,7 +151,7 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			return nil, 0, 0
 		}
 		// fmt.Println("LikesCounter in posttt : ", postt.LikesCounter)
-		fmt.Println("DislikeCounter in posttt ====> ", postt.DislikeCounter)
+		fmt.Println("DislikeCounter in posttt ====> ", dislikee.DislikeCount)
 		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
