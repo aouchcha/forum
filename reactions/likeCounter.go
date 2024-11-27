@@ -16,7 +16,7 @@ func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
 		var LikeCount, DislikeCount int
 		post_id := r.URL.Query().Get("postid")
 		comment_id := r.URL.Query().Get("comment_id")
-		LikeCount, DislikeCount, LikeComment, DislikeComment, err := getLikeAndDislikeCount(post_id, comment_id)
+		LikeCount, DislikeCount, LikeComment, DislikeComment, err := GetReactionsCounts(post_id, comment_id)
 		if err != nil {
 			http.Error(w, "Error fetching like and dislike count", http.StatusInternalServerError)
 			return
@@ -40,7 +40,7 @@ func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getLikeAndDislikeCount(post_id, liked_comment_id string) (int, int, int, int, error) {
+func GetReactionsCounts(post_id, comment_id string) (int, int, int, int, error) {
 	var LikeCount, DislikeCount int
 	var LikeComment, DislikeComment int
 	if post_id != "" {
@@ -56,12 +56,12 @@ func getLikeAndDislikeCount(post_id, liked_comment_id string) (int, int, int, in
 		}
 		return LikeCount, DislikeCount, 0, 0, nil
 	} else {
-		err := data.Db.QueryRow("SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?", liked_comment_id).Scan(&LikeComment)
+		err := data.Db.QueryRow("SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?", comment_id).Scan(&LikeComment)
 		if err != nil {
 			fmt.Println("Error fetching like count:", err)
 			return 0, 0, 0, 0, err
 		}
-		err = data.Db.QueryRow("SELECT COUNT(*) FROM dislikes WHERE disliked_comment_id = ?", liked_comment_id).Scan(&DislikeComment)
+		err = data.Db.QueryRow("SELECT COUNT(*) FROM dislikes WHERE disliked_comment_id = ?", comment_id).Scan(&DislikeComment)
 		if err != nil {
 			fmt.Println("Error fetching dislike count:", err)
 			return 0, 0, 0, 0, err

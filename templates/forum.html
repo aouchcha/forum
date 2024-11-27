@@ -58,14 +58,14 @@
                 method="post">
 
                 <label>Likes:</label>
-                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
+                <button type="submit" class="react" name="likebutt" value="like">{{.LikesCounter}}</button>
 
             </form>
             <form action="/Dislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
 
                 <label>Dislikes:</label>
-                <button type="submit" class="react" name="reaction" value="dislike">{{.DislikeCounter}}</button>
+                <button type="submit" class="react" name="dislikebutt" value="dislike">{{.DislikeCounter}}</button>
 
             </form>
         </div>
@@ -158,7 +158,7 @@
     const Forms = document.querySelectorAll(".reactions-container form")
     // const likes = document.querySelectorAll(".reactions-container input[id='postidValue']")
     let postid;
-    let commentid; 
+    let commentid;
     // console.log("postid : ", postid)
     Forms.forEach(Form => {
         Form.addEventListener("submit", (e) => {
@@ -166,31 +166,64 @@
             const path = e.currentTarget.getAttribute("action")
             params = path.split("?")
             const Queries = new URLSearchParams(params[1])
-            postid = Queries.get("Liked_Post_id")
-            console.log("postid : ", postid)
+
+            // console.log("postid : ", postid)
             const formData = new FormData(e.currentTarget)
-            fetch(params[0]+"?"+params[1], {
+            fetch(params[0] + "?" + params[1], {
                 method: "post",
                 body: formData
             })
-            let LikesButton = e.currentTarget.querySelector(".react")
-            // let DislikesButtons = e.currentTarget.querySelector(".react value='dislike'")
-            let likesCounter = parseInt(LikesButton.innerHTML) || 0
-            // console.log("LikesCounter ==>", LikesCounter)
-            // console.log("postid in fetch : ", postid)
-            path1 = "/api/likes?postid=" + postid
-            fetch(path1)
+            let counter;
+            let ReactionButton = e.currentTarget.querySelector(".react")
+            counter = parseInt(ReactionButton.innerHTML) || 0
+            let path1
+            reaction = ReactionButton.getAttribute("name")
+            if (reaction === 'likebutt') {
+                postid = Queries.get("Liked_Post_id")
+                path1 = "/api/likes?postid=" + postid
+                counter = parseInt(ReactionButton.innerHTML) || 0
+            } else if (reaction === "dislikebutt") {
+                postid = Queries.get("Disliked_Post_id")
+                path1 = "/api/dislikes?postid=" + postid
+                counter = parseInt(ReactionButton.innerHTML) || 0
+                console.log("counter in dislikes : ", counter)
+            }
+            console.log("path1 outside the fetch : ", path1)
+            // path1 = "/api/likes?postid=" + postid
+            if (reaction === 'likebutt') {
+                fetch(path1)
                     .then(response => {
                         return response.json()
                     })
                     .then(data => {
-                        console.log("------------------")
-                        console.log("LikeCount ==>", data.LikeCount)
-                        likesCounter = parseInt(data.LikeCount) || 0
-                        LikesButton.innerHTML = data.LikeCount
-                        LikesButton.style.color = "green"
+                        console.log("data : ", data)
+                        // if (reaction === "likebutt") {
+                        // console.log("------------------")
+                        // console.log("LikeCount ==>", data.LikeCount)
+                        counter = parseInt(data.LikeCount) || 0
+                        // console.log("counter in like consition==>", counter)
+                        ReactionButton.innerHTML = data.LikeCount
+                        ReactionButton.style.color = "green"
                     })
                     .catch(err => console.log("err :", err))
+            } else if (reaction === 'dislikebutt') {
+                console.log("path1 ====> ", path1)
+                fetch(path1)
+                    .then(response => {
+                        return response.json()
+                    })
+                    .then(data => {
+                        console.log("data : ", data)
+                        // console.log("DisLikeCount ==>", data.DislikeCount)
+                        counter = data.DisLikeCount || 0
+                        console.log("counter in dislike consition ==>", counter)
+                        ReactionButton.innerHTML = counter
+                        ReactionButton.style.color = "red"
+                        // }
+                    })
+                    .catch(err => console.log("err :", err))
+            }
+
         })
     })
 

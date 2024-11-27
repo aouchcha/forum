@@ -23,6 +23,7 @@ func main() {
 	http.HandleFunc("/Likes", reactions.Like)
 	http.HandleFunc("/api/likes", reactions.LikesCounterWithApi)
 	http.HandleFunc("/Dislikes", reactions.Dislikes)
+	http.HandleFunc("/api/dislikes", reactions.DislikesCounterWithApi)
 	http.HandleFunc("/logout", userData.Logout)
 	http.HandleFunc("/style/", handler.Style)
 	http.HandleFunc("/create_comment", creations.CreatCommnet)

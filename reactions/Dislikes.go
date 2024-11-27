@@ -26,35 +26,36 @@ func Dislikes(w http.ResponseWriter, r *http.Request) {
 		// }
 		fmt.Println("Disliked_Post_id :", Disliked_Comment_id_str)
 		fmt.Println("user_id :", user_id)
-		var exists bool
-		err = data.Db.QueryRow("SELECT id FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
-		if err == sql.ErrNoRows {
-			// Deleete from likes if exists first
-			err = data.Db.QueryRow("SELECT id FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
-			if err != sql.ErrNoRows {
-				_, err = data.Db.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
+		if postid != "" {
+			var exists bool
+			err = data.Db.QueryRow("SELECT id FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
+			if err == sql.ErrNoRows {
+				// Deleete from likes if exists first
+				err = data.Db.QueryRow("SELECT id FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
+				if err != sql.ErrNoRows {
+					_, err = data.Db.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
+					if err != nil {
+						http.Error(w, "Error unliking post", http.StatusInternalServerError)
+						return
+					}
+				}
+				// Then Insert into dislikes
+				_, err = data.Db.Exec("INSERT INTO dislikes (user_id, post_id, username) VALUES (?, ?, ?)", user_id, postid, user)
 				if err != nil {
-					http.Error(w, "Error unliking post", http.StatusInternalServerError)
+					fmt.Println("Error liking post", err)
+					http.Error(w, "Error liking post", http.StatusInternalServerError)
+					return
+				}
+
+			} else {
+				// Delete from dislikes if exists
+				_, err = data.Db.Exec("DELETE FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
+				if err != nil {
+					http.Error(w, "Error Disliked post", http.StatusInternalServerError)
 					return
 				}
 			}
-			// Then Insert into dislikes
-			_, err = data.Db.Exec("INSERT INTO dislikes (user_id, post_id, username) VALUES (?, ?, ?)", user_id, postid, user)
-			if err != nil {
-				fmt.Println("Error liking post", err)
-				http.Error(w, "Error liking post", http.StatusInternalServerError)
-				return
-			}
-
-		} else {
-			// Delete from dislikes if exists
-			_, err = data.Db.Exec("DELETE FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
-			if err != nil {
-				http.Error(w, "Error Disliked post", http.StatusInternalServerError)
-				return
-			}
-		}
-		if Disliked_Comment_id_str != "" {
+		} else if Disliked_Comment_id_str != "" {
 			Disliked_comment_id, err := strconv.Atoi(Disliked_Comment_id_str)
 			if err != nil {
 				fmt.Println("Error converting comment_id to int")

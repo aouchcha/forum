@@ -150,6 +150,8 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
 			return nil, 0, 0
 		}
+		// fmt.Println("LikesCounter in posttt : ", postt.LikesCounter)
+		fmt.Println("DislikeCounter in posttt ====> ", postt.DislikeCounter)
 		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
