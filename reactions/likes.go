@@ -21,6 +21,9 @@ func Like(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		comment_id_str := r.URL.Query().Get("comment_id")
+		fmt.Println("---------------------------")
+		fmt.Println("comment_id ==========> ", comment_id_str)
+		fmt.Println("---------------------------")
 		// liked_post_id, err := strconv.Atoi(r.URL.Query().Get("Liked_Post_id"))
 		// if err != nil {
 		// 	fmt.Println("Error converting liked_post_id to int")
@@ -29,34 +32,35 @@ func Like(w http.ResponseWriter, r *http.Request) {
 		// }
 		fmt.Println("liked_post_id :", postid)
 		fmt.Println("user_id :", user_id)
-		var exists bool
-		err = data.Db.QueryRow("SELECT id FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
-		if err == sql.ErrNoRows {
-			// Delete from dislikes if exists
-			err = data.Db.QueryRow("SELECT id FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
-			if err != sql.ErrNoRows {
-				_, err = data.Db.Exec("DELETE FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
+		if postid != "" {
+			var exists bool
+			err = data.Db.QueryRow("SELECT id FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
+			if err == sql.ErrNoRows {
+				// Delete from dislikes if exists
+				err = data.Db.QueryRow("SELECT id FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
+				if err != sql.ErrNoRows {
+					_, err = data.Db.Exec("DELETE FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
+					if err != nil {
+						http.Error(w, "Error unliking post", http.StatusInternalServerError)
+						return
+					}
+				}
+				// Then Insert into likes if not exists
+				_, err = data.Db.Exec("INSERT INTO likes (user_id, post_id, username) VALUES (?, ?, ?)", user_id, postid, user)
+				if err != nil {
+					fmt.Println("Error liking post", err)
+					http.Error(w, "Error liking post", http.StatusInternalServerError)
+					return
+				}
+			} else {
+				// Delete from likes if exists
+				_, err = data.Db.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
 				if err != nil {
 					http.Error(w, "Error unliking post", http.StatusInternalServerError)
 					return
 				}
 			}
-			// Then Insert into likes if not exists
-			_, err = data.Db.Exec("INSERT INTO likes (user_id, post_id, username) VALUES (?, ?, ?)", user_id, postid, user)
-			if err != nil {
-				fmt.Println("Error liking post", err)
-				http.Error(w, "Error liking post", http.StatusInternalServerError)
-				return
-			}
-		} else {
-			// Delete from likes if exists
-			_, err = data.Db.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
-			if err != nil {
-				http.Error(w, "Error unliking post", http.StatusInternalServerError)
-				return
-			}
-		}
-		if comment_id_str != "" {
+		} else if comment_id_str != "" {
 			liked_comment_id, err := strconv.Atoi(comment_id_str)
 			if err != nil {
 				fmt.Println("Error converting comment_id to int")
@@ -91,8 +95,8 @@ func Like(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		//http.Redirect(w, r, "/forum", http.StatusSeeOther)
-		//return
+		// http.Redirect(w, r, "/forum", http.StatusSeeOther)
+		// return
 	} else {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

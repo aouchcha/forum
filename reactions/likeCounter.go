@@ -54,6 +54,7 @@ func getLikeAndDislikeCount(post_id, liked_comment_id string) (int, int, int, in
 			fmt.Println("Error fetching dislike count:", err)
 			return 0, 0, 0, 0, err
 		}
+		return LikeCount, DislikeCount, 0, 0, nil
 	} else {
 		err := data.Db.QueryRow("SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?", liked_comment_id).Scan(&LikeComment)
 		if err != nil {
@@ -65,6 +66,7 @@ func getLikeAndDislikeCount(post_id, liked_comment_id string) (int, int, int, in
 			fmt.Println("Error fetching dislike count:", err)
 			return 0, 0, 0, 0, err
 		}
+		return 0, 0, LikeComment, DislikeComment, nil
 	}
-	return LikeCount, DislikeCount, LikeComment, DislikeComment, nil
+	// return LikeCount, DislikeCount, LikeComment, DislikeComment, nil
 }

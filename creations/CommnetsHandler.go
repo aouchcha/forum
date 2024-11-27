@@ -42,7 +42,10 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(post_id, username)
 	var toshow []Comment
 	comments_toshow, _ := GetComments(tmpl, w, username, toshow, post_id)
-	fmt.Println(comments_toshow)
+	for _, commentttt := range comments_toshow {
+		fmt.Println("comments_toshow.POSTid =============> ", commentttt.Post_commented_id)
+		fmt.Println("comments_toshow.ID =============> ", commentttt.Comment_id)
+	}
 	tmpl.Execute(w, comments_toshow)
 }
 
@@ -71,6 +74,7 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser string, comments_toshow []Comment, id int) ([]Comment, int) {
+	fmt.Println("GETcomments post id ======> ", id)
 	comm_rows, err := data.Db.Query("SELECT * FROM comments WHERE post_commented_id = ?;", id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -93,6 +97,7 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 			fmt.Println(err)
 			continue
 		}
+		fmt.Println("comment_id =============> ", comment_id)
 		err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?`, comment_id).Scan(&commented.Comment_likes_count)
 		if err != nil {
 			fmt.Println("Error fetching like count in comments ==>", err)
@@ -113,6 +118,7 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 			Curr_commenter_id:      commented.Curr_commenter_id,
 			Comment_body:           comment_body,
 			Comment_writer:         comment_writer,
+			Post_commented_id:      id,
 			Comment_time:           time,
 			Comment_likes_count:    commented.Comment_likes_count,
 			Comment_dislikes_count: commented.Comment_dislikes_count,

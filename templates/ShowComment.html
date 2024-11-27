@@ -17,7 +17,8 @@
             <sub><span>{{.Comment_time}}</span> ago </sub>
             <h1>ID : {{.Post_commented_id}}</h1>
             <div>
-                <form action="/Likes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}&postid={{.Post_commented_id}}"
+                <form
+                    action="/Likes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}&postid={{.Post_commented_id}}"
                     method="post">
                     <label>Likes:</label>
                     <button type="submit" class="react" name="reaction" value="likeComment">
@@ -48,27 +49,27 @@
                 params = path.split("?")
                 console.log("params : ", params)
                 const Queries = new URLSearchParams(params[1])
-                postid = Queries.get("post_id")
+                postid = Queries.get("postid")
                 commentid = Queries.get("comment_id")
                 console.log("postid : ", postid)
                 console.log("commentid : ", commentid)
                 const formData = new FormData(e.currentTarget)
+                let path5 = params[0] + "?" + params[1]
+                console.log("path ==>", path5)
                 fetch(params[0] + "?" + params[1], {
                     method: "post",
                     body: formData
                 })
                 let LikesButton = e.currentTarget.querySelector(".react")
-                // let DislikesButtons = e.currentTarget.querySelector(".react value='dislike'")
                 let likesCounter = parseInt(LikesButton.innerHTML) || 0
-                // console.log("LikesCounter ==>", LikesCounter)
-                // console.log("postid in fetch : ", postid)
                 path1 = "/api/likes?comment_id=" + commentid
+                console.log("path1 ==>", path1)
                 fetch(path1)
                     .then(response => {
                         return response.json()
                     })
                     .then(data => {
-                        console.log("LikeCount ==>", data.LikeComment)
+                        console.log("LikeComments ==>", data.LikeComment)
                         likesCounter = parseInt(data.LikeComment) || 0
                         LikesButton.innerHTML = data.LikeComment
                         LikesButton.style.color = "green"
