@@ -17,6 +17,12 @@ func init() {
 		return
 	}
 
+	// _, err = Db.Exec("PRAGMA foreign_keys = ON;")
+	// if err != nil {
+	// 	fmt.Println("Error enabling foreign keys:", err)
+	// 	return
+	// }
+
 	createUsersTable := `
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,11 +57,11 @@ func init() {
 		title TEXT NOT NULL,
 		body TEXT NOT NULL,
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (post_creator) REFERENCES users(username)
+		FOREIGN KEY (post_creator) REFERENCES users(username) ON DELETE CASCADE
 	);`
 
 	if _, err := Db.Exec(CreatPosts); err != nil {
-		fmt.Println(err)
+		fmt.Println("ana hna", err)
 		return
 	}
 
@@ -64,7 +70,7 @@ func init() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		post_id INTEGER NOT NULL,
 		categorie TEXT NOT NULL,
-		FOREIGN KEY (post_id) REFERENCES posts(id)
+		FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 	)`
 
 	if _, err := Db.Exec(CreatCategories); err != nil {
@@ -79,7 +85,7 @@ func init() {
 		comment_writer TEXT NOT NULL,
 		post_commented_id INTEGER NOT NULL,
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (post_commented_id) REFERENCES posts(id)
+		FOREIGN KEY (post_commented_id) REFERENCES posts(id) ON DELETE CASCADE
 	)`
 
 	if _, err := Db.Exec(CommentsTable); err != nil {

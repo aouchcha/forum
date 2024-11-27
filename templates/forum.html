@@ -59,7 +59,7 @@
             <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
             <form 
                 id="like_post"
-                action="/Likes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
 
                 <label>Likes:</label>
@@ -68,7 +68,7 @@
             </form>
             <form 
                 id="dislike_post"
-                action="/Dislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
 
                 <label>Dislikes:</label>
@@ -162,81 +162,71 @@
 
 
 
-    // Wait for the DOM to be fully loaded
-    // document.addEventListener('DOMContentLoaded', () => {
-        const Forms = document.querySelectorAll(".reactions-container form");
+    const Forms = document.querySelectorAll(".reactions-container form");
+    Forms.forEach(Form => {
+        Form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        Forms.forEach(Form => {
-            Form.addEventListener("submit", async (e) => {
-                e.preventDefault();
+            const button = e.currentTarget.querySelector('button');
+            const choice = e.currentTarget.getAttribute('id')
+            let TheOtherButton = ""
+            if (choice == "like_post") {
+                TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
+            }else {
+                TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
+            }
+            
 
-                const button = e.currentTarget.querySelector('button');
-                const choice = e.currentTarget.getAttribute('id')
-                let TheOtherButton = ""
-                if (choice == "like_post") {
-                    TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
-                }else {
-                    TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
+            if (!button) {
+                console.error("Button not found");
+                return;
+            }
+
+            let path1 = e.currentTarget.getAttribute('action');
+
+            let previouslike = button.textContent
+            
+            const postid = e.currentTarget.parentElement.querySelector('input').value;
+
+            try {
+                await fetch(path1, {
+                    method: "POST",
+                });
+
+                const path = `/api/likes?postid=${postid}`;
+
+                const response = await getdata(path);
+                const likeCount = response.LikeCount;
+                const DislikeCount = response.DislikeCount;
+
+                if (choice == "like_post"){
+                    button.textContent = likeCount;
+                    TheOtherButton.textContent = DislikeCount
+                }else if (choice == "dislike_post") {
+                    button.textContent = DislikeCount;
+                    TheOtherButton.textContent = likeCount
                 }
-                
-
-                if (!button) {
-                    console.error("Button not found");
-                    return;
-                }
-
-                let path1 = e.currentTarget.getAttribute('action');
-
-                let previouslike = button.textContent
-                const postid = e.currentTarget.parentElement.querySelector('input').value;
-
-                try {
-                    await fetch(path1, {
-                        method: "POST",
-                    });
-
-                    const path = `/api/likes?postid=${postid}`;
-
-                    const response = await getdata(path);
-                    const likeCount = response.LikeCount;
-                    const DislikeCount = response.DislikeCount;
-
-                    if (choice == "like_post"){
-                        button.textContent = likeCount;
-                        TheOtherButton.textContent = DislikeCount
-                    }else if (choice == "dislike_post") {
-                        button.textContent = DislikeCount;
-                        TheOtherButton.textContent = likeCount
-                    }
-                } catch (err) {
-                    console.error("Error processing like:", err);
-                }
-            });
+            } catch (err) {
+                console.error("Error processing like:", err);
+            }
         });
-    // });
+    });
 
-    // Function to fetch data from the API
     async function getdata(path) {
         try {
             const res = await fetch(path);
             if (!res.ok) {
                 throw new Error(res.statusText);
             }
-
             const json = await res.json();
-
-            // Check if there's an error in the response
             if (json.error) {
                 throw new Error(json.error);
             }
             console.log(json);
-            
-
-            // Return the like and dislike counts
             return json;
         } catch (error) {
             console.error("Fetch error:", error);
-            throw error; // Re-throw error to handle it in the caller
+            throw error; 
         }
     }
 

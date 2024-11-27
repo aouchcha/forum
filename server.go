@@ -20,9 +20,11 @@ func main() {
 	http.HandleFunc("/forum", handler.Forum) // this is where the forum would be handled after the login
 	http.HandleFunc("/create_post", creations.CreatePost)
 	http.HandleFunc("/InsertPost", creations.InsertPost)
-	http.HandleFunc("/Likes", reactions.Like)
+	http.HandleFunc("/PostsLikes", reactions.PostsLike)
+	http.HandleFunc("/PostsDislikes", reactions.PostsDislikes)
+	http.HandleFunc("/CommentsLikes", reactions.CommentsLike)
+	http.HandleFunc("/CommentsDisLikes", reactions.CommentsDislike)
 	http.HandleFunc("/api/likes", reactions.LikesCounterWithApi)
-	http.HandleFunc("/Dislikes", reactions.Dislikes)
 	http.HandleFunc("/logout", userData.Logout)
 	http.HandleFunc("/style/", handler.Style)
 	http.HandleFunc("/create_comment", creations.CreatCommnet)

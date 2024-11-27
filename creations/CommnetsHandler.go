@@ -99,18 +99,14 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 		handler.ChooseError(w, "Inernal Server Error", 500)
 		return
 	}
-	http.Redirect(w, r, "/forum", http.StatusSeeOther)
 }
 
 func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser string, comments_toshow []Comment, id int) ([]Comment, int, error) {
 	comm_rows, err := data.Db.Query("SELECT * FROM comments WHERE post_commented_id = ?;", id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			// log.Printf("Template execution error: %v", err)
 			return nil, 0, errors.New("no Feild in data base")
 		} else {
-			// http.Error(w, "ana hna Internal server error", http.StatusInternalServerError)
 			return nil, 0, errors.New("internal Server Error You Droped T-he comment table restar the server")
 		}
 	}
@@ -128,15 +124,10 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 		}
 		err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?`, comment_id).Scan(&commented.Comment_likes_count)
 		if err != nil {
-			// fmt.Println("Error fetching like count in comments ==>", err)
-			// http.Error(w, "Error fetching like count", http.StatusInternalServerError)
 			return nil, 0, errors.New("Error fetching like count")
 		}
-		// fmt.Println("Comment_likes_count : ", commented.Comment_likes_count)
 		err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE disliked_comment_id = ?`, comment_id).Scan(&commented.Comment_dislikes_count)
 		if err != nil {
-			// fmt.Println("Error fetching like count ==>", err)
-			// http.Error(w, "Error fetching like count", http.StatusInternalServerError)
 			return nil, 0, errors.New("Error fetching like count")
 		}
 		cid = comment_id

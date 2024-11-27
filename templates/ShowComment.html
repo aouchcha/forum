@@ -36,9 +36,11 @@
             <p>{{.Comment_body}}</p>
             <sub><span>{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">
+            <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
                 <!-- Likes Form -->
-                <form action="/Likes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
-                    method="post">
+                <form action="/CommentsLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post"
+                    id="Comment_Like">
                     <label>Likes:</label>
                     <button type="submit" class="react" name="reaction" value="likeComment">
                         {{.Comment_likes_count}}
@@ -47,8 +49,9 @@
 
                 <!-- Dislikes Form -->
                 <form
-                    action="/Dislikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
-                    method="post">
+                    action="/CommentsDisLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post"
+                    id="Comment_Dislike">
                     <label>Dislikes:</label>
                     <button type="submit" class="react" name="reaction" value="dislike">
                         {{.Comment_dislikes_count}}
@@ -61,31 +64,64 @@
     </div>
 </body>
 
-<!-- <script>
-    const ReactionSection = document.querySelectorAll('.reaction_section form')
-    ReactionSection.forEach(ReactionForm => {
-        ReactionForm.addEventListener("submit", (e) => {
-            e.preventDefault()
+<script>
+    const Forms = document.querySelectorAll('.reaction_section form')
+    Forms.forEach((CurrForm) => {
+        CurrForm.addEventListener('submit',async (event) =>{
+            event.preventDefault()
+            const ActionPath = event.currentTarget.getAttribute('action')
+            const Comment_id = event.currentTarget.parentElement.querySelector('input').value
+            const choice = event.currentTarget.getAttribute('id')
+            const button = event.currentTarget.querySelector('button')
+            let previouslike = button.textContent
+            console.log(previouslike);
             
-            const PathAction = e.currentTarget.getAttribute("action")
-            let temp = PathAction.split('?')
-
-            const result = getdata(Path, commentId)
-            console.log(temp[1])
+            let TheOtherButton = ""
+            if (choice == "Comment_Like") {
+                TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Dislike').querySelector('button')
+            }else {
+                TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Like').querySelector('button')
+            }
+            // console.log(ActionPath, Comment_id)
+            try {
+                await fetch(ActionPath,{
+                    method: "POST",
+                })
+                const ApiPath = `/api/likes?comment_id=${Comment_id}`;
+                const response = await getdata(ApiPath)
+                const likeCount = response.LikeCount
+                const DislikeCount = response.DislikeCount;
+                if (choice == "Comment_Like"){
+                    button.textContent = likeCount;
+                    TheOtherButton.textContent = DislikeCount
+                }else if (choice == "Comment_Dislike") {
+                    button.textContent = DislikeCount;
+                    TheOtherButton.textContent = likeCount
+                }
+            } catch (error) {
+                console.log("Error while reaction with commments", error)
+            }
         })
     })
 
-    async function getdata(path, CID) {
-        let res = await fetch(path)
-        if (!res.ok) {
-            throw new Error(res.statusText);
+    async function getdata(ApiPath) {
+        try {
+            const res = await fetch(ApiPath)
+            if (!res.ok) {
+                throw new Error(res.statusText)
+            }
+            const json = await res.json()
+            if(json.error) {
+                throw new Error(json.error)
+            }
+            console.log(json);
+            
+            return json
+        } catch (error) {
+            alert("There somethin wrong")
+            throw error
         }
-        let json = await res.json()
-        if (json.error) {
-            throw new Error(json.error)
-        }
-        return json.data
     }
-</script> -->
+</script>
 
 </html>
