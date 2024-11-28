@@ -100,6 +100,7 @@
 </body>
 <script>
     const comment = document.getElementsByClassName("bttn")
+    const reactions = document.getElementsByClassName("react")
     const create = document.getElementById("Create")
     function getCookie(cname) {
         let name = cname + "=";
@@ -124,6 +125,9 @@
         for (let cm of comment) {
             // console.log(cm)
             cm.disabled = true
+        }
+        for (let rea of reactions) {
+            rea.disabled = true
         }
     }
 

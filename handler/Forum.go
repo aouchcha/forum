@@ -22,6 +22,7 @@ type Post struct {
 	Body              string
 	Time              any
 	Categorie         string
+	Len               int
 }
 
 type Reactions struct {

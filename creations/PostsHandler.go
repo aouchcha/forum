@@ -42,6 +42,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 
 	CurrentUser := r.URL.Query().Get("user")
 	Post_id, _ := strconv.Atoi(r.URL.Query().Get("postid"))
+	fmt.Println(Post_id)
 	// fmt.Println("Create post function post id is :", Post_id, "and the writer is :", CurrentUser)
 	title := r.FormValue("title")
 	body := r.FormValue("body")
@@ -56,10 +57,8 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	row := data.Db.QueryRow("SELECT id FROM users WHERE username = ?", CurrentUser)
-	// var username string
-	var user_id int
-	err := row.Scan(&user_id)
-	fmt.Println("username is :", "username", "user_id is :", user_id)
+	var id int
+	err := row.Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("this user don't exist")
@@ -71,14 +70,25 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// Add The post to the posts table
-	_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, user_id)
+	_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, id)
 	if err != nil {
 		log.Println("Error inserting user:", err)
 		http.Error(w, "Internal server error", 500)
 		return
 	}
+
+	err = data.Db.QueryRow("SELECT id FROM posts WHERE post_creator = ? AND title = ? AND body = ? AND user_id = ?", CurrentUser, title, body, id).Scan(&Post_id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "We can't get the new post id", http.StatusInternalServerError)
+			return
+		} else {
+			http.Error(w, "Internal server error"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 	for _, categorie := range categories {
-		_, err = data.Db.Exec("INSERT INTO categories(post_id, categorie) VALUES (?, ?)", Post_id+1, categorie)
+		_, err = data.Db.Exec("INSERT INTO categories(post_id, categorie) VALUES (?, ?)", Post_id, categorie)
 		if err != nil {
 			log.Println("Error inserting user:", err)
 			http.Error(w, "Internal server error", 500)
