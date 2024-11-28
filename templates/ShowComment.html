@@ -23,11 +23,6 @@
     <a href="/forum"><button class="bttn">Return</button></a>
     <div class="post_content">
         <br>
-        <!-- <h1>Title: {{.Title}}</h1>
-        <h2>Body: {{.Body}}</h2>
-        <h3>POST ID: {{.Post_Id}}</h3>
-        <sub>written by: {{.Post_writer}}</sub>
-        <br> -->
         <div class="user_info">
             <img src="/style/programmer.png" alt="{{.Post_writer}}">
             <h2>{{.Post_writer}}</h2>
@@ -47,32 +42,24 @@
             <p>{{.Comment_body}}</p>
             <sub><span>{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">
+                <br>
             <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
-                <!-- Likes Form -->
                 <form action="/CommentsLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
                     method="post"
                     id="Comment_Like">
-                    <label>👍</label>
-                    <button type="submit" class="react" name="reaction" value="likeComment">
-                        {{.Comment_likes_count}}
-                    </button>
+                    <button type="submit" class="react" name="reaction" value="likeComment">👍 {{.Comment_likes_count}}</button>
                 </form>
-
-                <!-- Dislikes Form -->
                 <form
                     action="/CommentsDisLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
                     method="post"
                     id="Comment_Dislike">
-                    <label>👎</label>
-                    <button type="submit" class="react" name="reaction" value="dislike">
-                        {{.Comment_dislikes_count}}
-                    </button>
+                    <button type="submit" class="react" name="reaction" value="dislike">👎 {{.Comment_dislikes_count}}</button>
                 </form>
             </div>
         </div>
         {{end}}
-        <a href="/forum"><button class="bttn">Return</button></a>
     </div>
+    <a href="/forum"><button class="bttn">Return</button></a>
 </body>
 
 <script>
@@ -85,15 +72,17 @@
             const choice = event.currentTarget.getAttribute('id')
             const button = event.currentTarget.querySelector('button')
             let previouslike = button.textContent
-            console.log(previouslike);
-            
+            console.log(" previouslikje ===>",previouslike);
             let TheOtherButton = ""
             if (choice == "Comment_Like") {
                 TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Dislike').querySelector('button')
             }else {
                 TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Like').querySelector('button')
             }
-            // console.log(ActionPath, Comment_id)
+
+            let icon = button.textContent.split(' ')[0];
+            let icon2 = TheOtherButton.innerHTML.split(' ')[0];
+            console.log("iocnes :",icon, icon2);
             try {
                 await fetch(ActionPath,{
                     method: "POST",
@@ -103,11 +92,15 @@
                 const likeCount = response.LikeCount
                 const DislikeCount = response.DislikeCount;
                 if (choice == "Comment_Like"){
-                    button.textContent = likeCount;
-                    TheOtherButton.textContent = DislikeCount
+                    button.textContent = icon + " "+  likeCount;
+                    TheOtherButton.textContent = icon2 + " "+ DislikeCount 
+                    button.style.backgroundColor = "green"
+                    TheOtherButton.style.backgroundColor = ""
                 }else if (choice == "Comment_Dislike") {
-                    button.textContent = DislikeCount;
-                    TheOtherButton.textContent = likeCount
+                    button.textContent = icon + " "+  DislikeCount;
+                    TheOtherButton.textContent = icon2 + " "+ likeCount
+                    button.style.backgroundColor = "red"
+                    TheOtherButton.style.backgroundColor = ""
                 }
             } catch (error) {
                 console.log("Error while reaction with commments", error)

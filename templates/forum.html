@@ -46,9 +46,9 @@
             </form>
         </div>
     </header>
-    <h2 style="color: aliceblue;text-align: center;">Check the Newest Of your FEED!</h2>
+    <h2 style="text-align: center;">Check the Newest Of your FEED!</h2>
     {{if not .Posts}}
-    <h1 style="color: aliceblue;text-align: center;">No Posts Available!</h1>
+    <h1>No Posts Available!</h1>
     {{end}}
     {{range .Posts}}
     <div class="postcontainer">
@@ -56,27 +56,25 @@
             <img src="/style/programmer.png" alt="{{.Usernamepublished}}">
             <h2>{{.Usernamepublished}}</h2>
         </div>
-        <span>{{.Time}}</span> ago 
+        <span id="temps">{{.Time}}</span> ago
         <h1>Title: {{.Title}}</h1>
         <p> content : {{.Body}}</p>
         <div class="reactions-container">
             <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
-            <form 
-                id="like_post"
+            <form id="like_post"
                 action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
 
-                <label>👍</label>
-                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
+                <!-- <label>👍</label> -->
+                <button type="submit" class="react" name="reaction" value="like">👍 {{.LikesCounter}}</button>
 
             </form>
-            <form 
-                id="dislike_post"
+            <form id="dislike_post"
                 action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
 
-                <label>👎</label>
-                <button type="submit" class="react" name="reaction" value="dislike">{{.DislikeCounter}}</button>
+                <!-- <label>👎</label> -->
+                <button type="submit" class="react" name="reaction" value="dislike">👎 {{.DislikeCounter}}</button>
 
             </form>
         </div>
@@ -129,7 +127,7 @@
         }
     }
 
-    const times = document.querySelectorAll('span')
+    const times = document.querySelectorAll('#temps')
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
     function timeAffi(time) {
         let now = new Date()
@@ -182,12 +180,11 @@
             let TheOtherButton = ""
             if (choice == "like_post") {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
-                console.log("TheOtherButton1", TheOtherButton)
-            }else {
+            } else {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
                 console.log("TheOtherButton2", TheOtherButton)
             }
-            
+
 
             if (!button) {
                 console.error("Button not found");
@@ -196,8 +193,11 @@
 
             let path1 = e.currentTarget.getAttribute('action');
 
-            let previouslike = button.textContent;
-            
+            let icon = button.textContent.split(' ')[0];
+            let icon2 = TheOtherButton.innerHTML.split(' ')[0];
+            // console.log("icon2", icon2)
+            let previouslike = button.textContent.split(' ')[1];
+            console.log("previouslike outside ===>", previouslike)
             const postid = e.currentTarget.parentElement.querySelector('input').value;
 
             try {
@@ -211,14 +211,18 @@
                 const likeCount = response.LikeCount;
                 const DislikeCount = response.DislikeCount;
 
-                if (choice == "like_post"){
-                    button.textContent = likeCount;
-                    TheOtherButton.textContent = DislikeCount
+                if (choice == "like_post") {
+                    button.textContent = icon + " " + likeCount;
+                    TheOtherButton.textContent = icon2 + " " + DislikeCount
                     button.style.backgroundColor = "green"
+                    // if (previouslike == previouslike - 1) {
+                    //     console.log("previouslike", previouslike)
+                    //     TheOtherButton.style.backgroundColor = ""
+                    // }
                     TheOtherButton.style.backgroundColor = ""
-                }else if (choice == "dislike_post") {
-                    button.textContent = DislikeCount;
-                    TheOtherButton.textContent = likeCount
+                } else if (choice == "dislike_post") {
+                    button.textContent = icon + " " + DislikeCount;
+                    TheOtherButton.textContent = icon2 + " " + likeCount
                     button.style.backgroundColor = "red"
                     TheOtherButton.style.backgroundColor = ""
                 }
@@ -242,7 +246,7 @@
             return json;
         } catch (error) {
             console.error("Fetch error:", error);
-            throw error; 
+            throw error;
         }
     }
 

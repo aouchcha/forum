@@ -1,62 +1,42 @@
 body {
     margin: 0%;
     padding: 0%;
-    background-color: black;
+    background-color: rgb(255, 255, 255);
 }
 
 .header {
-    background-color: rgb(2, 4, 124);
+    background-color: rgb(84, 85, 100);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
     color: #F0FFFF;
     padding: 1%;
-    /* justify-content: flex-end; */
 }
 
 .post_content {
-    /* color: #F0FFFF; */
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* align-items: center; */
     justify-content: space-evenly;
     padding: 1%;
 }
 
 .react {
     height: 30px;
-    width: 30px;
-    border-radius: 50%; 
-    border: 0px;
+    width: 50px;
+    border: 1px solid black;
+    border-radius: 5px;
     cursor: pointer;
-    margin-right: 0;
-}
-
-.reactions-container {
-    /* align-content: right; */
-    /* display: flex-end; */
-    /* display: grid; */
-    /* grid-auto-flow: column; */
-    /* gap: 0px; */
-    
+    margin: 1px;
 }
 
 .header h2 {
     margin-top: 0;
 }
-/* h1, h2, h3 {
-    color: black;
-} */
+
+
 .jj {
-    /* margin-top: 10%; */
-    /* padding: 4%; */
     height: 100%;
-    /* display: flex; */
-    /* flex-direction: column; */
     justify-content: space-evenly;
     align-items: center;
-    /* background-color: azure; */
     color: rgb(0, 0, 0);
 }
 
@@ -77,10 +57,11 @@ body {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    background-color: rgb(2, 4, 124);
+    background-color: rgb(84, 85, 100);
     font-size: 40px;
     color: beige;
 }
+
 .creation {
     display: flex;
     flex-direction: column;
@@ -112,25 +93,25 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+
 .user_info img {
     height: 50px;
     width: 50px;
     border-radius: 50%;
 }
+
 .user_info {
     display: flex;
-    /* grid-auto-flow: row; */
 }
+
 .user_info h2 {
     gap: 0px;
     margin-left: 5px;
 }
+
 .bb {
-    /* background-color: #F0FFFF; */
-    /* display: flex; */
     flex-direction: column;
     justify-content: space-between;
-    /* align-items: center; */
 }
 
 .postcreation {
@@ -148,14 +129,7 @@ body {
 }
 
 .postcontainer {
-    /* display: grid; */
-    /* grid-auto-flow: column; */
-    /* flex-direction: column; */
-    /* align-items: center; */
-    /* margin-left: 5%;
-    margin-right: 5%; */
-    /* margin-bottom: 1%; */
-    /* margin-top: 1%; */
+    
     border: solid 2px black;
     border-radius: 10px;
     background-color: rgb(241, 241, 241);
@@ -163,69 +137,36 @@ body {
 }
 
 .comment_container {
-    /* border: solid 2px black; */
-    /* border-radius: 30px; */
-    /* display: flex; */
+    
     width: 100%;
     align-items: center;
     margin-right: 4%;
     justify-content: space-between;
     flex-direction: column;
-}
-
-.comment_container button {
-    /* border: solid 2px black; */
-    /* border-radius: 30px; */
-    /* display: flex; */
-    /* width: 100%;
-    align-items: center;
-    margin-right: 4%;
-    justify-content: space-between;
-    flex-direction: column; */
-
-    padding: 12px 15px;
-    text-decoration: none;
-    color: #000;
-    background: #f1f1f1;
-    border: 1px solid #f1f1f1;
-    border-radius: 50px;
-    font-weight: bold;
-    font-size: 0.7rem;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    border: 1px solid #000;
-
-
 }
 
 .comment_container textarea {
     height: 40px;
     width: 350px;
     border: solid 1px black;
-    /* border-radius: 10px; */
 }
 
 .one_comment {
     color: #F0FFFF;
     background-color: rgb(0, 0, 0);
     border: solid 2px rgb(255, 255, 255);
-    /* border-radius: 30px; */
-    display: flex;
+    border-radius: 10px;
     width: 100%;
-    align-items: center;
-    /* padding-left: 7px;
-    margin-right: 4%; */
     justify-content: space-between;
-    flex-direction: column;
-    padding-bottom: 7px;
+    padding: 7px;
 }
+
 .one_comment img {
     height: 50px;
     width: 50px;
     border-radius: 50%;
 }
+
 .bttn {
     padding: 12px 30px;
     text-decoration: none;
