@@ -58,6 +58,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		Title       string
 		Post_writer string
 		Body        string
+		Length      int
 		Comments    []Comment
 	}{
 		Post_Id:     post_id,
@@ -65,6 +66,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		Title:       title,
 		Post_writer: post_creator,
 		Body:        body,
+		Length:      len(comments_toshow),
 		Comments:    comments_toshow,
 	})
 }
