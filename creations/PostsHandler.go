@@ -55,9 +55,11 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad request empty post", http.StatusBadRequest)
 		return
 	}
-	row := data.Db.QueryRow("SELECT username FROM users WHERE username = ?", CurrentUser)
-	var username string
-	err := row.Scan(&username)
+	row := data.Db.QueryRow("SELECT id FROM users WHERE username = ?", CurrentUser)
+	// var username string
+	var user_id int
+	err := row.Scan(&user_id)
+	fmt.Println("username is :", "username", "user_id is :", user_id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("this user don't exist")
@@ -69,7 +71,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// Add The post to the posts table
-	_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body) VALUES (?, ?, ?)", CurrentUser, title, body)
+	_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, user_id)
 	if err != nil {
 		log.Println("Error inserting user:", err)
 		http.Error(w, "Internal server error", 500)

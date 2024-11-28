@@ -16,13 +16,11 @@ func init() {
 		fmt.Println("db error 1") // still need better error handling
 		return
 	}
-
-	// _, err = Db.Exec("PRAGMA foreign_keys = ON;")
-	// if err != nil {
-	// 	fmt.Println("Error enabling foreign keys:", err)
-	// 	return
-	// }
-
+	_, err = Db.Exec(`PRAGMA foreign_keys = ON;`)
+	if err != nil {
+		fmt.Println("db error in PRAGMA") // still need better error handling
+		return
+	}
 	createUsersTable := `
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,11 +51,12 @@ func init() {
 	const CreatPosts string = `
 	CREATE TABLE IF NOT EXISTS posts (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL,
 		post_creator TEXT NOT NULL,
 		title TEXT NOT NULL,
 		body TEXT NOT NULL,
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (post_creator) REFERENCES users(username) ON DELETE CASCADE
+		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 	);`
 
 	if _, err := Db.Exec(CreatPosts); err != nil {
@@ -68,7 +67,7 @@ func init() {
 	const CreatCategories string = `
 	CREATE TABLE IF NOT EXISTS categories (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		post_id INTEGER NOT NULL,
+		post_id INTEGER ,
 		categorie TEXT NOT NULL,
 		FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 	)`
@@ -83,7 +82,7 @@ func init() {
 		comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
 		comment_body TEXT NOT NULL,
 		comment_writer TEXT NOT NULL,
-		post_commented_id INTEGER NOT NULL,
+		post_commented_id INTEGER,
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (post_commented_id) REFERENCES posts(id) ON DELETE CASCADE
 	)`

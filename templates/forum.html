@@ -11,9 +11,9 @@
 <body>
     <header class="name">
         <div class="header">
-            Hello Mr {{.Currenuser}}
+            Welcome {{.Currenuser}}
             <form action="/logout" method="post">
-                <button type="submit" class="btn">Log Out</button>
+                <button type="submit" class="bttn">Log Out</button>
             </form>
         </div>
         <br>
@@ -41,7 +41,7 @@
                     <label for="likedposts">The Posts That I Liked</label>
                     <input type="radio" name="categories" id="likedposts" value="likedposts">
                     <pre>    </pre>
-                    <button type="submit" class="btn" id="filter">Filter</button>
+                    <button type="submit" class="bttn" id="filter">Filter</button>
                 </div>
             </form>
         </div>
@@ -52,9 +52,13 @@
     {{end}}
     {{range .Posts}}
     <div class="postcontainer">
-        <h3>title: {{.Title}}</h3>
-        <p>{{.Body}}</p>
-        <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
+        <div class="user_info">
+            <img src="/style/programmer.png" alt="{{.Usernamepublished}}">
+            <h2>{{.Usernamepublished}}</h2>
+        </div>
+        <span>{{.Time}}</span> ago 
+        <h1>Title: {{.Title}}</h1>
+        <p> content : {{.Body}}</p>
         <div class="reactions-container">
             <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
             <form 
@@ -62,7 +66,7 @@
                 action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
 
-                <label>Likes:</label>
+                <label>👍</label>
                 <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
 
             </form>
@@ -71,7 +75,7 @@
                 action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
 
-                <label>Dislikes:</label>
+                <label>👎</label>
                 <button type="submit" class="react" name="reaction" value="dislike">{{.DislikeCounter}}</button>
 
             </form>
@@ -155,6 +159,12 @@
                 body: formData
             })
             e.currentTarget.querySelector("textarea").value = ""
+            const div = document.createElement("div")
+            div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
+            cForm.appendChild(div)
+            setTimeout(() => {
+                div.remove()
+            }, 2000)
         })
     })
 
@@ -172,8 +182,10 @@
             let TheOtherButton = ""
             if (choice == "like_post") {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
+                console.log("TheOtherButton1", TheOtherButton)
             }else {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
+                console.log("TheOtherButton2", TheOtherButton)
             }
             
 
@@ -184,7 +196,7 @@
 
             let path1 = e.currentTarget.getAttribute('action');
 
-            let previouslike = button.textContent
+            let previouslike = button.textContent;
             
             const postid = e.currentTarget.parentElement.querySelector('input').value;
 
@@ -202,9 +214,13 @@
                 if (choice == "like_post"){
                     button.textContent = likeCount;
                     TheOtherButton.textContent = DislikeCount
+                    button.style.backgroundColor = "green"
+                    TheOtherButton.style.backgroundColor = ""
                 }else if (choice == "dislike_post") {
                     button.textContent = DislikeCount;
                     TheOtherButton.textContent = likeCount
+                    button.style.backgroundColor = "red"
+                    TheOtherButton.style.backgroundColor = ""
                 }
             } catch (err) {
                 console.error("Error processing like:", err);

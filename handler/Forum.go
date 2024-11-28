@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"html/template"
+	"net/http"
+
 	data "main/dataBase"
 	// handler "main/handler"
-	"net/http"
-	"text/template"
 )
 
 type Post struct {
@@ -122,10 +123,10 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 	var posts_toshow []Post
 	var comment_id, post_id int
 	for post_rows.Next() {
-		var id int
+		var id, user_id int
 		var title, body, usernamepublished string
 		var time any
-		if err := post_rows.Scan(&id, &usernamepublished, &title, &body, &time); err != nil {
+		if err := post_rows.Scan(&id, &user_id, &usernamepublished, &title, &body, &time); err != nil {
 			fmt.Println(err)
 			continue
 		}

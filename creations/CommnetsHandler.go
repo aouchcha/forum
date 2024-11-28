@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
-	"text/template"
 
 	data "main/dataBase"
 	handler "main/handler"
@@ -46,7 +46,6 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 	}
 	var title, body, post_creator string
 	err = data.Db.QueryRow(`SELECT post_creator, title, body FROM posts WHERE id = ?`, post_id).Scan(&post_creator, &title, &body)
-
 	if err != nil {
 		handler.ChooseError(w, "There is no post to this comment", 500)
 		return
