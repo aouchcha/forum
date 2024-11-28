@@ -19,6 +19,7 @@
         </div>
         <br>
     </header>
+    <br>
     <a href="/forum"><button class="bttn">Return</button></a>
     <div class="post_content">
         <br>
@@ -40,7 +41,9 @@
         {{end}}
         {{range .Comments}}
         <div class="one_comment">
-            <h4>by {{.Comment_writer}}</h4>
+            <h4>
+            <img src="/style/programmer.png" alt="{{.Comment_writer}}">
+                 {{.Comment_writer}}</h4>
             <p>{{.Comment_body}}</p>
             <sub><span>{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">

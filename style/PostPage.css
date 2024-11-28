@@ -11,16 +11,18 @@ body {
     justify-content: space-between;
     width: 100%;
     color: #F0FFFF;
+    padding: 1%;
     /* justify-content: flex-end; */
 }
 
-/* .post_content {
-    color: #F0FFFF;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.post_content {
+    /* color: #F0FFFF; */
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* align-items: center; */
     justify-content: space-evenly;
-} */
+    padding: 1%;
+}
 
 .react {
     height: 30px;
@@ -219,7 +221,11 @@ body {
     flex-direction: column;
     padding-bottom: 7px;
 }
-
+.one_comment img {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
 .bttn {
     padding: 12px 30px;
     text-decoration: none;

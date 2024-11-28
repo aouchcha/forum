@@ -16,11 +16,11 @@ func init() {
 		fmt.Println("db error 1") // still need better error handling
 		return
 	}
-	_, err = Db.Exec(`PRAGMA foreign_keys = ON;`)
-	if err != nil {
-		fmt.Println("db error in PRAGMA") // still need better error handling
-		return
-	}
+	// _, err = Db.Exec(`PRAGMA foreign_keys = ON;`)
+	// if err != nil {
+	// 	fmt.Println("db error in PRAGMA") // still need better error handling
+	// 	return
+	// }
 	createUsersTable := `
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

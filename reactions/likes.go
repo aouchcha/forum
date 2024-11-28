@@ -34,6 +34,7 @@ func PostsLike(w http.ResponseWriter, r *http.Request) {
 			// Then Insert into likes if not exists
 			_, err = data.Db.Exec("INSERT INTO likes (user_id, post_id, username) VALUES (?, ?, ?)", user_id, postid, user)
 			if err != nil {
+				fmt.Println("Hna error")
 				fmt.Println("Error liking post", err)
 				http.Error(w, "Error liking post", http.StatusInternalServerError)
 				return
