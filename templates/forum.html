@@ -6,47 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
     <link rel="stylesheet" href="../style/PostPage.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
-    <header class="name">
-        <div class="header">
-            Welcome {{.Currenuser}}
+    <header>
+        <div class="containerTop">
+            <div class="user">
+                <img src="/style/programmer.png" alt="{{.Currenuser}}">
+                <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
+                <h2><strong>User ID :</strong> {{.Curr_id}}</h2>
+            </div>
+            <button class="sidebarbtn" onclick="toggleSidebar()">☰ FILTER</button>
             <form action="/logout" method="post">
-                <button type="submit" class="bttn">Log Out</button>
+                <button type="submit" class="sidebarbtn">
+                    <i class="glyphicon glyphicon-log-out"></i>
+                    Log Out</button>
             </form>
         </div>
-        <br>
-        <div class="temp" id="temp">
-            <div class="creation">
-                <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create">Create
-                        Post</button></a>
-            </div>
+        <img src="/style/zone01oujda.png" alt="zone01oujda">
+        <h1><strong>Welcome To Forum </strong></h1>
+        <div>
+            <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create">Create
+                    Post</button></a>
+        </div>
+
+    </header>
+    <div class="temp" id="temp">
+        <div class="sidebar" id="sidebar">
             <form action="/forum" method="get">
-                <div class="filter">
-                    <label for="all">All</label>
+                <div>
+                    <li>Choose categories:</li>
+                    <br>
                     <input type="radio" name="categories" id="all" value="all">
-                    <label for="sport">Sport</label>
+                    <label for="all">All</label>
+                    <br>
                     <input type="radio" name="categories" id="sport" value="sport">
-                    <label for="politic">Politic</label>
+                    <label for="sport">Sport</label>
+                    <br>
                     <input type="radio" name="categories" id="politic" value="politic">
-                    <label for="enteairtement">Enteairtement</label>
+                    <label for="politic">Politic</label>
+                    <br>
                     <input type="radio" name="categories" id="enteairtement" value="enteairtement">
-                    <label for="economie">Economie</label>
+                    <label for="enteairtement">Enteairtement</label>
+                    <br>
                     <input type="radio" name="categories" id="economie" value="economie">
-                    <label for="it">IT</label>
+                    <label for="economie">Economie</label>
+                    <br>
                     <input type="radio" name="categories" id="it" value="it">
-                    <label for="myposts">My Own Posts</label>
+                    <label for="it">IT</label>
+                    <br>
                     <input type="radio" name="categories" id="myposts" value="myposts">
-                    <label for="likedposts">The Posts That I Liked</label>
+                    <label for="myposts">My Own Posts</label>
+                    <br>
                     <input type="radio" name="categories" id="likedposts" value="likedposts">
-                    <pre>    </pre>
+                    <label for="likedposts">The Posts That I Liked</label>
+                    <br>
                     <button type="submit" class="bttn" id="filter">Filter</button>
                 </div>
-            </form>
         </div>
-    </header>
-    <h2 style="text-align: center;">Check the Newest Of your FEED!</h2>
+        </form>
+    </div>
+    <h2 style="text-align: center;"><strong>Check the Newest Of your FEED!</strong></h2>
     {{if not .Posts}}
     <h1>No Posts Available!</h1>
     {{end}}
@@ -64,17 +86,17 @@
             <form id="like_post"
                 action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
-
-                <!-- <label>👍</label> -->
-                <button type="submit" class="react" name="reaction" value="like">👍 {{.LikesCounter}}</button>
+                <button type="submit" class="react" name="reaction" value="like">
+                    <i class="fa fa-thumbs-o-up">
+                    </i>
+                    {{.LikesCounter}}</button>
 
             </form>
             <form id="dislike_post"
                 action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
-
-                <!-- <label>👎</label> -->
-                <button type="submit" class="react" name="reaction" value="dislike">👎 {{.DislikeCounter}}</button>
+                <button type="submit" class="react" name="reaction" value="dislike"><i class="fa fa-thumbs-o-down"></i>
+                    {{.DislikeCounter}}</button>
 
             </form>
         </div>
@@ -97,8 +119,30 @@
         </form>
     </div>
     {{end}}
+    <footer class="footer">
+        <p>&copy; 2023 Your Website. All rights reserved.</p>
+        <p>
+            Github :
+        </p>
+        <div class="href">
+            <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
+            <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
+            | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
+        </div>
+    </footer>
 </body>
 <script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            console.log("sidebar closed")
+        } else {
+            sidebar.classList.add('open');
+            console.log("sidebar opened")
+        }
+        // sidebar.classList.add('sidebar');
+    }
     const comment = document.getElementsByClassName("bttn")
     const reactions = document.getElementsByClassName("react")
     const create = document.getElementById("Create")
@@ -184,9 +228,14 @@
             let TheOtherButton = ""
             if (choice == "like_post") {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
+                // console.log("TheOtherButton1", TheOtherButton)
+                // let thumbs = TheOtherButton.querySelector('i')
+                // console.log("TheOtherButton ====>", thumbs)
             } else {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
-                console.log("TheOtherButton2", TheOtherButton)
+                // console.log("TheOtherButton2", TheOtherButton)
+                // let thumbs = TheOtherButton.querySelector('i')
+                // console.log("TheOtherButton ====>", thumbs)
             }
 
 
@@ -197,10 +246,10 @@
 
             let path1 = e.currentTarget.getAttribute('action');
 
-            let icon = button.textContent.split(' ')[0];
-            let icon2 = TheOtherButton.innerHTML.split(' ')[0];
+            let icon = "👍🏻"
+            let icon2 = "👎🏻"
             // console.log("icon2", icon2)
-            let previouslike = button.textContent.split(' ')[1];
+            let previouslike = button.textContent
             console.log("previouslike outside ===>", previouslike)
             const postid = e.currentTarget.parentElement.querySelector('input').value;
 
@@ -225,8 +274,8 @@
                     // }
                     TheOtherButton.style.backgroundColor = ""
                 } else if (choice == "dislike_post") {
-                    button.textContent = icon + " " + DislikeCount;
-                    TheOtherButton.textContent = icon2 + " " + likeCount
+                    button.textContent = icon2 + " " + DislikeCount;
+                    TheOtherButton.textContent = icon + " " + likeCount
                     button.style.backgroundColor = "red"
                     TheOtherButton.style.backgroundColor = ""
                 }

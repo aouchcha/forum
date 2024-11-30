@@ -5,24 +5,25 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(to bottom right, #060764, #111);
+    background-color: #000000;
+    /* background: linear-gradient(to bottom right, #060764, #111); */
     /* background-image: url("/style/cool_background.jpeg"); */
     /* background-size: cover; */
     /* background-repeat: no-repeat; */
-    color: #f1f1f1;
+    /* color: #000000; */
     overflow: hidden;
 }
 
 .container {
-    background-image: url("/style/cool_background.jpeg");
+    /* background-image: url("/style/cool_background.jpeg"); */
     border: 1px solid #ccc;
     width: 100%;
     max-width: 600px;
     padding: 40px;
     text-align: center;
-    /* background: rgba(0, 0, 0, 0.85); */
+    background: rgba(0, 0, 0, 0.85);
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    box-shadow: 5px 10px 26px rgba(255, 255, 255, 0.6);
     animation: scaleIn 0.8s ease forwards;
     transform: scale(0.4);
 }

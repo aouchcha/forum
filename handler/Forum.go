@@ -44,6 +44,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var CurrentUser, CurrentSession string
+	var curr_id int
 	var session_id string
 	cat_to_filter := r.FormValue("categories")
 	cookie1, err1 := r.Cookie("session_token")
@@ -65,6 +66,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
+		curr_id = postt.CurrentUser_id
 	}
 
 	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
@@ -74,11 +76,13 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	}
 	err = tmpl.Execute(w, struct {
 		Currenuser string
+		Curr_id    int
 		comment_id int
 		Post_id    int
 		Posts      []Post
 	}{
 		Currenuser: CurrentUser,
+		Curr_id:    curr_id,
 		comment_id: comment_id,
 		Post_id:    post_id,
 		Posts:      posts_toshow,

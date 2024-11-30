@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"text/template"
 )
@@ -19,6 +20,7 @@ func ChooseError(w http.ResponseWriter, ErrMessage string, ErrCode int) {
 		ErrCode:    ErrCode,
 	})
 	if err != nil {
+		fmt.Println("Cha hahahahdda")
 		http.Error(w, "Internal server error in exuting error page", http.StatusInternalServerError)
 		return
 	}

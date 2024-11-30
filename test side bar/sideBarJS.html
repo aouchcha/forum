@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Side Div with Button</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 0;
+            height: 100vh;
+            background-color: lightblue;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-x: hidden; /* Hide content when collapsed */
+            transition: width 0.3s;
+            padding: 0; /* No padding by default */
+        }
+
+        .sidebar.open {
+            width: 250px; /* Width when expanded */
+            padding: 20px; /* Add padding when expanded */
+        }
+
+        .toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            z-index: 1000; /* Ensure it stays above the sidebar */
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <h2>Sidebar Content</h2>
+        <p>This is the content inside the sidebar.</p>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        function toggleSidebar() {
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            } else {
+                sidebar.classList.add('open');
+            }
+        }
+    </script>
+</body>
+</html>
