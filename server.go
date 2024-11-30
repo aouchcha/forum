@@ -10,7 +10,7 @@ import (
 	userData "main/userData"
 )
 
-var port = "9090"
+var port = "8087"
 
 func main() {
 	http.HandleFunc("/", handler.Home)
