@@ -10,17 +10,19 @@
 </head>
 
 <body style="background-color: aliceblue;">
-    <header class="name">
-        <div class="header">
-            Hello Mr {{.CurrentUser}}
+    <header>
+        <div class="user">
+            <img src="/style/programmer.png" alt="{{.CurrentUser}}">
+            <h2>User : {{.CurrentUser}}</h2>
             <form action="/logout" method="post">
                 <button type="submit" class="bttn">Log Out</button>
             </form>
+            <br>
+            <a href="/forum"><button class="bttn">Return</button></a>
         </div>
         <br>
     </header>
     <br>
-    <a href="/forum"><button class="bttn">Return</button></a>
     <div class="post_content">
         <br>
         <div class="user_info">
@@ -60,6 +62,17 @@
         {{end}}
     </div>
     <a href="/forum"><button class="bttn">Return</button></a>
+    <footer class="footer">
+        <p>&copy; 2023 Your Website. All rights reserved.</p>
+        <p>
+            Github :
+        </p>
+        <div class="href">
+            <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
+            <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
+            | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
+        </div>
+    </footer>
 </body>
 
 <script>
