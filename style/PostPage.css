@@ -4,7 +4,10 @@ body {
     padding: 0;
     background-color: rgb(255, 255, 255);
 }
-
+/* .zone01 {
+    position: relative;
+    align-items:safe ;
+} */
 .sidebar {
     width: 0;
     color: #060764;
@@ -43,11 +46,14 @@ body {
 }
 
 header {
-    position: inherit;
+    position: relative;
+    /* display: grid; */
+    /* box-sizing: border-box; */
+    /* overflow-y: hidden; */
     text-align: center;
     background: linear-gradient(to bottom right, #060764, #2e2e2e);
     color: #F0FFFF;
-    height: 55vh;
+    height: 100%;
 }
 .user {
     align-items: center;
@@ -149,11 +155,13 @@ header {
 }
 
 .postcontainer {
+    /* overflow: auto; */
     border: solid 2px black;
     border-radius: 10px;
     background-color: rgb(241, 241, 241);
     padding: 2%;
-    margin: 5px;
+    /* margin: 5px; */
+    margin-top: 0px;
 }
 
 .comment_container {
@@ -259,7 +267,7 @@ header {
     header {
         margin-left: 0;
         padding-bottom: auto;
-        height: 44vh;
+        height: 100%;
     }
     header h1 {
         font-size: 20px;
@@ -273,8 +281,13 @@ header {
     }
 }
 
-/* Adjust for very small screens (mobile-first approach) */
-@media (max-width: 320px) {
+@media (max-width: 480px) {
+    header {
+        position: relative;
+        /* display: block; */
+        /* offset-block-end: auto; */
+        height: 70vh;
+    }
     .sidebar {
         font-size: 12px;
     }
@@ -291,6 +304,11 @@ header {
     .comment_container textarea {
         height: 20px;
         width: 220;
+        border: solid 1px black;
+    }
+    .postcontainer textarea {
+        height: 100px;
+        width: 200px;
         border: solid 1px black;
     }
 }
