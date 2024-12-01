@@ -19,13 +19,15 @@
                 <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
                 <h2><strong>User ID :</strong> {{.Curr_id}}</h2>
             </div>
-            <button class="sidebarbtn" onclick="toggleSidebar()">☰
-                FILTER</button>
-            <form action="/logout" method="post">
-                <button type="submit" class="sidebarbtn">
-                    <i class="glyphicon glyphicon-log-out"></i>
-                    Log Out</button>
-            </form>
+            <div class="corner">
+                <button class="sidebarbtn" onclick="toggleSidebar()">☰
+                    FILTER</button>
+                <form action="/logout" method="post">
+                    <button type="submit" class="sidebarbtn">
+                        <i class="glyphicon glyphicon-log-out"></i>
+                        Log Out</button>
+                </form>
+            </div>
             <div class="zone01">
                 <img src="/style/zone01oujda.png" alt="zone01oujda">
                 <h1><strong>Welcome To Forum </strong></h1>

@@ -1,16 +1,18 @@
-
 body {
     margin: 0;
     padding: 0;
     background-color: rgb(255, 255, 255);
 }
-/* .zone01 {
-    position: relative;
-    align-items:safe ;
-} */
+
+.corner {
+    position: fixed;
+    top: 0%;
+    right: 0%;
+}
+
 .sidebar {
     width: 0;
-    color: #060764;
+    color: #000000;
     background-color: rgb(255, 255, 255);
     position: fixed;
     top: 0;
@@ -22,18 +24,23 @@ body {
 }
 
 .open {
-    border-right: white 2px solid;
-    border-bottom: white 2px solid;
-    border-bottom-right-radius: 5px ;
+    border-right: rgb(0, 0, 0) 2px solid;
+    border-bottom: rgb(0, 0, 0) 2px solid;
+    border-top: rgb(0, 0, 0) 2px solid;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
     width: 220px;
+    height: 100%;
     padding: 11px;
     position: fixed;
 }
+
 .containerTop {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
 .sidebarbtn {
     right: 0;
     margin-left: auto;
@@ -55,21 +62,27 @@ header {
     color: #F0FFFF;
     height: 100%;
 }
+
 .user {
     align-items: center;
     align-content: center;
 }
-.user h1,h2 {
+
+.user h1,
+h2 {
     display: flex;
     margin-left: 5px;
 }
+
 .user img {
     margin-top: 10px;
     width: 70px;
-    height: 70px;;
+    height: 70px;
+    ;
     border-radius: 50%;
     margin-right: 10px;
 }
+
 .post_content {
     justify-content: space-evenly;
     padding: 1%;
@@ -83,6 +96,7 @@ header {
     cursor: pointer;
     margin: 1px;
 }
+
 .jj {
     height: 100%;
     justify-content: space-evenly;
@@ -244,6 +258,7 @@ header {
     padding: 10px;
     margin-top: 20px;
 }
+
 /* @media (max-width: 768px) {
     .sidebar {
         width: 0;
@@ -252,14 +267,15 @@ header {
         width: 100%;
     }
 } */
- /* Adjust for smaller screens */
+/* Adjust for smaller screens */
 @media (max-width: 768px) {
     .sidebar {
         width: 0;
     }
 
     .open {
-        width: 40%; /* Full-screen sidebar on smaller devices */
+        width: 40%;
+        /* Full-screen sidebar on smaller devices */
         padding: 10px;
         font-size: 11px;
     }
@@ -269,13 +285,16 @@ header {
         padding-bottom: auto;
         height: 100%;
     }
+
     header h1 {
         font-size: 20px;
     }
+
     header img {
         width: 90px;
         height: 50px;
     }
+
     .content {
         margin-left: 0;
     }
@@ -288,6 +307,7 @@ header {
         /* offset-block-end: auto; */
         height: 70vh;
     }
+
     .sidebar {
         font-size: 12px;
     }
@@ -299,13 +319,15 @@ header {
     .sidebarbtn {
         width: 70px;
         height: 25px;
-        font-size:  10px;
+        font-size: 10px;
     }
+
     .comment_container textarea {
         height: 20px;
         width: 220;
         border: solid 1px black;
     }
+
     .postcontainer textarea {
         height: 100px;
         width: 200px;
