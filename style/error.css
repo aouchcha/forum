@@ -1,92 +1,12 @@
-/* body {
-    margin: 0%;
-    padding: 0%;
-    background-color: black;
-    color: white;
+body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(0, 0, 0);
 }
-
-.Err {
+.error-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    border: 2px solid white;
-    background-color: rgb(27, 63, 27);
-} */
-
-body {
-    display: flex;
-    align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    background: linear-gradient(to bottom right, #333, #111);
-    color: #f1f1f1;
-    overflow: hidden;
-}
-
-.Err {
-    width: 100%;
-    /* max-width: 600px; */
-    padding: 40px;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.85);
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    animation: scaleIn 0.8s ease forwards;
-    transform: scale(0.4);
-}
-
-h1 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #fff;
-    transition: opacity 1s ease;
-}
-
-
-.btn {
-    padding: 12px 30px;
-    text-decoration: none;
-    color: #000;
-    background: #f1f1f1;
-    border: 1px solid #f1f1f1;
-    border-radius: 50px;
-    font-weight: bold;
-    font-size: 1rem;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn:hover {
-    background-color: #000;
-    color: #ffffff;
-    border-color: #666666;
-}
-
-
-
-@keyframes scaleIn {
-    to {
-        transform: scale(1);
-    }
-}
-
-@media (max-width: 600px) {
-    .container {
-        padding: 20px;
-    }
-
-    h1 {
-        font-size: 1.8rem;
-    }
-
-    .subtext {
-        font-size: 1rem;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-    }
+    align-items: center;
+    height: 100vh;
 }

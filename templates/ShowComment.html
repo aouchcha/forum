@@ -10,6 +10,9 @@
 </head>
 
 <body style="background-color: aliceblue;">
+    <noscript>
+        <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
+    </noscript>
     <header>
         <div class="user">
             <img src="/style/programmer.png" alt="{{.CurrentUser}}">
@@ -34,28 +37,30 @@
     </div>
     <div class="comment_container">
         {{if not .Comments}}
-        <h1 >No Comments Available on this post !</h1>
+        <h1>No Comments Available on this post !</h1>
         {{end}}
         {{range .Comments}}
         <div class="one_comment">
             <h4>
-            <img src="/style/programmer.png" alt="{{.Comment_writer}}">
-                 {{.Comment_writer}}</h4>
+                <img src="/style/programmer.png" alt="{{.Comment_writer}}">
+                {{.Comment_writer}}
+            </h4>
             <p>{{.Comment_body}}</p>
             <sub><span>{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">
                 <br>
-            <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
-                <form action="/CommentsLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
-                    method="post"
-                    id="Comment_Like">
-                    <button type="submit" class="react" name="reaction" value="likeComment">👍 {{.Comment_likes_count}}</button>
+                <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
+                <form
+                    action="/CommentsLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post" id="Comment_Like">
+                    <button type="submit" class="react" name="reaction" value="likeComment">👍
+                        {{.Comment_likes_count}}</button>
                 </form>
                 <form
                     action="/CommentsDisLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
-                    method="post"
-                    id="Comment_Dislike">
-                    <button type="submit" class="react" name="reaction" value="dislike">👎 {{.Comment_dislikes_count}}</button>
+                    method="post" id="Comment_Dislike">
+                    <button type="submit" class="react" name="reaction" value="dislike">👎
+                        {{.Comment_dislikes_count}}</button>
                 </form>
             </div>
         </div>
@@ -78,40 +83,40 @@
 <script>
     const Forms = document.querySelectorAll('.reaction_section form')
     Forms.forEach((CurrForm) => {
-        CurrForm.addEventListener('submit',async (event) =>{
+        CurrForm.addEventListener('submit', async (event) => {
             event.preventDefault()
             const ActionPath = event.currentTarget.getAttribute('action')
             const Comment_id = event.currentTarget.parentElement.querySelector('input').value
             const choice = event.currentTarget.getAttribute('id')
             const button = event.currentTarget.querySelector('button')
             let previouslike = button.textContent
-            console.log(" previouslikje ===>",previouslike);
+            console.log(" previouslikje ===>", previouslike);
             let TheOtherButton = ""
             if (choice == "Comment_Like") {
                 TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Dislike').querySelector('button')
-            }else {
+            } else {
                 TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Like').querySelector('button')
             }
 
             let icon = button.textContent.split(' ')[0];
             let icon2 = TheOtherButton.innerHTML.split(' ')[0];
-            console.log("iocnes :",icon, icon2);
+            console.log("iocnes :", icon, icon2);
             try {
-                await fetch(ActionPath,{
+                await fetch(ActionPath, {
                     method: "POST",
                 })
                 const ApiPath = `/api/likes?comment_id=${Comment_id}`;
                 const response = await getdata(ApiPath)
                 const likeCount = response.LikeCount
                 const DislikeCount = response.DislikeCount;
-                if (choice == "Comment_Like"){
-                    button.textContent = icon + " "+  likeCount;
-                    TheOtherButton.textContent = icon2 + " "+ DislikeCount 
+                if (choice == "Comment_Like") {
+                    button.textContent = icon + " " + likeCount;
+                    TheOtherButton.textContent = icon2 + " " + DislikeCount
                     button.style.backgroundColor = "green"
                     TheOtherButton.style.backgroundColor = ""
-                }else if (choice == "Comment_Dislike") {
-                    button.textContent = icon + " "+  DislikeCount;
-                    TheOtherButton.textContent = icon2 + " "+ likeCount
+                } else if (choice == "Comment_Dislike") {
+                    button.textContent = icon + " " + DislikeCount;
+                    TheOtherButton.textContent = icon2 + " " + likeCount
                     button.style.backgroundColor = "red"
                     TheOtherButton.style.backgroundColor = ""
                 }
@@ -128,11 +133,11 @@
                 throw new Error(res.statusText)
             }
             const json = await res.json()
-            if(json.error) {
+            if (json.error) {
                 throw new Error(json.error)
             }
             console.log(json);
-            
+
             return json
         } catch (error) {
             alert("There somethin wrong")

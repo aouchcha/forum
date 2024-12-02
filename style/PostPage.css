@@ -207,7 +207,7 @@ h2 {
     background-color: rgb(0, 0, 0);
     border: solid 2px rgb(255, 255, 255);
     border-radius: 10px;
-    width: 100%;
+    /* width: 100%; */
     justify-content: space-between;
     padding: 7px;
 }
@@ -259,23 +259,12 @@ h2 {
     margin-top: 20px;
 }
 
-/* @media (max-width: 768px) {
-    .sidebar {
-        width: 0;
-    }
-    .open {
-        width: 100%;
-    }
-} */
-/* Adjust for smaller screens */
 @media (max-width: 768px) {
     .sidebar {
         width: 0;
     }
-
     .open {
         width: 40%;
-        /* Full-screen sidebar on smaller devices */
         padding: 10px;
         font-size: 11px;
     }
@@ -332,5 +321,9 @@ h2 {
         height: 100px;
         width: 200px;
         border: solid 1px black;
+    }
+    .one_comment {
+        position: relative;
+        width: auto;
     }
 }
