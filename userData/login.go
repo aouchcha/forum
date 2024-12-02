@@ -17,7 +17,6 @@ type Exist struct {
 
 func session() string {
 	id, _ := uuid.NewV7()
-	// fmt.Println(id.String())
 	return id.String()
 }
 
