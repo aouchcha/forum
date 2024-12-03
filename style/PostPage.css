@@ -177,7 +177,11 @@ h2 {
     /* margin: 5px; */
     margin-top: 0px;
 }
-
+.postcontainer img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
 .comment_container {
 
     width: 100%;
@@ -251,12 +255,13 @@ h2 {
     border-color: #ffffff;
 }
 
-.footer {
+footer {
     background: linear-gradient(to bottom right, #060764, #2e2e2e);
     color: #F0FFFF;
     text-align: center;
     padding: 10px;
     margin-top: 20px;
+    /* position: absolute; */
 }
 
 @media (max-width: 768px) {

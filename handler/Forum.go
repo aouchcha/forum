@@ -2,6 +2,7 @@ package handler
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"html/template"
@@ -22,7 +23,7 @@ type Post struct {
 	Body              string
 	Time              any
 	Categorie         string
-	Len               int
+	Image             string
 }
 
 type Reactions struct {
@@ -130,8 +131,9 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 	for post_rows.Next() {
 		var id, user_id int
 		var title, body, usernamepublished string
+		var imageData []byte
 		var time any
-		if err := post_rows.Scan(&id, &user_id, &usernamepublished, &title, &body, &time); err != nil {
+		if err := post_rows.Scan(&id, &user_id, &usernamepublished, &title, &body, &imageData, &time); err != nil {
 			fmt.Println(err)
 			continue
 		}
@@ -143,14 +145,15 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		if err != nil {
 			fmt.Println("Error fetching like count ==>", err)
 			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
-			return nil, 0, 0, errors.New("Internal server error")
+			return nil, 0, 0, errors.New("internal server error")
 		}
 		err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE post_id = ?`, post_id).Scan(&dislikee.DislikeCount)
 		if err != nil {
 			fmt.Println("Error fetching like count ==>", err)
 			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
-			return nil, 0, 0, errors.New("Internal server error")
+			return nil, 0, 0, errors.New("internal server error")
 		}
+		base64Image := base64.StdEncoding.EncodeToString(imageData)
 		fmt.Println("comments id= ", comment_id, "post id= ", post_id)
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
@@ -162,12 +165,11 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			Title:             title,
 			Body:              body,
 			Time:              time,
+			Image:             base64Image,
 		})
 	}
-	// fmt.Println("postt.CurrentUser_id : ", postt.CurrentUser_id)
-	// fmt.Println("LikesCounter in posttt : ", postt.LikesCounter)
 	if err := post_rows.Err(); err != nil {
-		return nil, 0, 0, errors.New("Error ma3reftch fin")
+		return nil, 0, 0, errors.New("error ma3reftch fin")
 	}
 	for i := 0; i < len(posts_toshow)-1; i++ {
 		for j := i + 1; j < len(posts_toshow); j++ {

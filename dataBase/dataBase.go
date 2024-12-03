@@ -181,6 +181,7 @@ func init() {
 		post_creator TEXT NOT NULL,
 		title TEXT NOT NULL,
 		body TEXT NOT NULL,
+		image BLOB,
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 	);`

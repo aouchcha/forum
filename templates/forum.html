@@ -1,164 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Forum</title>
-        <link rel="icon" type="image/png" sizes="40x40" href="/style/icon.png.png">
-        <link rel="stylesheet" href="../style/PostPage.css">
-        <link rel="stylesheet"
-            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <link rel="icon" type="image/png" sizes="40x40" href="/style/icon.png.png">
+    <link rel="stylesheet" href="../style/PostPage.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
 
-    <body>
-        <noscript>
-            <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
-        </noscript>
-        <header>
-            <div class="user">
-                <img src="/style/programmer.png" alt="{{.Currenuser}}">
-                <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
-                <h2><strong>User ID :</strong> {{.Curr_id}}</h2>
-            </div>
-            <div class="corner">
-                <button class="sidebarbtn" onclick="toggleSidebar()">☰
-                    FILTER</button>
-                <form action="/logout" method="post">
-                    <button type="submit" class="sidebarbtn">
-                        <i class="glyphicon glyphicon-log-out"></i>
-                        Log Out</button>
-                </form>
-            </div>
-            <div class="zone01">
-                <img src="/style/zone01oujda.png" alt="zone01oujda">
-                <h1><strong>Welcome To Forum </strong></h1>
-            </div>
-            <div>
-                <a
-                    href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button
-                        class="bttn" id="Create"> <i class="material-icons"></i>
-                        Create Post </button></a>
-            </div>
+<body>
+    <noscript>
+        <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
+    </noscript>
+    <header>
+        <div class="user">
+            <img src="/style/programmer.png" alt="{{.Currenuser}}">
+            <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
+            <h2><strong>User ID :</strong> {{.Curr_id}}</h2>
+        </div>
+        <div class="corner">
+            <button class="sidebarbtn" onclick="toggleSidebar()">☰
+                FILTER</button>
+            <form action="/logout" method="post">
+                <button type="submit" class="sidebarbtn">
+                    <i class="glyphicon glyphicon-log-out"></i>
+                    Log Out</button>
+            </form>
+        </div>
+        <div class="zone01">
+            <img src="/style/zone01oujda.png" alt="zone01oujda">
+            <h1><strong>Welcome To Forum </strong></h1>
+        </div>
+        <div>
+            <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create"> <i
+                        class="material-icons"></i>
+                    Create Post </button></a>
+        </div>
 
-        </header>
-        <div id="temp">
-            <div class="sidebar" id="sidebar">
-                <form action="/forum" method="get">
-                    <div>
-                        <li>Choose categories:</li>
-                        <br>
-                        <input type="radio" name="categories" id="all"
-                            value="all">
-                        <label for="all">All</label>
-                        <br>
-                        <input type="radio" name="categories" id="sport"
-                            value="sport">
-                        <label for="sport">Sport</label>
-                        <br>
-                        <input type="radio" name="categories" id="politic"
-                            value="politic">
-                        <label for="politic">Politic</label>
-                        <br>
-                        <input type="radio" name="categories" id="enteairtement"
-                            value="enteairtement">
-                        <label for="enteairtement">Enteairtement</label>
-                        <br>
-                        <input type="radio" name="categories" id="economie"
-                            value="economie">
-                        <label for="economie">Economie</label>
-                        <br>
-                        <input type="radio" name="categories" id="it"
-                            value="it">
-                        <label for="it">IT</label>
-                        <br>
-                        <input type="radio" name="categories" id="myposts"
-                            value="myposts">
-                        <label for="myposts">My Own Posts</label>
-                        <br>
-                        <input type="radio" name="categories" id="likedposts"
-                            value="likedposts">
-                        <label for="likedposts">The Posts That I Liked</label>
-                        <br>
-                        <button type="submit" class="bttn"
-                            id="filter">Filter</button>
-                    </div>
+    </header>
+    <div id="temp">
+        <div class="sidebar" id="sidebar">
+            <form action="/forum" method="get">
+                <div>
+                    <li>Choose categories:</li>
+                    <br>
+                    <input type="radio" name="categories" id="all" value="all">
+                    <label for="all">All</label>
+                    <br>
+                    <input type="radio" name="categories" id="sport" value="sport">
+                    <label for="sport">Sport</label>
+                    <br>
+                    <input type="radio" name="categories" id="politic" value="politic">
+                    <label for="politic">Politic</label>
+                    <br>
+                    <input type="radio" name="categories" id="enteairtement" value="enteairtement">
+                    <label for="enteairtement">Enteairtement</label>
+                    <br>
+                    <input type="radio" name="categories" id="economie" value="economie">
+                    <label for="economie">Economie</label>
+                    <br>
+                    <input type="radio" name="categories" id="it" value="it">
+                    <label for="it">IT</label>
+                    <br>
+                    <input type="radio" name="categories" id="myposts" value="myposts">
+                    <label for="myposts">My Own Posts</label>
+                    <br>
+                    <input type="radio" name="categories" id="likedposts" value="likedposts">
+                    <label for="likedposts">The Posts That I Liked</label>
+                    <br>
+                    <button type="submit" class="bttn" id="filter">Filter</button>
+                </div>
+        </div>
+        </form>
+    </div>
+    <!-- <h2 style="text-align: center;"><strong>Check the Newest Of your FEED!</strong></h2> -->
+    {{if not .Posts}}
+    <h1>No Posts Available!</h1>
+    {{end}}
+    {{range .Posts}}
+    <div class="postcontainer">
+        <div class="user_info">
+            <img src="/style/programmer.png" alt="{{.Usernamepublished}}">
+            <h2>{{.Usernamepublished}}</h2>
+        </div>
+        <span id="temps">{{.Time}}</span> ago
+        <h1>Title: {{.Title}}</h1>
+        <p> content : {{.Body}}</p>
+        {{if .Image}}
+            <img src="data:image/png;base64,{{.Image}}" alt="image">
+        {{end}}
+        <div class="reactions-container">
+            <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
+            <form id="like_post"
+                action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                method="post">
+                <button type="submit" class="react" name="reaction" value="like">
+                    <i class="fa fa-thumbs-o-up">
+                    </i>
+                    {{.LikesCounter}}</button>
+
+            </form>
+            <form id="dislike_post"
+                action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                method="post">
+                <button type="submit" class="react" name="reaction" value="dislike"><i class="fa fa-thumbs-o-down"></i>
+                    {{.DislikeCounter}}</button>
+
+            </form>
+        </div>
+        <div class="comment_container">
+            <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
+                <br>
+                <div class="bb">
+                    <textarea name="comments" id="comments" placeholder="Add your comments..."></textarea>
+                    <br>
+                    <button type="submit" class="bttn" id="comment">Comment</button>
                 </div>
             </form>
+            <br>
         </div>
-        <!-- <h2 style="text-align: center;"><strong>Check the Newest Of your FEED!</strong></h2> -->
-        {{if not .Posts}}
-        <h1>No Posts Available!</h1>
-        {{end}}
-        {{range .Posts}}
-        <div class="postcontainer">
-            <div class="user_info">
-                <img src="/style/programmer.png" alt="{{.Usernamepublished}}">
-                <h2>{{.Usernamepublished}}</h2>
-            </div>
-            <span id="temps">{{.Time}}</span> ago
-            <h1>Title: {{.Title}}</h1>
-            <p> content : {{.Body}}</p>
-            <div class="reactions-container">
-                <input id="postidValue" type="hidden" name="postid"
-                    value="{{.Postid}}">
-                <form id="like_post"
-                    action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
-                    method="post">
-                    <button type="submit" class="react" name="reaction"
-                        value="like">
-                        <i class="fa fa-thumbs-o-up">
-                        </i>
-                        {{.LikesCounter}}</button>
+        <form action="/showcomments" method="get" class="jj">
+            <input type="hidden" value="{{.Postid}}" name="postid">
+            <input type="hidden" value="{{.CurrentUsser}}" name="writer">
 
-                </form>
-                <form id="dislike_post"
-                    action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
-                    method="post">
-                    <button type="submit" class="react" name="reaction"
-                        value="dislike"><i class="fa fa-thumbs-o-down"></i>
-                        {{.DislikeCounter}}</button>
-
-                </form>
-            </div>
-            <div class="comment_container">
-                <form
-                    action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}"
-                    method="post">
-                    <br>
-                    <div class="bb">
-                        <textarea name="comments" id="comments"
-                            placeholder="Add your comments..."></textarea>
-                        <br>
-                        <button type="submit" class="bttn"
-                            id="comment">Comment</button>
-                    </div>
-                </form>
-                <br>
-            </div>
-            <form action="/showcomments" method="get" class="jj">
-                <input type="hidden" value="{{.Postid}}" name="postid">
-                <input type="hidden" value="{{.CurrentUsser}}" name="writer">
-
-                <button type="submit" class="href">See All Comments()</button>
-            </form>
+            <button type="submit" class="href">See All Comments()</button>
+        </form>
+    </div>
+    {{end}}
+    <footer class="footer">
+        <p>&copy; 2023 Your Website. All rights reserved.</p>
+        <p>
+            Github :
+        </p>
+        <div class="href">
+            <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
+            <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
+            | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
         </div>
-        {{end}}
-        <footer class="footer">
-            <p>&copy; 2023 Your Website. All rights reserved.</p>
-            <p>
-                Github :
-            </p>
-            <div class="href">
-                <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
-                <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
-                | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
-            </div>
-        </footer>
-    </body>
-    <script>
+    </footer>
+</body>
+<script>
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         if (sidebar.classList.contains('open')) {
