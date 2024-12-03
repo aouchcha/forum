@@ -90,7 +90,9 @@
         <h1>Title: {{.Title}}</h1>
         <p> content : {{.Body}}</p>
         {{if .Image}}
+        <div class="img-container">
             <img src="data:image/png;base64,{{.Image}}" alt="image">
+        </div>
         {{end}}
         <div class="reactions-container">
             <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
