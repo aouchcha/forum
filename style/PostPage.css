@@ -174,16 +174,15 @@ h2 {
     border-radius: 10px;
     background-color: rgb(241, 241, 241);
     padding: 2%;
-    /* margin: 5px; */
-    margin-top: 0px;
+    margin: 1% 20% 1% 20%;
 }
 .postcontainer img {
     max-width: 100%;
     height: auto;
     display: block;
 }
-.comment_container {
 
+.comment_container {
     width: 100%;
     align-items: center;
     margin-right: 4%;
@@ -297,8 +296,6 @@ footer {
 @media (max-width: 480px) {
     header {
         position: relative;
-        /* display: block; */
-        /* offset-block-end: auto; */
         height: 70vh;
     }
 
@@ -324,8 +321,15 @@ footer {
 
     .postcontainer textarea {
         height: 100px;
-        width: 200px;
+        width: 100%;
         border: solid 1px black;
+    }
+    .user_info h2 {
+        font-size: 20px;
+    }
+    .user_info img {
+        height: 30px;
+        width: 30px;
     }
     .one_comment {
         position: relative;
