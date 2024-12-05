@@ -147,14 +147,14 @@
 <script>
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
+        // const body = document.body;
         if (sidebar.classList.contains('open')) {
             sidebar.classList.remove('open');
-            console.log("sidebar closed")
+            // body.classList.remove('blurred');
         } else {
             sidebar.classList.add('open');
-            console.log("sidebar opened")
+            // body.classList.add('blurred');
         }
-        // sidebar.classList.add('sidebar');
     }
     const comment = document.getElementsByClassName("bttn")
     const reactions = document.getElementsByClassName("react")
