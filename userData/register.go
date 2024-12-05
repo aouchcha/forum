@@ -1,8 +1,9 @@
 package handler
 
 import (
-	data "main/dataBase"
 	"net/http"
+
+	data "main/dataBase"
 )
 
 func HandleRegistration(w http.ResponseWriter, r *http.Request) {

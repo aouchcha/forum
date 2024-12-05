@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -34,62 +35,60 @@ var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
-		ChooseError(w, "Tpage not found", 404)
+		http.Error(w, "page not found", http.StatusNotFound)
 		return
 	}
 	tmpl, err := template.ParseFiles("templates/forum.html")
 	if err != nil {
-		ChooseError(w, "Internal Server Error", 500)
+		http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
 		return
 	}
 
 	var CurrentUser, CurrentSession string
-	var curr_id int
 	var session_id string
 	cat_to_filter := r.FormValue("categories")
 	cookie1, err1 := r.Cookie("session_token")
-	cookie2, err2 := r.Cookie("user_token")
 
-	if err1 != nil || err2 != nil {
+	if err1 != nil {
 		cookie3, err3 := r.Cookie("guest_token")
 		if err3 != nil {
-			ChooseError(w, "Bad Request if you want to continue as a guest choose it", 400)
+			fmt.Println("ana hna mouchkil fl cookie : ", err3)
+			http.Error(w, "Bad Request if you want to continue as a guest choose it", http.StatusBadRequest)
 			return
 		}
 		CurrentUser = cookie3.Value
 		CurrentSession = "0"
 	} else {
-		CurrentUser = cookie2.Value
 		CurrentSession = cookie1.Value
 		err = data.Db.QueryRow("SELECT user_id, session_id FROM sessions WHERE session_id = ?", CurrentSession).Scan(&postt.CurrentUser_id, &session_id)
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
-		curr_id = postt.CurrentUser_id
+		err = data.Db.QueryRow("SELECT username from users where id = ?", postt.CurrentUser_id).Scan(&CurrentUser)
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
 	}
 
-	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
-	if err != nil {
-		ChooseError(w, err.Error(), 500)
-		return
-	}
+	posts_toshow, comment_id, post_id := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
+
 	err = tmpl.Execute(w, struct {
 		Currenuser string
-		Curr_id    int
 		comment_id int
 		Post_id    int
 		Posts      []Post
 	}{
 		Currenuser: CurrentUser,
-		Curr_id:    curr_id,
 		comment_id: comment_id,
 		Post_id:    post_id,
 		Posts:      posts_toshow,
 	})
-	// fmt.Println("LikesCount :", postt.LikesCounter)
+	fmt.Println("LikesCount :", postt.LikesCounter)
 	if err != nil {
-		ChooseError(w, "Internal Server Error", 500)
+		fmt.Println(err)
+		http.Error(w, "Internal Server", http.StatusInternalServerError)
 		return
 	}
 }
