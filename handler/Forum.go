@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"html/template"
 	"net/http"
 
@@ -103,7 +102,7 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		if cat_to_filter == "myposts" {
 			post_rows, err = data.Db.Query(`SELECT * FROM posts WHERE post_creator = ?`, CurrentUser)
 		} else if cat_to_filter == "likedposts" {
-			fmt.Println("liked posts")
+			// fmt.Println("liked posts")
 			post_rows, err = data.Db.Query(`
 				SELECT posts.* FROM posts 
 				JOIN likes ON posts.id = likes.post_id 
@@ -134,7 +133,8 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		var imageData []byte
 		var time any
 		if err := post_rows.Scan(&id, &user_id, &usernamepublished, &title, &body, &imageData, &time); err != nil {
-			fmt.Println(err)
+			http.Error(w, "Error fetching post data", http.StatusInternalServerError)
+			// fmt.Println(err)
 			continue
 		}
 		// fmt.Println(usernamepublished, title, body)
@@ -143,18 +143,18 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		var dislikee Reactions
 		err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE post_id = ?`, post_id).Scan(&likee.LikeCount)
 		if err != nil {
-			fmt.Println("Error fetching like count ==>", err)
+			// fmt.Println("Error fetching like count ==>", err)
 			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
 			return nil, 0, 0, errors.New("internal server error")
 		}
 		err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE post_id = ?`, post_id).Scan(&dislikee.DislikeCount)
 		if err != nil {
-			fmt.Println("Error fetching like count ==>", err)
+			// fmt.Println("Error fetching like count ==>", err)
 			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
 			return nil, 0, 0, errors.New("internal server error")
 		}
 		base64Image := base64.StdEncoding.EncodeToString(imageData)
-		fmt.Println("comments id= ", comment_id, "post id= ", post_id)
+		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
 			LikesCounter:      likee.LikeCount,
