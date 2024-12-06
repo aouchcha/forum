@@ -76,10 +76,8 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	comment_writer := r.URL.Query().Get("writer")
 
 	_, err := r.Cookie("session_token")
-	_, err2 := r.Cookie("user_token")
 
-	if err != nil || err2 != nil {
-		fmt.Println("ana hna akhay")
+	if err != nil {
 		handler.ChooseError(w, "Bad Request if you want to continue as a guest choose it", 400)
 		return
 	}
