@@ -92,8 +92,14 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 		handler.ChooseError(w, "Bad Request", 400)
 		return
 	}
+	var id int
+	err = data.Db.QueryRow("SELECT id FROM users WHERE username = ?", comment_writer).Scan(&id)
+	if err != nil {
+		handler.ChooseError(w, "Bad Request you need to log in to interact with the content", 400)
+		return
+	}
 
-	_, err = data.Db.Exec("INSERT INTO comments (comment_body, comment_writer, post_commented_id) VALUES (?, ?, ?)", comment_body, comment_writer, post_id)
+	_, err = data.Db.Exec("INSERT INTO comments (comment_body, comment_writer, comment_writer_id, post_commented_id) VALUES (?, ?, ?, ?)", comment_body, comment_writer, id, post_id)
 	if err != nil {
 		handler.ChooseError(w, "Inernal Server Error", 500)
 		return
@@ -114,10 +120,10 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 	var commented Comment
 
 	for comm_rows.Next() {
-		var comment_id, post_commented_id int
+		var comment_id, post_commented_id, userid int
 		var comment_body, comment_writer string
 		var time any
-		if err := comm_rows.Scan(&comment_id, &comment_body, &comment_writer, &post_commented_id, &time); err != nil {
+		if err := comm_rows.Scan(&comment_id, &comment_body, &comment_writer, &userid, &post_commented_id, &time); err != nil {
 			fmt.Println(err)
 			continue
 		}

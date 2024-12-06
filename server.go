@@ -52,6 +52,8 @@ func middlewareForum(next http.HandlerFunc) http.HandlerFunc {
 			if r.URL.Path == "/forum" {
 				next.ServeHTTP(w, r)
 			} else {
+				fmt.Println("URL", r.URL.Path)
+				fmt.Println("HANI HNA")
 				http.Redirect(w, r, "/login", http.StatusFound)
 			}
 			return
@@ -67,7 +69,7 @@ func middlewareForum(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
-	http.HandleFunc("/", handler.Home)
+	http.HandleFunc("/", middlewareAUTH(handler.Home))
 	http.HandleFunc("/login", middlewareAUTH(userData.Login))
 	http.HandleFunc("/guest", handler.Guest)
 	http.HandleFunc("/register", middlewareAUTH(userData.HandleRegistration))
@@ -81,8 +83,8 @@ func main() {
 	http.HandleFunc("/api/likes", middlewareForum(reactions.LikesCounterWithApi))
 	http.HandleFunc("/logout", userData.Logout)
 	http.HandleFunc("/style/", handler.Style)
-	http.HandleFunc("/create_comment", creations.CreatCommnet)
-	http.HandleFunc("/showcomments", middlewareForum(creations.ShowComments))
+	http.HandleFunc("/create_comment", middlewareForum(creations.CreatCommnet))
+	http.HandleFunc("/showcomments", creations.ShowComments)
 	fmt.Println("Server started on http://localhost:" + port)
 	http.ListenAndServe(":"+port, nil)
 }
