@@ -20,40 +20,40 @@ func session() string {
 	return id.String()
 }
 
-func setCookie(w http.ResponseWriter, name, value string, expiration time.Time) {
-	http.SetCookie(w, &http.Cookie{
-		Name:     name,
-		Value:    value,
+// func setCookie(w http.ResponseWriter, name, value string, expiration time.Time) {
+// 	http.SetCookie(w, &http.Cookie{
+// 		Name:     name,
+// 		Value:    value,
+// 		Expires:  expiration,
+// 		MaxAge:   3600,
+// 		HttpOnly: true,
+// 		Secure:   true, // Enable if using HTTPS
+// 	})
+// }
+
+func SessionCookie(w http.ResponseWriter, session string, expiration time.Time) {
+	cookie := &http.Cookie{
+		Name:     "session_token",
+		Value:    session,
 		Expires:  expiration,
 		MaxAge:   3600,
 		HttpOnly: true,
-		Secure:   true, // Enable if using HTTPS
-	})
+		Secure:   true,
+	}
+	http.SetCookie(w, cookie)
 }
 
-// func SessionCookie(w http.ResponseWriter, session string, expiration time.Time) {
-// 	cookie := &http.Cookie{
-// 		Name:     "session_token",
-// 		Value:    session,
-// 		Expires:  expiration,
-// 		MaxAge:   3600,
-// 		HttpOnly: true,
-// 		Secure:   true,
-// 	}
-// 	http.SetCookie(w, cookie)
-// }
-
-// func UserCookie(w http.ResponseWriter, session string, expiration time.Time) {
-// 	cookie := &http.Cookie{
-// 		Name:     "user_token",
-// 		Value:    session,
-// 		Expires:  expiration,
-// 		MaxAge:   3600,
-// 		HttpOnly: true,
-// 		Secure:   true,
-// 	}
-// 	http.SetCookie(w, cookie)
-// }
+func UserCookie(w http.ResponseWriter, session string, expiration time.Time) {
+	cookie := &http.Cookie{
+		Name:     "user_token",
+		Value:    session,
+		Expires:  expiration,
+		MaxAge:   3600,
+		HttpOnly: true,
+		Secure:   true,
+	}
+	http.SetCookie(w, cookie)
+}
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/login" {
@@ -78,15 +78,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		err := data.Db.QueryRow("SELECT id FROM users WHERE username = ? AND password = ?", username, password).Scan(&userid)
 		if err != nil {
 			tmpl.Execute(w, Exist{Exist: false})
-			// w.WriteHeader(http.StatusUnauthorized)
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		session := session()
 		expiration := time.Now().Add(4 * time.Hour)
-		// SessionCookie(w, string(session), expiration)
-		// UserCookie(w, username, expiration)
-		setCookie(w, "session_token", session, expiration)
-		setCookie(w, "user_token", username, expiration)
+		SessionCookie(w, string(session), expiration)
+		UserCookie(w, username, expiration)
+		// setCookie(w, "user_token", username, expiration)
+		// setCookie(w, "session_token", session, expiration)
 		err = data.Db.QueryRow("SELECT user_id FROM sessions WHERE user_id = ? ", userid).Scan(&userid)
 		if err != nil {
 			fmt.Println(err)

@@ -16,7 +16,7 @@
 
 <body>
     <header>
-        
+
         <div class="user">
             <img src="/style/programmer.png" alt="{{.Currenuser}}">
             <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
@@ -148,46 +148,42 @@
 <script>
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
-        // const body = document.body;
         if (sidebar.classList.contains('open')) {
             sidebar.classList.remove('open');
-            // body.classList.remove('blurred');
         } else {
             sidebar.classList.add('open');
-            // body.classList.add('blurred');
         }
     }
-    // const comment = document.getElementsByClassName("bttn")
-    // const reactions = document.getElementsByClassName("react")
-    // const create = document.getElementById("Create")
-    // function getCookie(cname) {
-    //     let name = cname + "=";
-    //     let decodedCookie = decodeURIComponent(document.cookie);
-    //     let ca = decodedCookie.split(';');
-    //     for (let i = 0; i < ca.length; i++) {
-    //         let c = ca[i];
-    //         while (c.charAt(0) == ' ') {
-    //             c = c.substring(1);
-    //         }
-    //         if (c.indexOf(name) == 0) {
-    //             return c.substring(name.length, c.length);
-    //         }
-    //     }
-    //     return "";
-    // }
-    // let username = getCookie("guest_token");
+    const comment = document.getElementsByClassName("bttn")
+    const reactions = document.getElementsByClassName("react")
+    const create = document.getElementById("Create")
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+    let username = getCookie("guest_token");
     // console.log(username);
 
-    // if (username == "guest") {
-    //     create.disabled = true
-    //     for (let cm of comment) {
-    //         // console.log(cm)
-    //         cm.disabled = true
-    //     }
-    //     for (let rea of reactions) {
-    //         rea.disabled = true
-    //     }
-    // }
+    if (username == "guest") {
+        create.disabled = true
+        for (let cm of comment) {
+            cm.disabled = true
+        }
+        for (let rea of reactions) {
+            rea.disabled = true
+        }
+    }
 
     const times = document.querySelectorAll('#temps')
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
