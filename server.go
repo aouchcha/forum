@@ -82,7 +82,7 @@ func main() {
 	http.HandleFunc("/logout", userData.Logout)
 	http.HandleFunc("/style/", handler.Style)
 	http.HandleFunc("/create_comment", creations.CreatCommnet)
-	http.HandleFunc("/showcomments", creations.ShowComments)
+	http.HandleFunc("/showcomments", middlewareForum(creations.ShowComments))
 	fmt.Println("Server started on http://localhost:" + port)
 	http.ListenAndServe(":"+port, nil)
 }
