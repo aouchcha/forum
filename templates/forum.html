@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <noscript>
+        <meta http-equiv="refresh" content="0; url=/noScript">
+    </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
@@ -12,9 +15,6 @@
 </head>
 
 <body>
-    <noscript>
-        <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
-    </noscript>
     <header>
         <div class="user">
             <img src="/style/programmer.png" alt="{{.Currenuser}}">
@@ -156,37 +156,37 @@
             // body.classList.add('blurred');
         }
     }
-    const comment = document.getElementsByClassName("bttn")
-    const reactions = document.getElementsByClassName("react")
-    const create = document.getElementById("Create")
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
-    }
-    let username = getCookie("guest_token");
-    console.log(username);
+    // const comment = document.getElementsByClassName("bttn")
+    // const reactions = document.getElementsByClassName("react")
+    // const create = document.getElementById("Create")
+    // function getCookie(cname) {
+    //     let name = cname + "=";
+    //     let decodedCookie = decodeURIComponent(document.cookie);
+    //     let ca = decodedCookie.split(';');
+    //     for (let i = 0; i < ca.length; i++) {
+    //         let c = ca[i];
+    //         while (c.charAt(0) == ' ') {
+    //             c = c.substring(1);
+    //         }
+    //         if (c.indexOf(name) == 0) {
+    //             return c.substring(name.length, c.length);
+    //         }
+    //     }
+    //     return "";
+    // }
+    // let username = getCookie("guest_token");
+    // console.log(username);
 
-    if (username == "guest") {
-        create.disabled = true
-        for (let cm of comment) {
-            // console.log(cm)
-            cm.disabled = true
-        }
-        for (let rea of reactions) {
-            rea.disabled = true
-        }
-    }
+    // if (username == "guest") {
+    //     create.disabled = true
+    //     for (let cm of comment) {
+    //         // console.log(cm)
+    //         cm.disabled = true
+    //     }
+    //     for (let rea of reactions) {
+    //         rea.disabled = true
+    //     }
+    // }
 
     const times = document.querySelectorAll('#temps')
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));

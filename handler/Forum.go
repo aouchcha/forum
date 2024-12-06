@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -35,6 +36,11 @@ var postt Post
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
 		ChooseError(w, "Tpage not found", 404)
+		return
+	}
+	if r.URL.Path == "/noScript" {
+		fmt.Println("noScript")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	tmpl, err := template.ParseFiles("templates/forum.html")

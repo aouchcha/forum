@@ -47,6 +47,7 @@ func PostsLike(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+		// http.Redirect(w, r, "/forum", http.StatusFound)
 	} else {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -67,7 +68,7 @@ func CommentsLike(w http.ResponseWriter, r *http.Request) {
 	User := r.URL.Query().Get("user")
 	// fmt.Println(Liked_comment_id, Post_id, User)
 	var User_id int
-	//Check if the user is in our data base
+	// Check if the user is in our data base
 	err = data.Db.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&User_id)
 	// fmt.Println("USER ID", User_id)
 	if err != nil {
@@ -80,20 +81,20 @@ func CommentsLike(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	var Exist bool
-	//Check if the user allrady like the comment
+	// Check if the user allrady like the comment
 	err = data.Db.QueryRow("SELECT id FROM likes WHERE user_id = ? AND username = ? AND liked_comment_id = ?", User_id, User, Liked_comment_id).Scan(&Exist)
 	if err == sql.ErrNoRows {
 		// The user didn't like the comment let's check if he already dislike the comment
 		err = data.Db.QueryRow("SELECT id FROM dislikes WHERE user_id = ? AND username = ? AND disliked_comment_id = ?", User_id, User, Liked_comment_id).Scan(&Exist)
 		if err != sql.ErrNoRows {
-			//if he dislike the post we remove the dislike
+			// if he dislike the post we remove the dislike
 			_, err = data.Db.Exec("DELETE FROM dislikes WHERE user_id = ? AND username = ? AND disliked_comment_id = ?", User_id, User, Liked_comment_id)
 			if err != nil {
 				http.Error(w, "Error unliking post", http.StatusInternalServerError)
 				return
 			}
 		}
-		//We add the like to our table
+		// We add the like to our table
 		_, err = data.Db.Exec("INSERT INTO likes (user_id, username, liked_comment_id) VALUES (?,?,?)", User_id, User, Liked_comment_id)
 		if err != nil {
 			http.Error(w, "Error liking post"+err.Error(), http.StatusInternalServerError)
@@ -101,7 +102,7 @@ func CommentsLike(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		//The user already like the comment now we remove the like from the table
+		// The user already like the comment now we remove the like from the table
 		_, err = data.Db.Exec("DELETE FROM likes WHERE user_id = ? AND username = ? AND liked_comment_id = ?", User_id, User, Liked_comment_id)
 		if err != nil {
 			http.Error(w, "Error unliking post", http.StatusInternalServerError)
