@@ -72,15 +72,17 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	posts_toshow, comment_id, post_id := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
+	posts_toshow, comment_id, post_id, _ := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
 
 	err = tmpl.Execute(w, struct {
 		Currenuser string
+		Curr_id    int
 		comment_id int
 		Post_id    int
 		Posts      []Post
 	}{
 		Currenuser: CurrentUser,
+		Curr_id:    postt.CurrentUser_id,
 		comment_id: comment_id,
 		Post_id:    post_id,
 		Posts:      posts_toshow,
