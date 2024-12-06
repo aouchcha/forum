@@ -174,8 +174,7 @@
         }
         return "";
     }
-    let username = getCookie("guest_token");
-    console.log(username);
+    let username = getCookie("session_token");
 
     if (username == "guest") {
         create.disabled = true
