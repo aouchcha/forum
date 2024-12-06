@@ -47,13 +47,16 @@ func Forum(w http.ResponseWriter, r *http.Request) {
     var CurrentUser, CurrentSession string
     var session_id string
     cat_to_filter := r.FormValue("categories")
-    cookie1, _ := r.Cookie("session_token")
-
-    isGuest := false
+    cookie1, err:= r.Cookie("session_token")
+	if err != nil {
+		http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
+		return
+	}
+    // isGuest := false
     if cookie1.Value == "guest" {
         CurrentUser = "guest"
         CurrentSession = "0"
-        isGuest = true
+        // isGuest = true
     } else {
         CurrentSession = cookie1.Value
         err = data.Db.QueryRow("SELECT user_id, session_id FROM sessions WHERE session_id = ?", CurrentSession).Scan(&postt.CurrentUser_id, &session_id)
@@ -83,7 +86,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
         comment_id: comment_id,
         Post_id:    post_id,
         Posts:      posts_toshow,
-        IsGuest:    isGuest, 
+        // IsGuest:    isGuest, 
     })
 
     if err != nil {
