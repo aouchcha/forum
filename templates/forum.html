@@ -5,70 +5,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
+    <link rel="icon" type="image/png" sizes="40x40" href="/style/icon.png.png">
     <link rel="stylesheet" href="../style/PostPage.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
-    <header class="name">
-        <div class="header">
-            Hello Mr {{.Currenuser}}
+    <noscript>
+        <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
+    </noscript>
+    <header>
+        <div class="user">
+            <img src="/style/programmer.png" alt="{{.Currenuser}}">
+            <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
+            <h2><strong>User ID :</strong> {{.Curr_id}}</h2>
+        </div>
+        <div class="corner">
+            <button class="sidebarbtn" onclick="toggleSidebar()">☰
+                FILTER</button>
             <form action="/logout" method="post">
-                <button type="submit" class="btn">Log Out</button>
+                <button type="submit" class="sidebarbtn">
+                    <i class="glyphicon glyphicon-log-out"></i>
+                    Log Out</button>
             </form>
         </div>
-        <br>
-        <div class="temp" id="temp">
-            <div class="creation">
-                <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create">Create Post</button></a>
-            </div>
-            <form action="/forum" method="get">
-                <div class="filter">
-                    <label for="all">All</label>
-                    <input type="radio" name="categories" id="all" value="all">
-                    <label for="sport">Sport</label>
-                    <input type="radio" name="categories" id="sport" value="sport">
-                    <label for="politic">Politic</label>
-                    <input type="radio" name="categories" id="politic" value="politic">
-                    <label for="enteairtement">Enteairtement</label>
-                    <input type="radio" name="categories" id="enteairtement" value="enteairtement">
-                    <label for="economie">Economie</label>
-                    <input type="radio" name="categories" id="economie" value="economie">
-                    <label for="it">IT</label>
-                    <input type="radio" name="categories" id="it" value="it">
-                    <label for="myposts">My Own Posts</label>
-                    <input type="radio" name="categories" id="myposts" value="myposts">
-                    <label for="likedposts">The Posts That I Liked</label>
-                    <input type="radio" name="categories" id="likedposts" value="likedposts">
-                    <pre>    </pre>
-                    <button type="submit" class="btn" id="filter">Filter</button>
-                </div>
-            </form>
+        <div class="zone01">
+            <img src="/style/zone01oujda.png" alt="zone01oujda">
+            <h1><strong>Welcome To Forum </strong></h1>
         </div>
+        <div>
+            <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create"> <i
+                        class="material-icons"></i>
+                    Create Post </button></a>
+        </div>
+
     </header>
-    <h2 style="color: aliceblue;text-align: center;">Check the Newest Of your FEED!</h2>
+    <div id="temp">
+        <div class="sidebar" id="sidebar">
+            <form action="/forum" method="get">
+                <div>
+                    <li>Choose categories:</li>
+                    <br>
+                    <input type="radio" name="categories" id="all" value="all">
+                    <label for="all">All</label>
+                    <br>
+                    <input type="radio" name="categories" id="sport" value="sport">
+                    <label for="sport">Sport</label>
+                    <br>
+                    <input type="radio" name="categories" id="politic" value="politic">
+                    <label for="politic">Politic</label>
+                    <br>
+                    <input type="radio" name="categories" id="enteairtement" value="enteairtement">
+                    <label for="enteairtement">Enteairtement</label>
+                    <br>
+                    <input type="radio" name="categories" id="economie" value="economie">
+                    <label for="economie">Economie</label>
+                    <br>
+                    <input type="radio" name="categories" id="it" value="it">
+                    <label for="it">IT</label>
+                    <br>
+                    <input type="radio" name="categories" id="myposts" value="myposts">
+                    <label for="myposts">My Own Posts</label>
+                    <br>
+                    <input type="radio" name="categories" id="likedposts" value="likedposts">
+                    <label for="likedposts">The Posts That I Liked</label>
+                    <br>
+                    <button type="submit" class="bttn" id="filter">Filter</button>
+                </div>
+        </div>
+        </form>
+    </div>
+    <!-- <h2 style="text-align: center;"><strong>Check the Newest Of your FEED!</strong></h2> -->
     {{if not .Posts}}
-    <h1 style="color: aliceblue;text-align: center;">No Posts Available!</h1>
+    <h1>No Posts Available!</h1>
     {{end}}
     {{range .Posts}}
     <div class="postcontainer">
-        <h3>title: {{.Title}}</h3>
-        <p>{{.Body}}</p>
-        <sub>by: {{.Usernamepublished}} | <span>{{.Time}}</span> ago </sub><br>
+        <div class="user_info">
+            <img src="/style/programmer.png" alt="{{.Usernamepublished}}">
+            <h2>{{.Usernamepublished}}</h2>
+        </div>
+        <span id="temps">{{.Time}}</span> ago
+        <h1>Title: {{.Title}}</h1>
+        <p> content : {{.Body}}</p>
+        {{if .Image}}
+        <div class="img-container">
+            <img src="data:image/png;base64,{{.Image}}" alt="image">
+        </div>
+        {{end}}
         <div class="reactions-container">
             <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
             <form id="like_post"
-                action="/Likes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
-
-                <label>Likes:</label>
-                <button type="submit" class="react" name="reaction" value="like">{{.LikesCounter}}</button>
+                <button type="submit" class="react" name="reaction" value="like">
+                    <i class="fa fa-thumbs-o-up">
+                    </i>
+                    {{.LikesCounter}}</button>
 
             </form>
-            <form action="/Dislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+            <form id="dislike_post"
+                action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
-
-                <label>Dislikes:</label>
-                <button type="submit" class="react" name="reaction" value="dislike">{{.DislikeCounter}}</button>
+                <button type="submit" class="react" name="reaction" value="dislike"><i class="fa fa-thumbs-o-down"></i>
+                    {{.DislikeCounter}}</button>
 
             </form>
         </div>
@@ -87,13 +128,36 @@
             <input type="hidden" value="{{.Postid}}" name="postid">
             <input type="hidden" value="{{.CurrentUsser}}" name="writer">
 
-            <button type="submit" class="bttn">See All Comments</button>
+            <button type="submit" class="href">See All Comments()</button>
         </form>
     </div>
     {{end}}
+    <footer class="footer">
+        <p>&copy; 2023 Your Website. All rights reserved.</p>
+        <p>
+            Github :
+        </p>
+        <div class="href">
+            <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
+            <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
+            | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
+        </div>
+    </footer>
 </body>
 <script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        // const body = document.body;
+        if (sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            // body.classList.remove('blurred');
+        } else {
+            sidebar.classList.add('open');
+            // body.classList.add('blurred');
+        }
+    }
     const comment = document.getElementsByClassName("bttn")
+    const reactions = document.getElementsByClassName("react")
     const create = document.getElementById("Create")
     function getCookie(cname) {
         let name = cname + "=";
@@ -110,8 +174,7 @@
         }
         return "";
     }
-    let username = getCookie("guest_token");
-    console.log(username);
+    let username = getCookie("session_token");
 
     if (username == "guest") {
         create.disabled = true
@@ -119,9 +182,12 @@
             // console.log(cm)
             cm.disabled = true
         }
+        for (let rea of reactions) {
+            rea.disabled = true
+        }
     }
 
-    const times = document.querySelectorAll('span')
+    const times = document.querySelectorAll('#temps')
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
     function timeAffi(time) {
         let now = new Date()
@@ -151,46 +217,104 @@
                 body: formData
             })
             e.currentTarget.querySelector("textarea").value = ""
+            const div = document.createElement("div")
+            div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
+            cForm.appendChild(div)
+            setTimeout(() => {
+                div.remove()
+            }, 2000)
         })
     })
 
-    const Forms = document.querySelectorAll(".reactions-container form")
-    // const likes = document.querySelectorAll(".reactions-container input[id='postidValue']")
-    let postid;
-    let commentid; 
-    // console.log("postid : ", postid)
+
+
+
+
+    const Forms = document.querySelectorAll(".reactions-container form");
     Forms.forEach(Form => {
-        Form.addEventListener("submit", (e) => {
-            e.preventDefault()
-            const path = e.currentTarget.getAttribute("action")
-            params = path.split("?")
-            const Queries = new URLSearchParams(params[1])
-            postid = Queries.get("Liked_Post_id")
-            console.log("postid : ", postid)
-            const formData = new FormData(e.currentTarget)
-            fetch(params[0]+"?"+params[1], {
-                method: "post",
-                body: formData
-            })
-            let LikesButton = e.currentTarget.querySelector(".react")
-            let likesCounter = parseInt(LikesButton.innerHTML) || 0
-            // console.log("LikesCounter ==>", LikesCounter)
-            // console.log("postid in fetch : ", postid)
-            path1 = "/api/likes?postid=" + postid
-            fetch(path1)
-                    .then(response => {
-                        return response.json()
-                    })
-                    .then(data => {
-                        console.log("------------------")
-                        console.log("LikeCount ==>", data.LikeCount)
-                        likesCounter = parseInt(data.LikeCount) || 0
-                        LikesButton.innerHTML = data.LikeCount
-                        LikesButton.style.color = "green"
-                    })
-                    .catch(err => console.log("err :", err))
-        })
-    })
+        Form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const button = e.currentTarget.querySelector('button');
+            const choice = e.currentTarget.getAttribute('id')
+            let TheOtherButton = ""
+            if (choice == "like_post") {
+                TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
+                // console.log("TheOtherButton1", TheOtherButton)
+                // let thumbs = TheOtherButton.querySelector('i')
+                // console.log("TheOtherButton ====>", thumbs)
+            } else {
+                TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
+                // console.log("TheOtherButton2", TheOtherButton)
+                // let thumbs = TheOtherButton.querySelector('i')
+                // console.log("TheOtherButton ====>", thumbs)
+            }
+
+
+            if (!button) {
+                console.error("Button not found");
+                return;
+            }
+
+            let path1 = e.currentTarget.getAttribute('action');
+
+            let icon = "👍🏻"
+            let icon2 = "👎🏻"
+            // console.log("icon2", icon2)
+            let previouslike = button.textContent
+            console.log("previouslike outside ===>", previouslike)
+            const postid = e.currentTarget.parentElement.querySelector('input').value;
+
+            try {
+                await fetch(path1, {
+                    method: "POST",
+                });
+
+                const path = `/api/likes?postid=${postid}`;
+
+                const response = await getdata(path);
+                const likeCount = response.LikeCount;
+                const DislikeCount = response.DislikeCount;
+
+                if (choice == "like_post") {
+                    button.textContent = icon + " " + likeCount;
+                    TheOtherButton.textContent = icon2 + " " + DislikeCount
+                    button.style.backgroundColor = "green"
+                    // if (previouslike == previouslike - 1) {
+                    //     console.log("previouslike", previouslike)
+                    //     TheOtherButton.style.backgroundColor = ""
+                    // }
+                    TheOtherButton.style.backgroundColor = ""
+                } else if (choice == "dislike_post") {
+                    button.textContent = icon2 + " " + DislikeCount;
+                    TheOtherButton.textContent = icon + " " + likeCount
+                    button.style.backgroundColor = "red"
+                    TheOtherButton.style.backgroundColor = ""
+                }
+            } catch (err) {
+                console.error("Error processing like:", err);
+            }
+        });
+    });
+
+    async function getdata(path) {
+        try {
+            const res = await fetch(path);
+            if (!res.ok) {
+                throw new Error(res.statusText);
+            }
+            const json = await res.json();
+            if (json.error) {
+                throw new Error(json.error);
+            }
+            console.log(json);
+            return json;
+        } catch (error) {
+            console.error("Fetch error:", error);
+            throw error;
+        }
+    }
+
 
 </script>
 

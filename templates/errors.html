@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OUPS!!</title>
-    <link rel="stylesheet" href="style/error.css">
+    <link rel="icon" type="image/png" sizes="40x40" href="/style/error.png">
+    <link rel="stylesheet" href="/style/error.css">
 </head>
 <body>
-   <div class="Err">
+   <div class=".error-container">
         <h1>{{.ErrMessage}}</h1>
         <h2>{{.ErrCode}}</h2>
+        <a href="/login"><button>Return To Login</button></a>
    </div>
 </body>
 </html>

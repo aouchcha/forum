@@ -6,53 +6,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Show Comments</title>
     <link rel="stylesheet" href="../style/PostPage.css">
+    <link rel="icon" type="image/png" sizes="40x40" href="/style/icon.png.png">
+    <script type="module" src=""></script>
 </head>
 
-<body>
-    <header class="name">
-        <div class="header">
-            Hello Mr {{.CurrentUser}}
+<body style="background-color: aliceblue;">
+    <noscript>
+        <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
+    </noscript>
+    <header>
+        <div class="user">
+            <img src="/style/programmer.png" alt="{{.CurrentUser}}">
+            <h2>User : {{.CurrentUser}}</h2>
             <form action="/logout" method="post">
-                <button type="submit" class="btn">Log Out</button>
+                <button type="submit" class="bttn">Log Out</button>
             </form>
+            <br>
+            <a href="/forum"><button class="bttn">Return</button></a>
         </div>
         <br>
     </header>
-    <div class="post_content">
-        <h1>Title: {{.Title}}</h1>
-        <h2>Body: {{.Body}}</h2>
-        <sub>written by: {{.Post_writer}}</sub>
+    <br>
+    <div class="postcontainer">
         <br>
+        <div class="user_info">
+            <img src="/style/programmer.png" alt="{{.Post_writer}}">
+            <h2>{{.Post_writer}}</h2>
+        </div>
+        <h1>Title: {{.Title}}</h1>
+        <p> content : {{.Body}}</p>
     </div>
     <div class="comment_container">
         {{if not .Comments}}
-        <h1 style="color: aliceblue;text-align: center;">No Comments Available!</h1>
+        <h1>No Comments Available on this post !</h1>
         {{end}}
         {{range .Comments}}
         <div class="one_comment">
-            <h4>by {{.Comment_writer}}</h4>
+            <h4>
+                <img src="/style/programmer.png" alt="{{.Comment_writer}}">
+                {{.Comment_writer}}
+            </h4>
             <p>{{.Comment_body}}</p>
             <sub><span>{{.Comment_time}}</span> ago </sub>
-            <div>
-                <form action="/Likes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
-                    method="post">
-                    <label>Likes:</label>
-                    <button type="submit" class="react" name="reaction" value="likeComment">
-                        {{.Comment_likes_count}} </button>
+            <div class="reaction_section">
+                <br>
+                <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
+                <form
+                    action="/CommentsLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post" id="Comment_Like">
+                    <button type="submit" class="react" name="reaction" value="likeComment">👍
+                        {{.Comment_likes_count}}</button>
                 </form>
                 <form
-                    action="/Dislikes?user_id={{.Curr_commenter_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
-                    method="post">
-                    <label>Dislikes:</label>
-                    <button type="submit" class="react" name="reaction"
-                        value="dislike">{{.Comment_dislikes_count}}</button>
-
+                    action="/CommentsDisLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    method="post" id="Comment_Dislike">
+                    <button type="submit" class="react" name="reaction" value="dislike">👎
+                        {{.Comment_dislikes_count}}</button>
                 </form>
             </div>
         </div>
         {{end}}
-        <a href="/forum"><button class="bttn">Return</button></a>
     </div>
+    <a href="/forum"><button class="bttn">Return</button></a>
+    <footer class="footer">
+        <p>&copy; 2023 Your Website. All rights reserved.</p>
+        <p>
+            Github :
+        </p>
+        <div class="href">
+            <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
+            <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
+            | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
+        </div>
+    </footer>
 </body>
+
+<script>
+    const Forms = document.querySelectorAll('.reaction_section form')
+    Forms.forEach((CurrForm) => {
+        CurrForm.addEventListener('submit', async (event) => {
+            event.preventDefault()
+            const ActionPath = event.currentTarget.getAttribute('action')
+            const Comment_id = event.currentTarget.parentElement.querySelector('input').value
+            const choice = event.currentTarget.getAttribute('id')
+            const button = event.currentTarget.querySelector('button')
+            let previouslike = button.textContent
+            console.log(" previouslikje ===>", previouslike);
+            let TheOtherButton = ""
+            if (choice == "Comment_Like") {
+                TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Dislike').querySelector('button')
+            } else {
+                TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Like').querySelector('button')
+            }
+
+            let icon = button.textContent.split(' ')[0];
+            let icon2 = TheOtherButton.innerHTML.split(' ')[0];
+            console.log("iocnes :", icon, icon2);
+            try {
+                await fetch(ActionPath, {
+                    method: "POST",
+                })
+                const ApiPath = `/api/likes?comment_id=${Comment_id}`;
+                const response = await getdata(ApiPath)
+                const likeCount = response.LikeCount
+                const DislikeCount = response.DislikeCount;
+                if (choice == "Comment_Like") {
+                    button.textContent = icon + " " + likeCount;
+                    TheOtherButton.textContent = icon2 + " " + DislikeCount
+                    button.style.backgroundColor = "green"
+                    TheOtherButton.style.backgroundColor = ""
+                } else if (choice == "Comment_Dislike") {
+                    button.textContent = icon + " " + DislikeCount;
+                    TheOtherButton.textContent = icon2 + " " + likeCount
+                    button.style.backgroundColor = "red"
+                    TheOtherButton.style.backgroundColor = ""
+                }
+            } catch (error) {
+                console.log("Error while reaction with commments", error)
+            }
+        })
+    })
+
+    async function getdata(ApiPath) {
+        try {
+            const res = await fetch(ApiPath)
+            if (!res.ok) {
+                throw new Error(res.statusText)
+            }
+            const json = await res.json()
+            if (json.error) {
+                throw new Error(json.error)
+            }
+            console.log(json);
+
+            return json
+        } catch (error) {
+            alert("There somethin wrong")
+            throw error
+        }
+    }
+</script>
 
 </html>

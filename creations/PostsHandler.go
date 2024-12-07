@@ -3,6 +3,7 @@ package creation
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -42,12 +43,28 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 
 	CurrentUser := r.URL.Query().Get("user")
 	Post_id, _ := strconv.Atoi(r.URL.Query().Get("postid"))
-	// fmt.Println("Create post function post id is :", Post_id, "and the writer is :", CurrentUser)
+	fmt.Println(Post_id)
+
 	title := r.FormValue("title")
 	body := r.FormValue("body")
-	// categories := r.FormValue("categories")
+	var imageData []byte
+	var ImageErr error
+	image, _, err6 := r.FormFile("image")
+	if err6 != nil {
+		fmt.Println("Error getting image:", err6)
+		imageData = nil
+		// return
+	} else {
+		// fmt.Println("Image:", image)
+		defer image.Close()
+		imageData, ImageErr = io.ReadAll(image)
+		if ImageErr != nil {
+			fmt.Println("Error reading image:", ImageErr)
+			imageData = nil
+			return
+		}
+	}
 	categories := r.Form["categories"]
-	// fmt.Println(categories)
 	if len(categories) == 0 {
 		categories = append(categories, "All")
 	}
@@ -55,9 +72,9 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad request empty post", http.StatusBadRequest)
 		return
 	}
-	row := data.Db.QueryRow("SELECT username FROM users WHERE username = ?", CurrentUser)
-	var username string
-	err := row.Scan(&username)
+	row := data.Db.QueryRow("SELECT id FROM users WHERE username = ?", CurrentUser)
+	var id int
+	err := row.Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("this user don't exist")
@@ -69,14 +86,33 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// Add The post to the posts table
-	_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body) VALUES (?, ?, ?)", CurrentUser, title, body)
+	if imageData == nil {
+		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, id)
+		if err != nil {
+			log.Println("Error inserting user:", err)
+			http.Error(w, "Internal server error", 500)
+			return
+		}
+	} else {
+		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body,image, user_id) VALUES (?, ?, ?, ?,?)", CurrentUser, title, body, imageData, id)
+		if err != nil {
+			log.Println("Error inserting user:", err)
+			http.Error(w, "Internal server error", 500)
+			return
+		}
+	}
+	err = data.Db.QueryRow("SELECT id FROM posts WHERE post_creator = ? AND title = ? AND body = ? AND user_id = ?", CurrentUser, title, body, id).Scan(&Post_id)
 	if err != nil {
-		log.Println("Error inserting user:", err)
-		http.Error(w, "Internal server error", 500)
-		return
+		if err == sql.ErrNoRows {
+			http.Error(w, "We can't get the new post id", http.StatusInternalServerError)
+			return
+		} else {
+			http.Error(w, "Internal server error"+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 	for _, categorie := range categories {
-		_, err = data.Db.Exec("INSERT INTO categories(post_id, categorie) VALUES (?, ?)", Post_id+1, categorie)
+		_, err = data.Db.Exec("INSERT INTO categories(post_id, categorie) VALUES (?, ?)", Post_id, categorie)
 		if err != nil {
 			log.Println("Error inserting user:", err)
 			http.Error(w, "Internal server error", 500)
