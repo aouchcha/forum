@@ -72,15 +72,16 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreatCommnet(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("create comment")
 	comment_body := r.FormValue("comments")
 	comment_writer := r.URL.Query().Get("writer")
 
-	_, err := r.Cookie("session_token")
+	// _, err := r.Cookie("session_token")
 
-	if err != nil {
-		handler.ChooseError(w, "Bad Request if you want to continue as a guest choose it", 400)
-		return
-	}
+	// if err != nil {
+	// 	handler.ChooseError(w, "Bad Request if you want to continue as a guest choose it", 400)
+	// 	return
+	// }
 
 	post_id, err := strconv.Atoi(r.URL.Query().Get("postid"))
 	if err != nil {

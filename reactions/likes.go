@@ -60,10 +60,10 @@ func CommentsLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Post_id, err := strconv.Atoi(r.URL.Query().Get("post_id"))
-	if err != nil {
-		http.Error(w, "Internal server error in converting the post id into int", http.StatusInternalServerError)
-		return
-	}
+	// if err =! nil {
+	// 	http.Error(w, "Internal server error in converting the post id into int", http.StatusInternalServerError)
+	// 	return
+	// }
 	User := r.URL.Query().Get("user")
 	// fmt.Println(Liked_comment_id, Post_id, User)
 	var User_id int

@@ -176,17 +176,6 @@
     }
     let username = getCookie("session_token");
 
-    if (username == "guest") {
-        create.disabled = true
-        for (let cm of comment) {
-            // console.log(cm)
-            cm.disabled = true
-        }
-        for (let rea of reactions) {
-            rea.disabled = true
-        }
-    }
-
     const times = document.querySelectorAll('#temps')
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
     function timeAffi(time) {
@@ -218,11 +207,11 @@
             })
             e.currentTarget.querySelector("textarea").value = ""
             const div = document.createElement("div")
-            div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
-            cForm.appendChild(div)
-            setTimeout(() => {
-                div.remove()
-            }, 2000)
+            // div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
+            // cForm.appendChild(div)
+            // setTimeout(() => {
+            //     div.remove()
+            // }, 2000)
         })
     })
 
@@ -307,14 +296,12 @@
             if (json.error) {
                 throw new Error(json.error);
             }
-            console.log(json);
             return json;
         } catch (error) {
             console.error("Fetch error:", error);
             throw error;
         }
     }
-
 
 </script>
 
