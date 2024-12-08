@@ -86,18 +86,12 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// Add The post to the posts table
-	i := 1
-	title = "title" + strconv.Itoa(i)
-	body = "body" + strconv.Itoa(i)
 	if imageData == nil {
-		for i <= 1200 {
-			_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, i)
-			if err != nil {
-				log.Println("Error inserting user:", err)
-				http.Error(w, "Internal server error", 500)
-				return
-			}
-			i++
+		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, id)
+		if err != nil {
+			log.Println("Error inserting user:", err)
+			http.Error(w, "Internal server error", 500)
+			return
 		}
 	} else {
 		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body,image, user_id) VALUES (?, ?, ?, ?,?)", CurrentUser, title, body, imageData, id)
@@ -107,14 +101,6 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	var counter int
-	err7 := data.Db.QueryRow("SELECT COUNT(*) FROM posts").Scan(&counter)
-	if err7 != nil {
-		fmt.Println("counter error", err)
-		http.Error(w, "Error fetching like count", http.StatusInternalServerError)
-		return
-	}
-	fmt.Println("counter", counter)
 	err = data.Db.QueryRow("SELECT id FROM posts WHERE post_creator = ? AND title = ? AND body = ? AND user_id = ?", CurrentUser, title, body, id).Scan(&Post_id)
 	if err != nil {
 		if err == sql.ErrNoRows {

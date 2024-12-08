@@ -11,6 +11,7 @@ import (
 )
 
 func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("likes api")
 	if r.URL.Path == "/api/likes" {
 		var LikeCount, DislikeCount int
 		post_id := r.URL.Query().Get("postid")

@@ -209,8 +209,10 @@ func init() {
 		comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
 		comment_body TEXT NOT NULL,
 		comment_writer TEXT NOT NULL,
+		comment_writer_id INTEGER NOT NULL,
 		post_commented_id INTEGER,
 		time DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (comment_writer_id) REFERENCES users(id) ON DELETE CASCADE,
 		FOREIGN KEY (post_commented_id) REFERENCES posts(id) ON DELETE CASCADE
 	)`
 
@@ -225,6 +227,7 @@ func init() {
     post_id INTEGER ,
 	liked_comment_id INTEGER ,             
     username TEXT ,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (liked_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE, 
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE  
 );`
@@ -239,6 +242,7 @@ func init() {
     post_id INTEGER ,
 	disliked_comment_id INTEGER ,             
     username TEXT ,
+	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (disliked_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE, 
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE  
 );`

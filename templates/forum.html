@@ -2,9 +2,6 @@
 <html lang="en">
 
 <head>
-    <noscript>
-        <meta http-equiv="refresh" content="0; url=/noScript">
-    </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
@@ -15,8 +12,10 @@
 </head>
 
 <body>
+    <noscript>
+        <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
+    </noscript>
     <header>
-
         <div class="user">
             <img src="/style/programmer.png" alt="{{.Currenuser}}">
             <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
@@ -148,10 +147,13 @@
 <script>
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
+        // const body = document.body;
         if (sidebar.classList.contains('open')) {
             sidebar.classList.remove('open');
+            // body.classList.remove('blurred');
         } else {
             sidebar.classList.add('open');
+            // body.classList.add('blurred');
         }
     }
     const comment = document.getElementsByClassName("bttn")
@@ -172,18 +174,7 @@
         }
         return "";
     }
-    let username = getCookie("guest_token");
-    // console.log(username);
-
-    if (username == "guest") {
-        create.disabled = true
-        for (let cm of comment) {
-            cm.disabled = true
-        }
-        for (let rea of reactions) {
-            rea.disabled = true
-        }
-    }
+    let username = getCookie("session_token");
 
     const times = document.querySelectorAll('#temps')
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
@@ -216,11 +207,11 @@
             })
             e.currentTarget.querySelector("textarea").value = ""
             const div = document.createElement("div")
-            div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
-            cForm.appendChild(div)
-            setTimeout(() => {
-                div.remove()
-            }, 2000)
+            // div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
+            // cForm.appendChild(div)
+            // setTimeout(() => {
+            //     div.remove()
+            // }, 2000)
         })
     })
 
@@ -305,14 +296,12 @@
             if (json.error) {
                 throw new Error(json.error);
             }
-            console.log(json);
             return json;
         } catch (error) {
             console.error("Fetch error:", error);
             throw error;
         }
     }
-
 
 </script>
 

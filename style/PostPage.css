@@ -17,10 +17,7 @@ body {
     overflow-x: hidden;
     width: 0;
 }
-.noscript-message {
-    color: red;
-    filter: none;
-}
+
 .open {
     top: 0;
     left: 0;
