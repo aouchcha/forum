@@ -60,7 +60,6 @@ func main() {
 	http.HandleFunc("/CommentsDisLikes", middleware(reactions.CommentsDislike, false))
 	http.HandleFunc("/api/likes", middleware(reactions.LikesCounterWithApi, false))
 	http.HandleFunc("/create_comment", middleware(creations.CreatCommnet, false))
-
 	fmt.Println("Server started on http://localhost:" + port)
 	http.ListenAndServe(":"+port, nil)
 }
