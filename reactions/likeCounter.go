@@ -13,34 +13,33 @@ import (
 func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("likes api")
 	if r.URL.Path == "/api/likes" {
+
 		cookie, err := r.Cookie("session_token")
 		if err != nil || cookie.Value == "guest" {
-			ResponseReaction(false, "", w, 401, 0, 0)
+			ResponseReaction(w, 401, 0, 0)
 		}
 
 		var LikeCount, DislikeCount int
-		var Check bool = true
+		// var Check bool = true
 		post_id := r.URL.Query().Get("postid")
 		comment_id := r.URL.Query().Get("comment_id")
 		fmt.Println(post_id, comment_id)
 		// Fetch the Like and Dislike counts
 		LikeCount, DislikeCount, err = getLikeAndDislikeCount(post_id, comment_id)
 		if err != nil {
-			ResponseReaction(false, "Bad Request You need to sign in", w, 400, 0, 0)
+			ResponseReaction(w, 400, 0, 0)
 			// http.Error(w, "Error fetching like and dislike count", http.StatusInternalServerError)
 			return
 		}
-		ResponseReaction(Check, "", w, 200, LikeCount, DislikeCount)
+		ResponseReaction(w, 200, LikeCount, DislikeCount)
 	}
 }
 
-func ResponseReaction(Check bool, Message string, w http.ResponseWriter, ErrCode, LikeCount, DislikeCount int) {
+func ResponseReaction(w http.ResponseWriter, ErrCode, LikeCount, DislikeCount int) {
 	response, err := json.Marshal(struct {
-		Check        bool
 		LikeCount    string
 		DislikeCount string
 	}{
-		Check:        Check,
 		LikeCount:    strconv.Itoa(LikeCount),
 		DislikeCount: strconv.Itoa(DislikeCount),
 	})

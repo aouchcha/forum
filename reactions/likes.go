@@ -7,10 +7,16 @@ import (
 	"strconv"
 
 	data "main/dataBase"
+	"main/handler"
 )
 
 func PostsLike(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/PostsLikes" {
+		if handler.IsJavaScriptDisabled(r) {
+			fmt.Println("5555555")
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
 		user := r.URL.Query().Get("user")
 		postid := r.URL.Query().Get("Liked_Post_id")
 		var user_id int
@@ -54,6 +60,11 @@ func PostsLike(w http.ResponseWriter, r *http.Request) {
 }
 
 func CommentsLike(w http.ResponseWriter, r *http.Request) {
+	if handler.IsJavaScriptDisabled(r) {
+		fmt.Println("5555555")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	Liked_comment_id, err := strconv.Atoi(r.URL.Query().Get("comment_id"))
 	if err != nil {
 		http.Error(w, "Internal server error in converting the comment id into int", http.StatusInternalServerError)

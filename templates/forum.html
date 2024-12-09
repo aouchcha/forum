@@ -17,6 +17,11 @@
 
 <body>
     <header>
+        <noscript>
+            <strong style="color: red;">
+                You Disable JS please refreach the page to continue
+            </strong>
+        </noscript>
         <div class="user">
             <img src="/style/programmer.png" alt="{{.Currenuser}}">
             <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
@@ -179,7 +184,7 @@
     const sidebar = document.getElementById('sidebar');
     const filter_butt = document.getElementById('filter_butt')
     filter_butt.addEventListener('click', () => toggleSidebar(sidebar))
-    
+
 </script>
 
 

@@ -7,10 +7,16 @@ import (
 	"strconv"
 
 	data "main/dataBase"
+	"main/handler"
 )
 
 func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/PostsDislikes" {
+		if handler.IsJavaScriptDisabled(r) {
+			fmt.Println("5555555")
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
 		user := r.URL.Query().Get("user")
 		postid := r.URL.Query().Get("Disliked_Post_id")
 		user_id, err := strconv.Atoi(r.URL.Query().Get("user_id"))
@@ -53,6 +59,11 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 }
 
 func CommentsDislike(w http.ResponseWriter, r *http.Request) {
+	if handler.IsJavaScriptDisabled(r) {
+		fmt.Println("5555555")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	Post_id, err := strconv.Atoi(r.URL.Query().Get("post_id"))
 	if err != nil {
 		http.Error(w, "Internal server error in converting the post id into int", http.StatusInternalServerError)
