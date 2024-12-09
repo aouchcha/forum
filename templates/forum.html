@@ -197,16 +197,45 @@
 
     const commentForms = document.querySelectorAll(".comment_container form")
     commentForms.forEach(cForm => {
-        cForm.addEventListener("submit", (e) => {
+        cForm.addEventListener("submit",  async (e) => {
             e.preventDefault()
             const path = e.currentTarget.getAttribute("action")
             const formData = new FormData(e.currentTarget)
-            fetch(path, {
+            const TextA = e.currentTarget.querySelector("textarea")
+           try {
+            let res = await fetch(path, {
                 method: "post",
                 body: formData
             })
-            e.currentTarget.querySelector("textarea").value = ""
-            const div = document.createElement("div")
+            console.log(res);
+            
+            if (!res.ok) {
+                switch (res.status) {
+                case 400:
+                    throw new Error("Bad Request: Please check your input.");
+                case 401:
+                    throw new Error("Forbidden: You need to log in to perform this action.");
+                case 404:
+                    throw new Error("Not Found: The requested resource could not be found.");
+                case 500:
+                    throw new Error("Server Error: Please try again later.");
+                default:
+                    throw new Error(`Unexpected Error: ${res.status} ${res.statusText}`);
+                }
+            }
+            
+            let json = await res.json()
+            console.log(json);
+            TextA.value = ""
+           } catch (error) {
+            alert(error)
+            console.log(error);
+            
+            if (error.message == "Forbidden: You need to log in to perform this action.") {
+                window.location.href = '/login'
+            }
+           }
+            // const div = document.createElement("div")
             // div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
             // cForm.appendChild(div)
             // setTimeout(() => {
@@ -262,6 +291,8 @@
                 const path = `/api/likes?postid=${postid}`;
 
                 const response = await getdata(path);
+                console.log(response);
+                
                 const likeCount = response.LikeCount;
                 const DislikeCount = response.DislikeCount;
 
@@ -289,19 +320,32 @@
     async function getdata(path) {
         try {
             const res = await fetch(path);
+            console.log(res);
+            
             if (!res.ok) {
-                throw new Error(res.statusText);
+                switch (res.status) {
+                case 400:
+                    throw new Error("Bad Request: Please check your input.");
+                case 401:
+                    throw new Error("Forbidden: You need to log in to perform this action.");
+                case 404:
+                    throw new Error("Not Found: The requested resource could not be found.");
+                case 500:
+                    throw new Error("Server Error: Please try again later.");
+                default:
+                    throw new Error(`Unexpected Error: ${res.status} ${res.statusText}`);
+                }
             }
-            const json = await res.json();
-            if (json.error) {
-                throw new Error(json.error);
+            
+            let json = await res.json()
+            return json
+           } catch (error) {
+            alert(error)
+            if (error.message == "Forbidden: You need to log in to perform this action.") {
+                window.location.href = '/login'
             }
-            return json;
-        } catch (error) {
-            console.error("Fetch error:", error);
-            throw error;
-        }
     }
+}
 
 </script>
 

@@ -11,7 +11,7 @@ import (
 	userData "main/userData"
 )
 
-var port = "7089"
+var port = "8840"
 
 func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -58,8 +58,8 @@ func main() {
 	http.HandleFunc("/PostsDislikes", middleware(reactions.PostsDislikes, false))
 	http.HandleFunc("/CommentsLikes", middleware(reactions.CommentsLike, false))
 	http.HandleFunc("/CommentsDisLikes", middleware(reactions.CommentsDislike, false))
-	http.HandleFunc("/api/likes", middleware(reactions.LikesCounterWithApi, false))
-	http.HandleFunc("/create_comment", middleware(creations.CreatCommnet, false))
+	http.HandleFunc("/api/likes", reactions.LikesCounterWithApi)
+	http.HandleFunc("/create_comment", creations.CreatCommnet)
 	fmt.Println("Server started on http://localhost:" + port)
 	http.ListenAndServe(":"+port, nil)
 }

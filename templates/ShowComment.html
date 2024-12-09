@@ -127,22 +127,20 @@
         })
     })
 
-    async function getdata(ApiPath) {
+    async function getdata(path) {
         try {
-            const res = await fetch(ApiPath)
+            const res = await fetch(path);
             if (!res.ok) {
-                throw new Error(res.statusText)
+                throw new Error(res.statusText);
             }
-            const json = await res.json()
+            const json = await res.json();
             if (json.error) {
-                throw new Error(json.error)
+                throw new Error(json.error);
             }
-            console.log(json);
-
-            return json
+            return json;
         } catch (error) {
-            alert("There somethin wrong")
-            throw error
+            alert("You need to sign in to react")
+            window.location.href = '/login'
         }
     }
 </script>

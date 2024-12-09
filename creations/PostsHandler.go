@@ -1,7 +1,6 @@
 package creation
 
 import (
-	"database/sql"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +9,7 @@ import (
 	"text/template"
 
 	data "main/dataBase"
+	"main/handler"
 )
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
@@ -69,21 +69,18 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		categories = append(categories, "All")
 	}
 	if title == "" || body == "" {
-		http.Error(w, "bad request empty post", http.StatusBadRequest)
+		handler.ChooseError(w, "Bad Request", 400)
+		// http.Error(w, "bad request empty post", http.StatusBadRequest)
 		return
 	}
 	row := data.Db.QueryRow("SELECT id FROM users WHERE username = ?", CurrentUser)
 	var id int
 	err := row.Scan(&id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			fmt.Println("this user don't exist")
-			http.Error(w, "you are in the guest session", http.StatusInternalServerError)
-			return
-		} else {
-			fmt.Println("we can't retrive data")
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
+		fmt.Println("we can't retrive data")
+		handler.ChooseError(w, "Inrternal Server Error", 500)
+		// http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	// Add The post to the posts table
 	if imageData == nil {
@@ -103,19 +100,15 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 	}
 	err = data.Db.QueryRow("SELECT id FROM posts WHERE post_creator = ? AND title = ? AND body = ? AND user_id = ?", CurrentUser, title, body, id).Scan(&Post_id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			http.Error(w, "We can't get the new post id", http.StatusInternalServerError)
-			return
-		} else {
-			http.Error(w, "Internal server error"+err.Error(), http.StatusInternalServerError)
-			return
-		}
+		handler.ChooseError(w, "Internal Server Error", 500)
+		return
 	}
 	for _, categorie := range categories {
 		_, err = data.Db.Exec("INSERT INTO categories(post_id, categorie) VALUES (?, ?)", Post_id, categorie)
 		if err != nil {
 			log.Println("Error inserting user:", err)
-			http.Error(w, "Internal server error", 500)
+			handler.ChooseError(w, "Internal Server Error", 500)
+			// http.Error(w, "Internal server error", 500)
 			return
 		}
 	}

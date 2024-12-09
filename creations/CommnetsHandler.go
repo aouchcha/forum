@@ -2,6 +2,7 @@ package creation
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -70,40 +71,78 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		Comments: comments_toshow,
 	})
 }
-
 func CreatCommnet(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("create comment")
-	comment_body := r.FormValue("comments")
-	comment_writer := r.URL.Query().Get("writer")
+	fmt.Println("Create Comment API called")
 
-	// _, err := r.Cookie("session_token")
+	commentBody := r.FormValue("comments")
+	commentWriter := r.URL.Query().Get("writer")
 
-	// if err != nil {
-	// 	handler.ChooseError(w, "Bad Request if you want to continue as a guest choose it", 400)
-	// 	return
-	// }
+	var message string
+	var errCode int
 
-	post_id, err := strconv.Atoi(r.URL.Query().Get("postid"))
+	var userID int
+	err := data.Db.QueryRow("SELECT id FROM users WHERE username = ?", commentWriter).Scan(&userID)
 	if err != nil {
-		handler.ChooseError(w, "Inernal Server Error", 500)
-		return
-	}
-	// err = data.Db.QueryRow("SELECT post_creator FROM users WHERE id=?", postid).Scan()
-	if comment_body == "" {
-		handler.ChooseError(w, "Bad Request", 400)
-		return
-	}
-	var id int
-	err = data.Db.QueryRow("SELECT id FROM users WHERE username = ?", comment_writer).Scan(&id)
-	if err != nil {
-		handler.ChooseError(w, "Bad Request you need to log in to interact with the content", 400)
+		fmt.Println("Error finding user:", err)
+		message = "Unauthorized: Please log in to comment"
+		errCode = http.StatusUnauthorized
+		ResponseComments(message, w, errCode)
 		return
 	}
 
-	_, err = data.Db.Exec("INSERT INTO comments (comment_body, comment_writer, comment_writer_id, post_commented_id) VALUES (?, ?, ?, ?)", comment_body, comment_writer, id, post_id)
+	// Parse post ID
+	postID, err := strconv.Atoi(r.URL.Query().Get("postid"))
 	if err != nil {
-		handler.ChooseError(w, "Inernal Server Error", 500)
+		fmt.Println("Error parsing post ID:", err)
+		message = "Bad Request: Invalid Post ID"
+		errCode = http.StatusBadRequest
+		ResponseComments(message, w, errCode)
 		return
+	}
+
+	// Validate comment body
+	if commentBody == "" {
+		fmt.Println("Error: Comment body is empty")
+		message = "Bad Request: Comment body cannot be empty"
+		errCode = http.StatusBadRequest
+		ResponseComments(message, w, errCode)
+		return
+	}
+
+	// Verify user in database
+
+	// Insert comment into database
+	_, err = data.Db.Exec("INSERT INTO comments (comment_body, comment_writer, comment_writer_id, post_commented_id) VALUES (?, ?, ?, ?)", commentBody, commentWriter, userID, postID)
+	if err != nil {
+		fmt.Println("Error inserting comment:", err)
+		message = "Internal Server Error: Failed to save comment"
+		errCode = http.StatusInternalServerError
+		ResponseComments(message, w, errCode)
+		return
+	}
+
+	// Success response
+	message = "Comment created successfully"
+	errCode = http.StatusOK
+	ResponseComments(message, w, errCode)
+}
+
+func ResponseComments(message string, w http.ResponseWriter, errCode int) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Construct response structure
+	response := struct {
+		Message string `json:"message"`
+	}{
+		Message: message,
+	}
+
+	// Encode the response to JSON
+	w.WriteHeader(errCode)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		fmt.Println("Error encoding response:", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"check": false, "message": "Internal Server Error"}`))
 	}
 }
 
