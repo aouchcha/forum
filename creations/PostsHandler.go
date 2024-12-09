@@ -47,6 +47,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 
 	title := r.FormValue("title")
 	body := r.FormValue("body")
+	// adding image
 	var imageData []byte
 	var ImageErr error
 	image, _, err6 := r.FormFile("image")
@@ -64,6 +65,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	// end here
 	categories := r.Form["categories"]
 	if len(categories) == 0 {
 		categories = append(categories, "All")

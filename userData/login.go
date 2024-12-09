@@ -10,6 +10,10 @@ import (
 	"github.com/google/uuid"
 )
 
+// type userExist struct {
+// 	Yes bool
+// }
+
 func SessionCookie(w http.ResponseWriter, session_id string, expiration time.Time) {
 	cookie := &http.Cookie{
 		Name:    "session_token",
