@@ -24,7 +24,7 @@
         </div>
         <div class="corner">
 
-            <button class="sidebarbtn" onclick="toggleSidebar()">☰
+            <button class="sidebarbtn" id=filter_butt>☰
                 FILTER</button>
             <form action="/logout" method="post">
                 <button type="submit" class="sidebarbtn">
@@ -147,7 +147,7 @@
     </footer>
 </body>
 <script type="module">
-    import { toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';
+    import {toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';
 
     const commentButtons = document.getElementsByClassName("bttn");
     const reactions = document.getElementsByClassName("react");
@@ -175,6 +175,11 @@
     // Fetch reactions to prevent refresh
     const reactionForms = document.querySelectorAll(".reactions-container form");
     FetchReactions(reactionForms);
+
+    const sidebar = document.getElementById('sidebar');
+    const filter_butt = document.getElementById('filter_butt')
+    filter_butt.addEventListener('click', () => toggleSidebar(sidebar))
+    
 </script>
 
 

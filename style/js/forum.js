@@ -1,6 +1,5 @@
 
-export function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
+export function toggleSidebar(sidebar) {
     if (sidebar.classList.contains('open')) {
         sidebar.classList.remove('open');
     } else {
@@ -23,12 +22,7 @@ export function getCookie(cname) {
     }
     return "";
 }
-// let username = getCookie("session_token");
 
-// function TimeFormat(params) {
-
-// }
-// times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
 export function timeAffi(time) {
     let now = new Date()
     let then = new Date(time)
@@ -43,10 +37,7 @@ export function timeAffi(time) {
         return days + " day"
     }
 }
-// const CreateButton = document.getElementById('Create')
-// const HiddenDiv = document.getElementById('temp')
 
-// const commentForms = document.querySelectorAll(".comment_container form")
 export function FetchComments(commentForms) {
     commentForms.forEach(cForm => {
         cForm.addEventListener("submit", async (e) => {
@@ -59,8 +50,7 @@ export function FetchComments(commentForms) {
                     method: "post",
                     body: formData
                 })
-                console.log(res);
-
+                
                 if (!res.ok) {
                     switch (res.status) {
                         case 400:
@@ -101,9 +91,6 @@ export function FetchComments(commentForms) {
 
 }
 
-
-
-// const Forms = document.querySelectorAll(".reactions-container form");
 export function FetchReactions(Forms) {
     Forms.forEach(Form => {
         Form.addEventListener("submit", async (e) => {
@@ -151,10 +138,6 @@ export function FetchReactions(Forms) {
                     button.textContent = icon + " " + likeCount;
                     TheOtherButton.textContent = icon2 + " " + DislikeCount
                     button.style.backgroundColor = "green"
-                    // if (previouslike == previouslike - 1) {
-                    //     console.log("previouslike", previouslike)
-                    //     TheOtherButton.style.backgroundColor = ""
-                    // }
                     TheOtherButton.style.backgroundColor = ""
                 } else if (choice == "dislike_post") {
                     button.textContent = icon2 + " " + DislikeCount;
@@ -168,6 +151,7 @@ export function FetchReactions(Forms) {
         });
     });
 }
+
 export function FetchCommentsReactions(Forms) {
     Forms.forEach((CurrForm) => {
         CurrForm.addEventListener('submit', async (event) => {
