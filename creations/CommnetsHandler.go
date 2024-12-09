@@ -122,9 +122,10 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Success response
-	message = "Comment created successfully"
-	errCode = http.StatusOK
-	ResponseComments(message, w, errCode)
+	// message = "Comment created successfully"
+	// errCode = http.StatusOK
+	// ResponseComments(message, w, errCode)
+	http.Redirect(w, r, "/forum", http.StatusSeeOther)
 }
 
 func ResponseComments(message string, w http.ResponseWriter, errCode int) {

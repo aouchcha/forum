@@ -50,6 +50,7 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	http.Redirect(w, r, "forum", http.StatusSeeOther)
 }
 
 func CommentsDislike(w http.ResponseWriter, r *http.Request) {
@@ -107,4 +108,6 @@ func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	http.Redirect(w, r, "forum", http.StatusSeeOther)
+
 }
