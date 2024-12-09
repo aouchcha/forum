@@ -47,7 +47,7 @@
                 {{.Comment_writer}}
             </h4>
             <p>{{.Comment_body}}</p>
-            <sub><span>{{.Comment_time}}</span> ago </sub>
+            <sub><span id="temps">{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">
                 <br>
                 <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
@@ -82,26 +82,12 @@
 </body>
 
 <script type="module">
-    import { FetchCommentsReactions } from "../style/js/forum.js";
+    import { FetchCommentsReactions, timeAffi } from "../style/js/forum.js";
     const Forms = document.querySelectorAll('.reaction_section form')
     FetchCommentsReactions(Forms)
-
-    // async function getdata(path) {
-    //     try {
-    //         const res = await fetch(path);
-    //         if (!res.ok) {
-    //             throw new Error(res.statusText);
-    //         }
-    //         const json = await res.json();
-    //         if (json.error) {
-    //             throw new Error(json.error);
-    //         }
-    //         return json;
-    //     } catch (error) {
-    //         alert("You need to sign in to react")
-    //         window.location.href = '/login'
-    //     }
-    // }
+    //time affichage 
+    const times = document.querySelectorAll('#temps');
+    times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
 </script>
 
 </html>
