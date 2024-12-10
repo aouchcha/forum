@@ -18,6 +18,11 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error in Create page", http.StatusInternalServerError)
 		return
 	}
+	// if handler.IsJavaScriptDisabled(r) {
+	// 	fmt.Println("Error in javascript in post creation")
+	// 	http.Redirect(w, r, "/", http.StatusSeeOther)
+	// 	return
+	// }
 	// fmt.Println("PATH:", r.URL.Path)
 	post_id := r.URL.Query().Get("postid")
 	username := r.URL.Query().Get("user")
@@ -36,6 +41,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page not found", http.StatusNotFound)
 		return
 	}
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Not Allowed Method", http.StatusMethodNotAllowed)
 		return

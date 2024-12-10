@@ -71,11 +71,12 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		Comments: comments_toshow,
 	})
 }
+
 func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Create Comment API called")
 	fmt.Println(r.Header.Get("Accept"))
 	if handler.IsJavaScriptDisabled(r) {
-		fmt.Println("5555555")
+		fmt.Println("error in javascript in the create comment")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

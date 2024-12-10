@@ -24,6 +24,7 @@ type Post struct {
 	Time              any
 	Categorie         string
 	Image             string
+	CommentsLength    int
 }
 
 type Reactions struct {
@@ -79,13 +80,15 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		comment_id int
 		Post_id    int
 		Posts      []Post
-		IsGuest    bool
+		// Length     int
+		// IsGuest    bool
 	}{
 		Currenuser: CurrentUser,
 		Curr_id:    postt.CurrentUser_id,
 		comment_id: comment_id,
 		Post_id:    post_id,
 		Posts:      posts_toshow,
+		// Length:     Length,
 		// IsGuest:    isGuest,
 	})
 	if err != nil {
@@ -156,6 +159,11 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		base64Image := base64.StdEncoding.EncodeToString(imageData)
 		// fmt.Println("base64Image = ", base64Image)
 		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
+		var Length int
+		err8 := data.Db.QueryRow("SELECT COUNT(*) FROM comments WHERE post_commented_id = ?", id).Scan(&Length)
+		if err8 != nil {
+			fmt.Println("Error in getting the number of comments")
+		}
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
 			LikesCounter:      likee.LikeCount,
@@ -167,6 +175,7 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			Body:              body,
 			Time:              time,
 			Image:             base64Image,
+			CommentsLength:    Length,
 		})
 	}
 	if err := post_rows.Err(); err != nil {
