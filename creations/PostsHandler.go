@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 
 	data "main/dataBase"
@@ -18,6 +19,11 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error in Create page", http.StatusInternalServerError)
 		return
 	}
+	// if handler.IsJavaScriptDisabled(r) {
+	// 	fmt.Println("Error in javascript in post creation")
+	// 	http.Redirect(w, r, "/", http.StatusSeeOther)
+	// 	return
+	// }
 	// fmt.Println("PATH:", r.URL.Path)
 	post_id := r.URL.Query().Get("postid")
 	username := r.URL.Query().Get("user")
@@ -36,6 +42,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page not found", http.StatusNotFound)
 		return
 	}
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Not Allowed Method", http.StatusMethodNotAllowed)
 		return
@@ -45,8 +52,9 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 	Post_id, _ := strconv.Atoi(r.URL.Query().Get("postid"))
 	fmt.Println(Post_id)
 
-	title := r.FormValue("title")
-	body := r.FormValue("body")
+	title := strings.TrimSpace(r.FormValue("title"))
+	body := strings.TrimSpace(r.FormValue("body"))
+	// adding image
 	var imageData []byte
 	var ImageErr error
 	image, _, err6 := r.FormFile("image")
@@ -64,6 +72,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	// end here
 	categories := r.Form["categories"]
 	if len(categories) == 0 {
 		categories = append(categories, "All")
@@ -87,14 +96,18 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, id)
 		if err != nil {
 			log.Println("Error inserting user:", err)
-			http.Error(w, "Internal server error", 500)
+			handler.ChooseError(w, "Inrternal Server Error", 500)
+
+			// http.Error(w, "Internal server error", 500)
 			return
 		}
 	} else {
 		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body,image, user_id) VALUES (?, ?, ?, ?,?)", CurrentUser, title, body, imageData, id)
 		if err != nil {
 			log.Println("Error inserting user:", err)
-			http.Error(w, "Internal server error", 500)
+			handler.ChooseError(w, "Inrternal Server Error", 500)
+
+			// http.Error(w, "Internal server error", 500)
 			return
 		}
 	}

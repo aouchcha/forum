@@ -24,6 +24,7 @@ type Post struct {
 	Time              any
 	Categorie         string
 	Image             string
+	CommentsLength    int
 }
 
 type Reactions struct {
@@ -34,74 +35,73 @@ type Reactions struct {
 var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
-    if r.URL.Path != "/forum" {
-        http.Error(w, "page not found", http.StatusNotFound)
-        return
-    }
-    tmpl, err := template.ParseFiles("templates/forum.html")
-    if err != nil {
-        http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
-        return
-    }
-
-    var CurrentUser, CurrentSession string
-    var session_id string
-    cat_to_filter := r.FormValue("categories")
-    cookie1, err:= r.Cookie("session_token")
+	if r.URL.Path != "/forum" {
+		http.Error(w, "page not found", http.StatusNotFound)
+		return
+	}
+	tmpl, err := template.ParseFiles("templates/forum.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
 		return
 	}
-    // isGuest := false
-    if cookie1.Value == "guest" {
-        CurrentUser = "guest"
-        CurrentSession = "0"
-        // isGuest = true
-    } else {
-        CurrentSession = cookie1.Value
-        err = data.Db.QueryRow("SELECT user_id, session_id FROM sessions WHERE session_id = ?", CurrentSession).Scan(&postt.CurrentUser_id, &session_id)
-        if err != nil {
-            http.Redirect(w, r, "/login", http.StatusSeeOther)
-            return
-        }
-        err = data.Db.QueryRow("SELECT username from users where id = ?", postt.CurrentUser_id).Scan(&CurrentUser)
-        if err != nil {
-            http.Redirect(w, r, "/login", http.StatusSeeOther)
-            return
-        }
-    }
 
-    posts_toshow, comment_id, post_id, _ := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
+	var CurrentUser, CurrentSession string
+	var session_id string
+	cat_to_filter := r.FormValue("categories")
+	cookie1, err := r.Cookie("session_token")
+	if err != nil {
+		http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
+		return
+	}
+	// isGuest := false
+	if cookie1.Value == "guest" {
+		CurrentUser = "guest"
+		CurrentSession = "0"
+		// isGuest = true
+	} else {
+		CurrentSession = cookie1.Value
+		err = data.Db.QueryRow("SELECT user_id, session_id FROM sessions WHERE session_id = ?", CurrentSession).Scan(&postt.CurrentUser_id, &session_id)
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		err = data.Db.QueryRow("SELECT username from users where id = ?", postt.CurrentUser_id).Scan(&CurrentUser)
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+	}
 
-    err = tmpl.Execute(w, struct {
-        Currenuser string
-        Curr_id    int
-        comment_id int
-        Post_id    int
-        Posts      []Post
-        IsGuest    bool 
-    }{
-        Currenuser: CurrentUser,
-        Curr_id:    postt.CurrentUser_id,
-        comment_id: comment_id,
-        Post_id:    post_id,
-        Posts:      posts_toshow,
-        // IsGuest:    isGuest, 
-    })
+	posts_toshow, comment_id, post_id, _ := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
 
-    if err != nil {
-        fmt.Println(err)
-        http.Error(w, "Internal Server", http.StatusInternalServerError)
-        return
-    }
+	err = tmpl.Execute(w, struct {
+		Currenuser string
+		Curr_id    int
+		comment_id int
+		Post_id    int
+		Posts      []Post
+		// Length     int
+		// IsGuest    bool
+	}{
+		Currenuser: CurrentUser,
+		Curr_id:    postt.CurrentUser_id,
+		comment_id: comment_id,
+		Post_id:    post_id,
+		Posts:      posts_toshow,
+		// Length:     Length,
+		// IsGuest:    isGuest,
+	})
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Internal Server", http.StatusInternalServerError)
+		return
+	}
 }
-
 
 func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string) ([]Post, int, int, error) {
 	var post_rows *sql.Rows
 	var err error
 	if cat_to_filter != "all" && cat_to_filter != "" {
-
 		if cat_to_filter == "myposts" {
 			post_rows, err = data.Db.Query(`SELECT * FROM posts WHERE post_creator = ?`, CurrentUser)
 		} else if cat_to_filter == "likedposts" {
@@ -157,7 +157,13 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			return nil, 0, 0, errors.New("internal server error")
 		}
 		base64Image := base64.StdEncoding.EncodeToString(imageData)
+		// fmt.Println("base64Image = ", base64Image)
 		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
+		var Length int
+		err8 := data.Db.QueryRow("SELECT COUNT(*) FROM comments WHERE post_commented_id = ?", id).Scan(&Length)
+		if err8 != nil {
+			fmt.Println("Error in getting the number of comments")
+		}
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
 			LikesCounter:      likee.LikeCount,
@@ -169,10 +175,11 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			Body:              body,
 			Time:              time,
 			Image:             base64Image,
+			CommentsLength:    Length,
 		})
 	}
 	if err := post_rows.Err(); err != nil {
-		return nil, 0, 0, errors.New("error ma3reftch fin")
+		return nil, 0, 0, errors.New("error during iteration on each row in the database")
 	}
 	for i := 0; i < len(posts_toshow)-1; i++ {
 		for j := i + 1; j < len(posts_toshow); j++ {

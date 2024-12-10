@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	creations "main/creations"
 	data "main/dataBase"
@@ -11,7 +12,7 @@ import (
 	userData "main/userData"
 )
 
-var port = "8840"
+var port = "8080"
 
 func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -31,8 +32,10 @@ func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 			}
 			return
 		}
-
-		err = data.Db.QueryRow("SELECT user_id FROM sessions WHERE session_id = ?;", cookie.Value).Scan(&userID)
+		err = data.Db.QueryRow(
+			"SELECT user_id FROM sessions WHERE session_id = ?;",
+			cookie.Value,
+		).Scan(&userID)
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
@@ -41,13 +44,33 @@ func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 		next(w, r)
 	}
 }
+func auth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var expiresAt time.Time
+
+		cookie, err := r.Cookie("session_token")
+		if err != nil || cookie.Value == "" {
+			next(w, r)
+			return
+		}
+		err = data.Db.QueryRow(
+			"SELECT expires_at FROM sessions WHERE session_id = ?;",
+			cookie.Value,
+		).Scan(&expiresAt)
+		if err != nil || time.Now().After(expiresAt) {
+			next(w, r)
+			return
+		}
+		http.Redirect(w, r, "/forum", http.StatusFound)
+	}
+}
 
 func main() {
 
-	http.HandleFunc("/", handler.Home)
-	http.HandleFunc("/login", userData.Login)
+	http.HandleFunc("/", auth(handler.Home))
+	http.HandleFunc("/login", auth(userData.Login))
 	http.HandleFunc("/guest", handler.Guest)
-	http.HandleFunc("/register", userData.HandleRegistration)
+	http.HandleFunc("/register", auth(userData.HandleRegistration))
 	http.HandleFunc("/logout", userData.Logout)
 	http.HandleFunc("/style/", handler.Style)
 	http.HandleFunc("/forum", middleware(handler.Forum, true))

@@ -11,3 +11,15 @@ body {
     align-items: center;
     height: 100vh;
 }
+
+.bttn {
+    padding: 12px 30px;
+    color: #000;
+    background: #f1f1f1;
+    border-radius: 50px;
+    font-weight: bold;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #000;
+    box-shadow: #6e6c6c 1px 1px 1px 1px;
+}

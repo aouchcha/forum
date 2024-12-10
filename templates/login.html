@@ -10,8 +10,12 @@
 </head>
 
 <body>
-    <form action="/login" method="post">
-        <div class="login-container" id="login-container">
+
+    <div class="login-container" id="login-container">
+        <form action="/login" method="post">
+            <noscript>
+                <h1 style="color: red;"><strong>You Need Js to use the plateform!</strong></h1>
+            </noscript>
             <h1>Welcome Back</h1>
             <img src="../style/programmer.png" alt="Profile" class="profile-img">
             <div class="input-group">
@@ -21,11 +25,12 @@
                 <input type="password" name="password" placeholder="Password" autocomplete="off" required>
             </div>
             <button class="btn btn-login" type="submit">Sign In</button>
-            <button class="btn btn-login" type="button" onclick="window.location.href='/register';">Sign Up</button>
-            <button class="btn btn-login" type="button" onclick="window.location.href='/guest';">Continue as
-                Guest</button>
-            <button class="btn btn-home" type="button" onclick="window.location.href='/';">Back to Home</button>
-        </div>
-    </form>
+        </form>
+        <button class="btn btn-login" type="button" onclick="window.location.href='/register';">Sign Up</button>
+        <button class="btn btn-login" type="button" onclick="window.location.href='/guest';">Continue as
+            Guest</button>
+        <button class="btn btn-home" type="button" onclick="window.location.href='/';">Back to Home</button>
+    </div>
 </body>
+
 </html>

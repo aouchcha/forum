@@ -2,6 +2,12 @@
 <html lang="en">
 
 <head>
+    <noscript>
+        <strong style="color: red;">
+            You Disable JS please refreach the page to continue.
+        </strong>
+        <meta http-equiv="refresh" content="url=/">
+    </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum</title>
@@ -9,6 +15,7 @@
     <link rel="stylesheet" href="../style/PostPage.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="module" src="../style/js/forum.js"></script>
 </head>
 
 <body>
@@ -21,10 +28,11 @@
         <div class="user">
             <img src="/style/programmer.png" alt="{{.Currenuser}}">
             <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
-            <h2><strong>User ID :</strong> {{.Curr_id}}</h2>
+            <h3><strong>User ID :</strong> {{.Curr_id}}</h3>
         </div>
         <div class="corner">
-            <button class="sidebarbtn" onclick="toggleSidebar()">☰
+
+            <button class="sidebarbtn" id=filter_butt>☰
                 FILTER</button>
             <form action="/logout" method="post">
                 <button type="submit" class="sidebarbtn">
@@ -129,8 +137,7 @@
         <form action="/showcomments" method="get" class="jj">
             <input type="hidden" value="{{.Postid}}" name="postid">
             <input type="hidden" value="{{.CurrentUsser}}" name="writer">
-
-            <button type="submit" class="href">See All Comments()</button>
+            <button type="submit" class="href">See All Comments({{.CommentsLength}})</button>
         </form>
     </div>
     {{end}}
@@ -146,209 +153,42 @@
         </div>
     </footer>
 </body>
-<script>
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        // const body = document.body;
-        if (sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            // body.classList.remove('blurred');
-        } else {
-            sidebar.classList.add('open');
-            // body.classList.add('blurred');
-        }
-    }
-    const comment = document.getElementsByClassName("bttn")
-    const reactions = document.getElementsByClassName("react")
-    const create = document.getElementById("Create")
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
-    }
-    let username = getCookie("session_token");
+<script type="module">
+    import {toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';
 
-    const times = document.querySelectorAll('#temps')
+    const commentButtons = document.getElementsByClassName("bttn");
+    const reactions = document.getElementsByClassName("react");
+    const createButton = document.getElementById("Create");
+    const username = getCookie("session_token");
+
+    if (username === 'guest') {
+        for (const button of commentButtons) {
+            button.disabled = true;
+        }
+        for (const reaction of reactions) {
+            reaction.disabled = true;
+        }
+        createButton.disabled = true;
+    }
+
+    // Format time elements
+    const times = document.querySelectorAll('#temps');
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
-    function timeAffi(time) {
-        let now = new Date()
-        let then = new Date(time)
-        let min = ((now - then) / (1000 * 60)).toFixed()
-        let hours = ((now - then) / (1000 * 3600)).toFixed()
-        let days = ((now - then) / (1000 * 3600 * 24)).toFixed()
-        if (min < 60) {
-            return min + " minutes"
-        } else if (hours < 24) {
-            return hours + " hours"
-        } else {
-            return days + " day"
-        }
-    }
-    const CreateButton = document.getElementById('Create')
-    const HiddenDiv = document.getElementById('temp')
 
-    const commentForms = document.querySelectorAll(".comment_container form")
-    commentForms.forEach(cForm => {
-        cForm.addEventListener("submit",  async (e) => {
-            e.preventDefault()
-            const path = e.currentTarget.getAttribute("action")
-            const formData = new FormData(e.currentTarget)
-            const TextA = e.currentTarget.querySelector("textarea")
-           try {
-            let res = await fetch(path, {
-                method: "post",
-                body: formData
-            })
-            console.log(res);
-            
-            if (!res.ok) {
-                switch (res.status) {
-                case 400:
-                    throw new Error("Bad Request: Please check your input.");
-                case 401:
-                    throw new Error("Forbidden: You need to log in to perform this action.");
-                case 404:
-                    throw new Error("Not Found: The requested resource could not be found.");
-                case 500:
-                    throw new Error("Server Error: Please try again later.");
-                default:
-                    throw new Error(`Unexpected Error: ${res.status} ${res.statusText}`);
-                }
-            }
-            
-            let json = await res.json()
-            console.log(json);
-            TextA.value = ""
-           } catch (error) {
-            alert(error)
-            console.log(error);
-            
-            if (error.message == "Forbidden: You need to log in to perform this action.") {
-                window.location.href = '/login'
-            }
-           }
-            // const div = document.createElement("div")
-            // div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
-            // cForm.appendChild(div)
-            // setTimeout(() => {
-            //     div.remove()
-            // }, 2000)
-        })
-    })
+    // Fetch Comments Data
+    const commentForms = document.querySelectorAll(".comment_container form");
+    FetchComments(commentForms);
 
+    // Fetch reactions to prevent refresh
+    const reactionForms = document.querySelectorAll(".reactions-container form");
+    FetchReactions(reactionForms);
 
-
-
-
-    const Forms = document.querySelectorAll(".reactions-container form");
-    Forms.forEach(Form => {
-        Form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const button = e.currentTarget.querySelector('button');
-            const choice = e.currentTarget.getAttribute('id')
-            let TheOtherButton = ""
-            if (choice == "like_post") {
-                TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
-                // console.log("TheOtherButton1", TheOtherButton)
-                // let thumbs = TheOtherButton.querySelector('i')
-                // console.log("TheOtherButton ====>", thumbs)
-            } else {
-                TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
-                // console.log("TheOtherButton2", TheOtherButton)
-                // let thumbs = TheOtherButton.querySelector('i')
-                // console.log("TheOtherButton ====>", thumbs)
-            }
-
-
-            if (!button) {
-                console.error("Button not found");
-                return;
-            }
-
-            let path1 = e.currentTarget.getAttribute('action');
-
-            let icon = "👍🏻"
-            let icon2 = "👎🏻"
-            // console.log("icon2", icon2)
-            let previouslike = button.textContent
-            console.log("previouslike outside ===>", previouslike)
-            const postid = e.currentTarget.parentElement.querySelector('input').value;
-
-            try {
-                await fetch(path1, {
-                    method: "POST",
-                });
-
-                const path = `/api/likes?postid=${postid}`;
-
-                const response = await getdata(path);
-                console.log(response);
-                
-                const likeCount = response.LikeCount;
-                const DislikeCount = response.DislikeCount;
-
-                if (choice == "like_post") {
-                    button.textContent = icon + " " + likeCount;
-                    TheOtherButton.textContent = icon2 + " " + DislikeCount
-                    button.style.backgroundColor = "green"
-                    // if (previouslike == previouslike - 1) {
-                    //     console.log("previouslike", previouslike)
-                    //     TheOtherButton.style.backgroundColor = ""
-                    // }
-                    TheOtherButton.style.backgroundColor = ""
-                } else if (choice == "dislike_post") {
-                    button.textContent = icon2 + " " + DislikeCount;
-                    TheOtherButton.textContent = icon + " " + likeCount
-                    button.style.backgroundColor = "red"
-                    TheOtherButton.style.backgroundColor = ""
-                }
-            } catch (err) {
-                console.error("Error processing like:", err);
-            }
-        });
-    });
-
-    async function getdata(path) {
-        try {
-            const res = await fetch(path);
-            console.log(res);
-            
-            if (!res.ok) {
-                switch (res.status) {
-                case 400:
-                    throw new Error("Bad Request: Please check your input.");
-                case 401:
-                    throw new Error("Forbidden: You need to log in to perform this action.");
-                case 404:
-                    throw new Error("Not Found: The requested resource could not be found.");
-                case 500:
-                    throw new Error("Server Error: Please try again later.");
-                default:
-                    throw new Error(`Unexpected Error: ${res.status} ${res.statusText}`);
-                }
-            }
-            
-            let json = await res.json()
-            return json
-           } catch (error) {
-            alert(error)
-            if (error.message == "Forbidden: You need to log in to perform this action.") {
-                window.location.href = '/login'
-            }
-    }
-}
+    const sidebar = document.getElementById('sidebar');
+    const filter_butt = document.getElementById('filter_butt')
+    filter_butt.addEventListener('click', () => toggleSidebar(sidebar))
 
 </script>
+
+
 
 </html>

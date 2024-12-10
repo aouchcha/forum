@@ -2,18 +2,21 @@
 <html lang="en">
 
 <head>
+    <noscript>
+        <strong style="color: red;">
+            You Disable JS please refreach the page to continue
+        </strong>
+        <meta http-equiv="refresh" content="url=/login">
+    </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Show Comments</title>
     <link rel="stylesheet" href="../style/PostPage.css">
     <link rel="icon" type="image/png" sizes="40x40" href="/style/icon.png.png">
-    <script type="module" src=""></script>
+    <script type="module" src="../style/js/forum.js"></script>
 </head>
 
 <body style="background-color: aliceblue;">
-    <noscript>
-        <strong style="color: red;">We're sorry but this website doesn't work properly without JavaScript</strong>
-    </noscript>
     <header>
         <div class="user">
             <img src="/style/programmer.png" alt="{{.CurrentUser}}">
@@ -47,7 +50,7 @@
                 {{.Comment_writer}}
             </h4>
             <p>{{.Comment_body}}</p>
-            <sub><span>{{.Comment_time}}</span> ago </sub>
+            <sub><span id="temps">{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">
                 <br>
                 <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
@@ -81,68 +84,13 @@
     </footer>
 </body>
 
-<script>
+<script type="module">
+    import { FetchCommentsReactions, timeAffi } from "../style/js/forum.js";
     const Forms = document.querySelectorAll('.reaction_section form')
-    Forms.forEach((CurrForm) => {
-        CurrForm.addEventListener('submit', async (event) => {
-            event.preventDefault()
-            const ActionPath = event.currentTarget.getAttribute('action')
-            const Comment_id = event.currentTarget.parentElement.querySelector('input').value
-            const choice = event.currentTarget.getAttribute('id')
-            const button = event.currentTarget.querySelector('button')
-            let previouslike = button.textContent
-            console.log(" previouslikje ===>", previouslike);
-            let TheOtherButton = ""
-            if (choice == "Comment_Like") {
-                TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Dislike').querySelector('button')
-            } else {
-                TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Like').querySelector('button')
-            }
-
-            let icon = button.textContent.split(' ')[0];
-            let icon2 = TheOtherButton.innerHTML.split(' ')[0];
-            console.log("iocnes :", icon, icon2);
-            try {
-                await fetch(ActionPath, {
-                    method: "POST",
-                })
-                const ApiPath = `/api/likes?comment_id=${Comment_id}`;
-                const response = await getdata(ApiPath)
-                const likeCount = response.LikeCount
-                const DislikeCount = response.DislikeCount;
-                if (choice == "Comment_Like") {
-                    button.textContent = icon + " " + likeCount;
-                    TheOtherButton.textContent = icon2 + " " + DislikeCount
-                    button.style.backgroundColor = "green"
-                    TheOtherButton.style.backgroundColor = ""
-                } else if (choice == "Comment_Dislike") {
-                    button.textContent = icon + " " + DislikeCount;
-                    TheOtherButton.textContent = icon2 + " " + likeCount
-                    button.style.backgroundColor = "red"
-                    TheOtherButton.style.backgroundColor = ""
-                }
-            } catch (error) {
-                console.log("Error while reaction with commments", error)
-            }
-        })
-    })
-
-    async function getdata(path) {
-        try {
-            const res = await fetch(path);
-            if (!res.ok) {
-                throw new Error(res.statusText);
-            }
-            const json = await res.json();
-            if (json.error) {
-                throw new Error(json.error);
-            }
-            return json;
-        } catch (error) {
-            alert("You need to sign in to react")
-            window.location.href = '/login'
-        }
-    }
+    FetchCommentsReactions(Forms)
+    //time affichage 
+    const times = document.querySelectorAll('#temps');
+    times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
 </script>
 
 </html>

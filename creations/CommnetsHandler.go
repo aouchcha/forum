@@ -71,9 +71,15 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		Comments: comments_toshow,
 	})
 }
+
 func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Create Comment API called")
-
+	fmt.Println(r.Header.Get("Accept"))
+	if handler.IsJavaScriptDisabled(r) {
+		fmt.Println("error in javascript in the create comment")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	commentBody := r.FormValue("comments")
 	commentWriter := r.URL.Query().Get("writer")
 
@@ -122,10 +128,10 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Success response
-	// message = "Comment created successfully"
-	// errCode = http.StatusOK
-	// ResponseComments(message, w, errCode)
-	http.Redirect(w, r, "/forum", http.StatusSeeOther)
+	message = "Comment created successfully"
+	errCode = http.StatusOK
+	ResponseComments(message, w, errCode)
+	// http.Redirect(w, r, "/forum", http.StatusSeeOther)
 }
 
 func ResponseComments(message string, w http.ResponseWriter, errCode int) {

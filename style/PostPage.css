@@ -190,8 +190,8 @@ header {
 }
 
 .comment_container textarea {
-    height: 40px;
-    width: 350px;
+    /* height: 100%; */
+    width: 100%;
     border: solid 1px black;
 }
 
@@ -304,7 +304,7 @@ footer {
 @media (max-width: 480px) {
     header {
         position: relative;
-        height: 70vh;
+        /* height: 100%; */
     }
 
     .sidebar {
