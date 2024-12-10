@@ -262,6 +262,14 @@ footer {
     /* position: absolute; */
 }
 
+.noscript{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100vh;
+    background-color: red;
+}
+
 @media (max-width: 768px) {
     .sidebar {
         width: 0;
