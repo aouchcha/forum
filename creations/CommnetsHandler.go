@@ -11,7 +11,6 @@ import (
 
 	data "main/dataBase"
 	handler "main/handler"
-	userData "main/userData"
 )
 
 type Comment struct {
@@ -78,7 +77,6 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Header.Get("Accept"))
 	if handler.IsJavaScriptDisabled(r) {
 		fmt.Println("error in javascript in the create comment")
-		userData.DeleteCookie(w, r)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
