@@ -8,11 +8,15 @@ import (
 	data "main/dataBase"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// type userExist struct {
-// 	Yes bool
-// }
+//	type userExist struct {
+//		Yes bool
+//	}
+func CheckPassword(hashed, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
+}
 
 func SessionCookie(w http.ResponseWriter, session_id string, expiration time.Time) {
 	cookie := &http.Cookie{
@@ -23,27 +27,30 @@ func SessionCookie(w http.ResponseWriter, session_id string, expiration time.Tim
 	http.SetCookie(w, cookie)
 }
 
-// func validateSession(r *http.Request) error {
-// }
 func Login(w http.ResponseWriter, r *http.Request) {
-	// err := validateSession(r)
-	// if err == nil {
-	// http.Redirect(w, r, "/forum", http.StatusFound)
-	// return
-	// } else
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
+
 		var userID int
-		err := data.Db.QueryRow("SELECT id FROM users WHERE username = ? AND password = ?", username, password).Scan(&userID)
+		var hashed string
+		err := data.Db.QueryRow("SELECT id, password FROM users WHERE username = ?", username).Scan(&userID, &hashed)
 		if err != nil {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return
 		}
+
+		err = CheckPassword(hashed, password)
+		if err != nil {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
 		_, err = data.Db.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
 		if err != nil {
 			fmt.Println("Error deleting old sessions:", err)
 		}
+
 		session := uuid.New().String()
 		expiration := time.Now().Add(5 * time.Minute)
 		_, err = data.Db.Exec("INSERT INTO sessions (session_id, user_id, expires_at) VALUES (?, ?, ?)", session, userID, expiration)
@@ -51,6 +58,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
+
 		SessionCookie(w, session, expiration)
 		fmt.Println("login success")
 		http.Redirect(w, r, "/forum", http.StatusFound)
