@@ -4,6 +4,8 @@ import (
 	data "main/dataBase"
 	"main/handler"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -30,9 +32,19 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error parsing form", http.StatusBadRequest)
 			return
 		}
-		email := r.FormValue("email")
-		username := r.FormValue("username")
-		password := r.FormValue("password")
+		// Regular expression for validating email addresses
+		emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+
+		// Compiling the regex
+		re := regexp.MustCompile(emailRegex)
+		email := strings.TrimSpace(r.FormValue("email"))
+		username := strings.TrimSpace(r.FormValue("username"))
+		password := strings.TrimSpace(r.FormValue("password"))
+
+		if len(username) >= 8 || !re.MatchString(email) {
+			handler.ChooseError(w, "Bad Request", 400)
+			return
+		}
 
 		if email == "" || username == "" || password == "" {
 			http.Error(w, "Missing required fields", http.StatusBadRequest)
@@ -56,7 +68,7 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
             INSERT INTO users (email, username, password)
             VALUES (?, ?, ?)`, email, username, hashedPassword)
 
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/forum", http.StatusSeeOther)
 		return
 	}
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
