@@ -2,6 +2,7 @@ package handler
 
 import (
 	data "main/dataBase"
+	"main/handler"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -15,6 +16,10 @@ func HashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 func HandleRegistration(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/register" {
+		handler.ChooseError(w, "Page Not Found", 404)
+		return
+	}
 	if r.Method == "GET" {
 		http.ServeFile(w, r, "./templates/register.html")
 		return

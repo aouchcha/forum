@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	data "main/dataBase"
-	"main/handler"
+	handler "main/handler"
 )
 
 func PostsDislikes(w http.ResponseWriter, r *http.Request) {

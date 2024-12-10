@@ -67,10 +67,10 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 
-	http.HandleFunc("/", handler.Home)
+	http.HandleFunc("/", (handler.Home))
 	http.HandleFunc("/login", auth(userData.Login))
 	http.HandleFunc("/guest", handler.Guest)
-	http.HandleFunc("/register", userData.HandleRegistration)
+	http.HandleFunc("/register", auth(userData.HandleRegistration))
 	http.HandleFunc("/logout", userData.Logout)
 	http.HandleFunc("/style/", handler.Style)
 	http.HandleFunc("/forum", middleware(handler.Forum, true))
