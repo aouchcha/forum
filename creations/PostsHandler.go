@@ -77,30 +77,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		categories = append(categories, "All")
 	}
 
-	// Check for duplicate categories
-	Doubled := false
-	for i := 0; i < len(categories); i++ {
-		for j := i + 1; j < len(categories); j++ {
-			if categories[i] == categories[j] {
-				Doubled = true
-				break
-			}
-		}
-		if Doubled {
-			break
-		}
-	}
-
-	// Check if all categories are valid
-	OurCat := map[string]bool{"it": true, "economie": true, "enteairtement": true, "politic": true, "sport": true, "All": true}
-	Check := true
-	for _, cat := range categories {
-		if !OurCat[cat] {
-			Check = false
-			break
-		}
-	}
-
+	Doubled, Check := CheckCategories(categories, "")
 	if Doubled || !Check {
 		handler.ChooseError(w, "Bad Request", http.StatusBadRequest)
 		return
@@ -154,4 +131,36 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	http.Redirect(w, r, "/forum", http.StatusSeeOther)
+}
+
+func CheckCategories(categories []string, categorie string) (bool, bool) {
+	Doubled := false
+	OurCat := map[string]bool{"it": true, "economie": true, "enteairtement": true, "politic": true, "sport": true, "All": true}
+	Check := true
+	if categorie == "" && categories != nil {
+		for i := 0; i < len(categories); i++ {
+			for j := i + 1; j < len(categories); j++ {
+				if categories[i] == categories[j] {
+					Doubled = true
+					break
+				}
+			}
+			if Doubled {
+				break
+			}
+		}
+
+		// Check if all categories are valid
+		for _, cat := range categories {
+			if !OurCat[cat] {
+				Check = false
+				break
+			}
+		}
+	} else {
+		if !OurCat[categorie] {
+			Check = false
+		}
+	}
+	return Doubled, Check
 }

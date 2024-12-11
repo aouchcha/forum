@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"net/http"
 
+	creation "main/creations"
 	data "main/dataBase"
 	// handler "main/handler"
 )
@@ -77,8 +78,11 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
 	if err != nil {
 		fmt.Println(err)
-		ChooseError(w, err.Error(), http.StatusInternalServerError)
-		// http.Error(w, "Internal Server", http.StatusInternalServerError)
+		if err.Error() == "Bad Request" {
+			ChooseError(w, err.Error(), http.StatusBadRequest)
+		} else {
+			ChooseError(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -110,6 +114,11 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string) ([]Post, int, int, error) {
 	var post_rows *sql.Rows
 	var err error
+	Doubeled, check := creation.CheckCategories(nil, cat_to_filter)
+	if Doubeled || !check {
+		// handler.ChooseError(w, "Bad Request", http.StatusBadRequest)
+		return nil, 0, 0, errors.New("Bad Request")
+	}
 	if cat_to_filter != "all" && cat_to_filter != "" {
 		if cat_to_filter == "myposts" {
 			post_rows, err = data.Db.Query(`SELECT * FROM posts WHERE post_creator = ?`, CurrentUser)
