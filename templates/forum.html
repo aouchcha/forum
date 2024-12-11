@@ -6,7 +6,7 @@
         <strong style="color: red;">
             You Disable JS please refreach the page to continue.
         </strong>
-        <meta http-equiv="refresh" content="5; url=/">
+        <meta http-equiv="refresh" content="5; url=/NoJs">
     </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,22 +21,22 @@
 <body>
     <header>
         <div class="user">
+            <h2><strong>Mr</strong> {{.Currenuser}}</h2>
             <img src="/style/programmer.png" alt="{{.Currenuser}}">
-            <h2><strong>User Name :</strong> {{.Currenuser}}</h2>
-            <h3><strong>User ID :</strong> {{.Curr_id}}</h3>
-        </div>
-        <div class="corner">
-
-            <button class="sidebarbtn" id=filter_butt>☰
-                FILTER</button>
-            <form action="/logout" method="post">
+            <!-- <h3><strong>User ID :</strong> {{.Curr_id}}</h3> -->
+            <form action="/logout" method="post" id="logout">
                 <button type="submit" class="sidebarbtn">
                     <i class="glyphicon glyphicon-log-out"></i>
                     Log Out</button>
             </form>
         </div>
+        <br>
+        <div class="corner">
+            <button class="sidebarbtn" id=filter_butt>☰
+                FILTER</button>
+        </div>
         <div class="zone01">
-            <img src="/style/zone01oujda.png" alt="zone01oujda">
+            <!-- <img src="/style/zone01oujda.png" alt="zone01oujda"> -->
             <h1><strong>Welcome To Forum </strong></h1>
         </div>
         <div>
@@ -154,6 +154,9 @@
     const commentButtons = document.getElementsByClassName("bttn");
     const reactions = document.getElementsByClassName("react");
     const createButton = document.getElementById("Create");
+    const logoutform = document.querySelector('.user form button')
+
+    
     const username = getCookie("session_token");
 
     if (username === 'guest') {
@@ -164,6 +167,8 @@
             reaction.disabled = true;
         }
         createButton.disabled = true;
+        logoutform.innerHTML = "Sign In"
+
     }
 
     // Format time elements

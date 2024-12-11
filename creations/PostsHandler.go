@@ -2,7 +2,7 @@ package creation
 
 import (
 	"fmt"
-	"io"
+	// "io"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,7 +10,8 @@ import (
 	"text/template"
 
 	data "main/dataBase"
-	"main/handler"
+	handler "main/handler"
+	// userData "main/userData"
 )
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
@@ -19,11 +20,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error in Create page", http.StatusInternalServerError)
 		return
 	}
-	// if handler.IsJavaScriptDisabled(r) {
-	// 	fmt.Println("Error in javascript in post creation")
-	// 	http.Redirect(w, r, "/", http.StatusSeeOther)
-	// 	return
-	// }
 	// fmt.Println("PATH:", r.URL.Path)
 	post_id := r.URL.Query().Get("postid")
 	username := r.URL.Query().Get("user")
@@ -38,6 +34,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func InsertPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("hani dkhelt l insert post")
 	if r.URL.Path != "/InsertPost" {
 		http.Error(w, "page not found", http.StatusNotFound)
 		return
@@ -54,28 +51,59 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 
 	title := strings.TrimSpace(r.FormValue("title"))
 	body := strings.TrimSpace(r.FormValue("body"))
+	fmt.Println("TITLE :" + title)
+	fmt.Println("BODY :" + body)
 	// adding image
-	var imageData []byte
-	var ImageErr error
-	image, _, err6 := r.FormFile("image")
-	if err6 != nil {
-		fmt.Println("Error getting image:", err6)
-		imageData = nil
-		// return
-	} else {
-		// fmt.Println("Image:", image)
-		defer image.Close()
-		imageData, ImageErr = io.ReadAll(image)
-		if ImageErr != nil {
-			fmt.Println("Error reading image:", ImageErr)
-			imageData = nil
-			return
-		}
-	}
+	// var imageData []byte
+	// var ImageErr error
+	// image, _, err6 := r.FormFile("image")
+	// if err6 != nil {
+	// 	fmt.Println("Error getting image:", err6)
+	// 	imageData = nil
+	// 	// return
+	// } else {
+	// 	// fmt.Println("Image:", image)
+	// 	defer image.Close()
+	// 	imageData, ImageErr = io.ReadAll(image)
+	// 	if ImageErr != nil {
+	// 		fmt.Println("Error reading image:", ImageErr)
+	// 		imageData = nil
+	// 		return
+	// 	}
+	// }
 	// end here
 	categories := r.Form["categories"]
 	if len(categories) == 0 {
 		categories = append(categories, "All")
+	}
+
+	// Check for duplicate categories
+	Doubled := false
+	for i := 0; i < len(categories); i++ {
+		for j := i + 1; j < len(categories); j++ {
+			if categories[i] == categories[j] {
+				Doubled = true
+				break
+			}
+		}
+		if Doubled {
+			break
+		}
+	}
+
+	// Check if all categories are valid
+	OurCat := map[string]bool{"it": true, "economie": true, "enteairtement": true, "politic": true, "sport": true, "All": true}
+	Check := true
+	for _, cat := range categories {
+		if !OurCat[cat] {
+			Check = false
+			break
+		}
+	}
+
+	if Doubled || !Check {
+		handler.ChooseError(w, "Bad Request", http.StatusBadRequest)
+		return
 	}
 	if title == "" || body == "" {
 		handler.ChooseError(w, "Bad Request", 400)
@@ -92,25 +120,25 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Add The post to the posts table
-	if imageData == nil {
-		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, id)
-		if err != nil {
-			log.Println("Error inserting user:", err)
-			handler.ChooseError(w, "Inrternal Server Error", 500)
+	// if imageData == nil {
+	_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body, user_id) VALUES (?, ?, ?, ?)", CurrentUser, title, body, id)
+	if err != nil {
+		log.Println("Error inserting user:", err)
+		handler.ChooseError(w, "Inrternal Server Error", 500)
 
-			// http.Error(w, "Internal server error", 500)
-			return
-		}
-	} else {
-		_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body,image, user_id) VALUES (?, ?, ?, ?,?)", CurrentUser, title, body, imageData, id)
-		if err != nil {
-			log.Println("Error inserting user:", err)
-			handler.ChooseError(w, "Inrternal Server Error", 500)
-
-			// http.Error(w, "Internal server error", 500)
-			return
-		}
+		// http.Error(w, "Internal server error", 500)
+		return
 	}
+	// } else {
+	// 	_, err = data.Db.Exec("INSERT INTO posts(post_creator, title, body,image, user_id) VALUES (?, ?, ?, ?,?)", CurrentUser, title, body, imageData, id)
+	// 	if err != nil {
+	// 		log.Println("Error inserting user:", err)
+	// 		handler.ChooseError(w, "Inrternal Server Error", 500)
+
+	// 		// http.Error(w, "Internal server error", 500)
+	// 		return
+	// 	}
+	// }
 	err = data.Db.QueryRow("SELECT id FROM posts WHERE post_creator = ? AND title = ? AND body = ? AND user_id = ?", CurrentUser, title, body, id).Scan(&Post_id)
 	if err != nil {
 		handler.ChooseError(w, "Internal Server Error", 500)

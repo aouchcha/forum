@@ -4,10 +4,20 @@ body {
     background-color: rgb(255, 255, 255);
 }
 
+.logout{
+     position: relative;
+    /* top: 0%;
+    right: 0%; */
+}
+
 .corner {
-    position: fixed;
+    /* position: fixed;
     top: 0%;
-    right: 0%;
+    right: 0%; */
+    /* display: flex; */
+    /* align-items: center;
+    justify-content: center; */
+    flex-direction: row;
 }
 
 .sidebar {
@@ -47,9 +57,10 @@ body {
     margin-left: auto;
     width: 90px;
     height: 40px;
-    background-color: #000;
+    background-color: #24327b;
     color: #fff;
     border: 1px solid #fff;
+    border-radius: 10px;
     cursor: pointer;
 }
 
@@ -65,6 +76,8 @@ header {
 }
 
 .user {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     align-content: center;
 }

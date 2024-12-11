@@ -49,7 +49,7 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 		var expiresAt time.Time
 
 		cookie, err := r.Cookie("session_token")
-		if err != nil || cookie.Value == "" {
+		if err != nil || cookie.Value == "" || cookie.Value == "guest" {
 			next(w, r)
 			return
 		}
@@ -57,10 +57,12 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 			"SELECT expires_at FROM sessions WHERE session_id = ?;",
 			cookie.Value,
 		).Scan(&expiresAt)
+		fmt.Println(expiresAt)
 		if err != nil || time.Now().After(expiresAt) {
 			next(w, r)
 			return
 		}
+
 		http.Redirect(w, r, "/forum", http.StatusFound)
 	}
 }
@@ -83,6 +85,7 @@ func main() {
 	http.HandleFunc("/CommentsDisLikes", middleware(reactions.CommentsDislike, false))
 	http.HandleFunc("/api/likes", reactions.LikesCounterWithApi)
 	http.HandleFunc("/create_comment", creations.CreatCommnet)
+	http.HandleFunc("/NoJs", handler.NoJs)
 	fmt.Println("Server started on http://localhost:" + port)
 	http.ListenAndServe(":"+port, nil)
 }

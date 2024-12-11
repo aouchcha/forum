@@ -6,7 +6,7 @@
         <strong style="color: red;">
             You Disable JS please refreach the page to continue
         </strong>
-        <meta http-equiv="refresh" content="5; url=/">
+        <meta http-equiv="refresh" content="5; url=/NoJs">
     </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +29,7 @@
                 </div>
             </div>
         </header>
-    <form action="/InsertPost?postid={{.Post_id}}&user={{.Username}}" method="post" enctype="multipart/form-data">
+    <form action="/InsertPost?postid={{.Post_id}}&user={{.Username}}" method="post">
         <div style="display: grid; justify-content: center;">
             <h1>Title</h1>
             <textarea name="title" id="title" placeholder="Enter your title ..."></textarea>
@@ -48,10 +48,10 @@
                 <label for="it">IT</label>
             </div>
             <br>
-            <div name="image" id="export">
+            <!-- <div name="image" id="export">
                 <label for="images"></label>
                 <input type="file" name="image" id="export" accept="image/png, image/jpeg">
-            </div>
+            </div> -->
             <br><br>
             <button type="submit" class="bttn">Publish The Post</button>
             <br>

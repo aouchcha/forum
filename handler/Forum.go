@@ -2,7 +2,7 @@ package handler
 
 import (
 	"database/sql"
-	"encoding/base64"
+	// "encoding/base64"
 	"errors"
 	"fmt"
 	"html/template"
@@ -36,12 +36,14 @@ var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
-		http.Error(w, "page not found", http.StatusNotFound)
+		ChooseError(w, "Page Not Found", http.StatusNotFound)
+		// http.Error(w, "page not found", http.StatusNotFound)
 		return
 	}
 	tmpl, err := template.ParseFiles("templates/forum.html")
 	if err != nil {
-		http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
+		ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
+		// http.Error(w, "Internal Server Error with forum html page", http.StatusInternalServerError)
 		return
 	}
 
@@ -62,17 +64,23 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		CurrentSession = cookie1.Value
 		err = data.Db.QueryRow("SELECT user_id, session_id FROM sessions WHERE session_id = ?", CurrentSession).Scan(&postt.CurrentUser_id, &session_id)
 		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			ChooseError(w, "You don't have the right to be here sign in", http.StatusUnauthorized)
 			return
 		}
 		err = data.Db.QueryRow("SELECT username from users where id = ?", postt.CurrentUser_id).Scan(&CurrentUser)
 		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			ChooseError(w, "You don't have the right to be here sign in", http.StatusUnauthorized)
 			return
 		}
 	}
 
-	posts_toshow, comment_id, post_id, _ := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
+	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser)
+	if err != nil {
+		fmt.Println(err)
+		ChooseError(w, err.Error(), http.StatusInternalServerError)
+		// http.Error(w, "Internal Server", http.StatusInternalServerError)
+		return
+	}
 
 	err = tmpl.Execute(w, struct {
 		Currenuser string
@@ -93,7 +101,8 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		fmt.Println(err)
-		http.Error(w, "Internal Server", http.StatusInternalServerError)
+		ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
+		// http.Error(w, "Internal Server", http.StatusInternalServerError)
 		return
 	}
 }
@@ -107,9 +116,9 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		} else if cat_to_filter == "likedposts" {
 			// fmt.Println("liked posts")
 			post_rows, err = data.Db.Query(`
-				SELECT posts.* FROM posts 
-				JOIN likes ON posts.id = likes.post_id 
-				WHERE likes.username = ?`, CurrentUser)
+				SELECT p.* FROM posts p
+				JOIN likes li ON p.id = li.post_id 
+				WHERE li.username = ?`, CurrentUser)
 		} else {
 			post_rows, err = data.Db.Query(`
 				SELECT p.* FROM posts p
@@ -136,9 +145,10 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 		var imageData []byte
 		var time any
 		if err := post_rows.Scan(&id, &user_id, &usernamepublished, &title, &body, &imageData, &time); err != nil {
-			http.Error(w, "Error fetching post data", http.StatusInternalServerError)
+			// http.Error(w, "Error fetching post data", http.StatusInternalServerError)
 			// fmt.Println(err)
-			continue
+			return nil, 0, 0, errors.New("internal server error (we can't get the posts)")
+			// continue
 		}
 		// fmt.Println(usernamepublished, title, body)
 		post_id = id
@@ -156,13 +166,15 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			http.Error(w, "Error fetching like count", http.StatusInternalServerError)
 			return nil, 0, 0, errors.New("internal server error")
 		}
-		base64Image := base64.StdEncoding.EncodeToString(imageData)
+		// base64Image := base64.StdEncoding.EncodeToString(imageData)
 		// fmt.Println("base64Image = ", base64Image)
 		// fmt.Println("comments id= ", comment_id, "post id= ", post_id)
 		var Length int
 		err8 := data.Db.QueryRow("SELECT COUNT(*) FROM comments WHERE post_commented_id = ?", id).Scan(&Length)
 		if err8 != nil {
 			fmt.Println("Error in getting the number of comments")
+			return nil, 0, 0, errors.New("internal server error (we can't get the number of comments that we have)")
+
 		}
 		posts_toshow = append(posts_toshow, Post{
 			Postid:            id,
@@ -174,8 +186,8 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			Title:             title,
 			Body:              body,
 			Time:              time,
-			Image:             base64Image,
-			CommentsLength:    Length,
+			// Image:             base64Image,
+			CommentsLength: Length,
 		})
 	}
 	if err := post_rows.Err(); err != nil {

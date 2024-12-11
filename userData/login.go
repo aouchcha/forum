@@ -41,13 +41,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		var hashed string
 		err := data.Db.QueryRow("SELECT id, password FROM users WHERE username = ?", username).Scan(&userID, &hashed)
 		if err != nil {
-			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			handler.ChooseError(w, "Invalid credentials (Wrong username)", http.StatusUnauthorized)
+			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return
 		}
 
 		err = CheckPassword(hashed, password)
 		if err != nil {
-			handler.ChooseError(w, "Invalid Credentials", http.StatusUnauthorized)
+			handler.ChooseError(w, "Invalid Credentials (Wrong password)", http.StatusUnauthorized)
 			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return
 		}

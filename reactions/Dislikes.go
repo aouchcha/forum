@@ -8,13 +8,15 @@ import (
 
 	data "main/dataBase"
 	handler "main/handler"
+	// userData "main/userData"
 )
 
 func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/PostsDislikes" {
 		if handler.IsJavaScriptDisabled(r) {
-			fmt.Println("5555555")
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			fmt.Println("error in javascript in the create comment")
+			// userData.DeleteCookie(w, r)
+			http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 			return
 		}
 		user := r.URL.Query().Get("user")
@@ -60,8 +62,9 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 
 func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 	if handler.IsJavaScriptDisabled(r) {
-		fmt.Println("5555555")
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		fmt.Println("error in javascript in the create comment")
+		// userData.DeleteCookie(w, r)
+		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
 	}
 	Post_id, err := strconv.Atoi(r.URL.Query().Get("post_id"))
