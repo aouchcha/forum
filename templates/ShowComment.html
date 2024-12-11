@@ -6,7 +6,7 @@
         <strong style="color: red;">
             You Disable JS please refreach the page to continue
         </strong>
-        <meta http-equiv="refresh" content="url=/">
+        <meta http-equiv="refresh" content="5; url=/NoJs">
     </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +22,7 @@
             <img src="/style/programmer.png" alt="{{.CurrentUser}}">
             <h2>User : {{.CurrentUser}}</h2>
             <form action="/logout" method="post">
-                <button type="submit" class="bttn">Log Out</button>
+                <button id="logout" type="submit" class="bttn">Log Out</button>
             </form>
             <br>
             <a href="/forum"><button class="bttn">Return</button></a>
@@ -85,12 +85,23 @@
 </body>
 
 <script type="module">
-    import { FetchCommentsReactions, timeAffi } from "../style/js/forum.js";
+    import { getCookie,FetchCommentsReactions, timeAffi } from "../style/js/forum.js";
     const Forms = document.querySelectorAll('.reaction_section form')
     FetchCommentsReactions(Forms)
     //time affichage 
     const times = document.querySelectorAll('#temps');
     times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
+    const reactions = document.getElementsByClassName("react");
+    const username = getCookie("session_token");
+    const logoutform = document.querySelector('#logout');
+    console.log("logoutform" , logoutform);
+
+    if (username === 'guest') {
+        for (const reaction of reactions) {
+            reaction.disabled = true;
+        }
+        logoutform.innerHTML = "Sign In"
+    }
 </script>
 
 </html>

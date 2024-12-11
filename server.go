@@ -5,11 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	creations "main/creations"
-	data "main/dataBase"
-	handler "main/handler"
-	reactions "main/reactions"
-	userData "main/userData"
+	"go.mod/dataBase"
+	"go.mod/handlers"
+	"go.mod/reactions"
+	"go.mod/userdata"
 )
 
 var port = "8080"
@@ -32,7 +31,7 @@ func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 			}
 			return
 		}
-		err = data.Db.QueryRow(
+		err = dataBase.Db.QueryRow(
 			"SELECT user_id FROM sessions WHERE session_id = ?;",
 			cookie.Value,
 		).Scan(&userID)
@@ -44,6 +43,7 @@ func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 		next(w, r)
 	}
 }
+
 func auth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var expiresAt time.Time
@@ -53,7 +53,7 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 			next(w, r)
 			return
 		}
-		err = data.Db.QueryRow(
+		err = dataBase.Db.QueryRow(
 			"SELECT expires_at FROM sessions WHERE session_id = ?;",
 			cookie.Value,
 		).Scan(&expiresAt)
@@ -68,24 +68,23 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
-
-	http.HandleFunc("/", auth(handler.Home))
-	http.HandleFunc("/login", auth(userData.Login))
-	http.HandleFunc("/guest", handler.Guest)
-	http.HandleFunc("/register", auth(userData.HandleRegistration))
-	http.HandleFunc("/logout", userData.Logout)
-	http.HandleFunc("/style/", handler.Style)
-	http.HandleFunc("/forum", middleware(handler.Forum, true))
-	http.HandleFunc("/showcomments", middleware(creations.ShowComments, true))
-	http.HandleFunc("/create_post", middleware(creations.CreatePost, false))
-	http.HandleFunc("/InsertPost", middleware(creations.InsertPost, false))
+	http.HandleFunc("/", auth(handlers.Home))
+	http.HandleFunc("/login", auth(userdata.Login))
+	http.HandleFunc("/guest", handlers.Guest)
+	http.HandleFunc("/register", auth(userdata.HandleRegistration))
+	http.HandleFunc("/logout", userdata.Logout)
+	http.HandleFunc("/style/", handlers.Style)
+	http.HandleFunc("/forum", middleware(handlers.Forum, true))
+	http.HandleFunc("/showcomments", middleware(handlers.ShowComments, true))
+	http.HandleFunc("/create_post", middleware(handlers.CreatePost, false))
+	http.HandleFunc("/InsertPost", middleware(handlers.InsertPost, false))
 	http.HandleFunc("/PostsLikes", middleware(reactions.PostsLike, false))
 	http.HandleFunc("/PostsDislikes", middleware(reactions.PostsDislikes, false))
 	http.HandleFunc("/CommentsLikes", middleware(reactions.CommentsLike, false))
 	http.HandleFunc("/CommentsDisLikes", middleware(reactions.CommentsDislike, false))
 	http.HandleFunc("/api/likes", reactions.LikesCounterWithApi)
-	http.HandleFunc("/create_comment", creations.CreatCommnet)
-	http.HandleFunc("/NoJs", handler.NoJs)
+	http.HandleFunc("/create_comment", handlers.CreatCommnet)
+	http.HandleFunc("/NoJs", handlers.NoJs)
 	fmt.Println("Server started on http://localhost:" + port)
 	http.ListenAndServe(":"+port, nil)
 }

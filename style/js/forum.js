@@ -50,7 +50,6 @@ export function FetchComments(commentForms) {
                     method: "post",
                     body: formData
                 })
-                
                 if (!res.ok) {
                     switch (res.status) {
                         case 400:
@@ -65,10 +64,6 @@ export function FetchComments(commentForms) {
                             throw new Error(`Unexpected Error: ${res.status} ${res.statusText}`);
                     }
                 }
-
-                let json = await res.json()
-                console.log("the json response here :", json);
-                console.log("contentC :", TextA.value);
                 const div = document.createElement("div")
                 if (TextA.value != "") {
                     div.innerHTML = `<div style="color:green;"><p>Comment Added Succesfully!</p></div>`
@@ -80,7 +75,7 @@ export function FetchComments(commentForms) {
                 TextA.value = ""
             } catch (error) {
                 alert(error)
-                console.log(error);
+
 
                 if (error.message == "Forbidden: You need to log in to perform this action.") {
                     window.location.href = '/login'
@@ -101,7 +96,7 @@ export function FetchReactions(Forms) {
             let TheOtherButton = ""
             if (choice == "like_post") {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#dislike_post').querySelector('button'))
-    
+
             } else {
                 TheOtherButton = (e.currentTarget.parentElement.querySelector('#like_post').querySelector('button'))
             }
@@ -113,14 +108,16 @@ export function FetchReactions(Forms) {
             }
 
             let path1 = e.currentTarget.getAttribute('action');
+            const params = new URLSearchParams(path1.split('?')[1]);
 
             let icon = "👍🏻"
             let icon2 = "👎🏻"
-            // console.log("icon2", icon2)
-            let previouslike = button.textContent
-            console.log("previouslike outside ===>", previouslike)
-            const postid = e.currentTarget.parentElement.querySelector('input').value;
-
+            let postid;
+            if (choice == "like_post") {
+                postid = params.get('Liked_Post_id');
+            } else {
+                postid = params.get('Disliked_Post_id');
+            }
             try {
                 await fetch(path1, {
                     method: "POST",
@@ -129,7 +126,7 @@ export function FetchReactions(Forms) {
                 const path = `/api/likes?postid=${postid}`;
 
                 const response = await getdata(path);
-                console.log(response);
+
 
                 const likeCount = response.LikeCount;
                 const DislikeCount = response.DislikeCount;
@@ -137,13 +134,13 @@ export function FetchReactions(Forms) {
                 if (choice == "like_post") {
                     button.textContent = icon + " " + likeCount;
                     TheOtherButton.textContent = icon2 + " " + DislikeCount
-                    button.style.backgroundColor = "green"
-                    TheOtherButton.style.backgroundColor = ""
+
+
                 } else if (choice == "dislike_post") {
                     button.textContent = icon2 + " " + DislikeCount;
                     TheOtherButton.textContent = icon + " " + likeCount
-                    button.style.backgroundColor = "red"
-                    TheOtherButton.style.backgroundColor = ""
+
+
                 }
             } catch (err) {
                 console.error("Error processing like:", err);
@@ -157,11 +154,16 @@ export function FetchCommentsReactions(Forms) {
         CurrForm.addEventListener('submit', async (event) => {
             event.preventDefault()
             const ActionPath = event.currentTarget.getAttribute('action')
-            const Comment_id = event.currentTarget.parentElement.querySelector('input').value
+            const params = new URLSearchParams(ActionPath.split('?')[1]);
+
+            let Comment_id;
+
+            Comment_id = params.get('comment_id');
+
+
+
             const choice = event.currentTarget.getAttribute('id')
             const button = event.currentTarget.querySelector('button')
-            let previouslike = button.textContent
-            console.log(" previouslikje ===>", previouslike);
             let TheOtherButton = ""
             if (choice == "Comment_Like") {
                 TheOtherButton = event.currentTarget.parentElement.querySelector('#Comment_Dislike').querySelector('button')
@@ -171,7 +173,6 @@ export function FetchCommentsReactions(Forms) {
 
             let icon = button.textContent.split(' ')[0];
             let icon2 = TheOtherButton.innerHTML.split(' ')[0];
-            console.log("iocnes :", icon, icon2);
             try {
                 await fetch(ActionPath, {
                     method: "POST",
@@ -183,25 +184,24 @@ export function FetchCommentsReactions(Forms) {
                 if (choice == "Comment_Like") {
                     button.textContent = icon + " " + likeCount;
                     TheOtherButton.textContent = icon2 + " " + DislikeCount
-                    button.style.backgroundColor = "green"
-                    TheOtherButton.style.backgroundColor = ""
+
+
                 } else if (choice == "Comment_Dislike") {
                     button.textContent = icon + " " + DislikeCount;
                     TheOtherButton.textContent = icon2 + " " + likeCount
-                    button.style.backgroundColor = "red"
-                    TheOtherButton.style.backgroundColor = ""
+
+
                 }
             } catch (error) {
-                console.log("Error while reaction with commments", error)
+
             }
         })
     })
-} 
+}
 
 async function getdata(path) {
     try {
-        const res = await fetch(path);
-        console.log(res);
+        const res = await fetch(path)
 
         if (!res.ok) {
             switch (res.status) {
@@ -227,4 +227,3 @@ async function getdata(path) {
         }
     }
 }
-

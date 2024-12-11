@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"net/http"
@@ -8,12 +8,12 @@ import (
 
 func Style(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/style/" || strings.HasSuffix(r.URL.Path, "/") {
-		http.Error(w, "403 | Access to this resource is forbidden !", http.StatusForbidden)
+		ChooseError(w, "403 | Access to this resource is forbidden !", 403)
 		return
 	}
 	filePath := "style" + strings.TrimPrefix(r.URL.Path, "/style")
 	if !isFileExists(filePath) {
-		http.Error(w, "404 | Page Not Found", 404)
+		ChooseError(w, "404 | Page Not Found", 404)
 		return
 	}
 	http.ServeFile(w, r, filePath)

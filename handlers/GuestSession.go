@@ -1,7 +1,6 @@
-package handler
+package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -13,6 +12,5 @@ func Guest(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(4 * time.Minute),
 	}
 	http.SetCookie(w, cookie)
-	fmt.Println("guest handle")
-	http.Redirect(w,r,"/forum",http.StatusSeeOther)
+	http.Redirect(w, r, "/forum", http.StatusSeeOther)
 }

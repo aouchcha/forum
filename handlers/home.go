@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "Post" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		ChooseError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	http.ServeFile(w, r, "templates/homePage.html")

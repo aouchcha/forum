@@ -70,18 +70,19 @@
                     <input type="radio" name="categories" id="it" value="it">
                     <label for="it">IT</label>
                     <br>
-                    <input type="radio" name="categories" id="myposts" value="myposts">
-                    <label for="myposts">My Own Posts</label>
-                    <br>
-                    <input type="radio" name="categories" id="likedposts" value="likedposts">
-                    <label for="likedposts">The Posts That I Liked</label>
-                    <br>
-                    <button type="submit" class="bttn" id="filter">Filter</button>
+                    <div class="mbappe">
+                        <input type="radio" name="categories" id="myposts" value="myposts">
+                        <label for="myposts">My Own Posts</label>
+                        <br>
+                        <input type="radio" name="categories" id="likedposts" value="likedposts">
+                        <label for="likedposts">The Posts That I Liked</label>
+                        <br>
+                    </div>
+                    <button type="submit" class="" id="filter">Filter</button>
                 </div>
         </div>
         </form>
     </div>
-    <!-- <h2 style="text-align: center;"><strong>Check the Newest Of your FEED!</strong></h2> -->
     {{if not .Posts}}
     <h1>No Posts Available!</h1>
     {{end}}
@@ -94,13 +95,7 @@
         <span id="temps">{{.Time}}</span> ago
         <h1>Title: {{.Title}}</h1>
         <p> content : {{.Body}}</p>
-        {{if .Image}}
-        <div class="img-container">
-            <img src="data:image/png;base64,{{.Image}}" alt="image">
-        </div>
-        {{end}}
         <div class="reactions-container">
-            <input id="postidValue" type="hidden" name="postid" value="{{.Postid}}">
             <form id="like_post"
                 action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
                 method="post">
@@ -122,16 +117,14 @@
             <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
                 <br>
                 <div class="bb">
-                    <textarea name="comments" id="comments" placeholder="Add your comments..."></textarea>
+                    <textarea name="comments" id="comments" placeholder="Add your comments..." maxlength="1000"></textarea>
                     <br>
                     <button type="submit" class="bttn" id="comment">Comment</button>
                 </div>
             </form>
             <br>
         </div>
-        <form action="/showcomments" method="get" class="jj">
-            <input type="hidden" value="{{.Postid}}" name="postid">
-            <input type="hidden" value="{{.CurrentUsser}}" name="writer">
+        <form action="/showcomments?post_id={{.Postid}}&writer={{.CurrentUsser}}" method="post" class="jj">
             <button type="submit" class="href">See All Comments({{.CommentsLength}})</button>
         </form>
     </div>
@@ -145,17 +138,21 @@
             <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
             <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
             | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
+            | <a href="https://github.com/maynaou">Mouhssine Aynaou</a>
         </div>
     </footer>
 </body>
 <script type="module">
-    import {toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';
+    import { toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';
 
     const commentButtons = document.getElementsByClassName("bttn");
     const reactions = document.getElementsByClassName("react");
     const createButton = document.getElementById("Create");
     const logoutform = document.querySelector('.user form button')
-
+    //side bar settings
+    const sidebar = document.getElementById('sidebar');
+    const filter_butt = document.getElementById('filter_butt')
+    filter_butt.addEventListener('click', () => toggleSidebar(sidebar))
     
     const username = getCookie("session_token");
 
@@ -168,7 +165,8 @@
         }
         createButton.disabled = true;
         logoutform.innerHTML = "Sign In"
-
+        let sideContent = sidebar.querySelector('form').querySelector('div').querySelector('.mbappe')
+        sideContent.remove()
     }
 
     // Format time elements
@@ -183,9 +181,7 @@
     const reactionForms = document.querySelectorAll(".reactions-container form");
     FetchReactions(reactionForms);
 
-    const sidebar = document.getElementById('sidebar');
-    const filter_butt = document.getElementById('filter_butt')
-    filter_butt.addEventListener('click', () => toggleSidebar(sidebar))
+    
 
 </script>
 

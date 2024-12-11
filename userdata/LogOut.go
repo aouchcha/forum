@@ -1,19 +1,19 @@
-package handler
+package userdata
 
 import (
 	"net/http"
 
-	data "main/dataBase"
-	"main/handler"
+	"go.mod/dataBase"
+	"go.mod/handlers"
 )
 
 func Logout(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/logout" {
-		handler.ChooseError(w, "Page Not Found", 404)
+		handlers.ChooseError(w, "Page Not Found", 404)
 		return
 	}
 	if r.Method != http.MethodPost {
-		handler.ChooseError(w, "Method Not Allowed", 405)
+		handlers.ChooseError(w, "Method Not Allowed", 405)
 		return
 	}
 
@@ -35,9 +35,9 @@ func DeleteCookie(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, cookie1)
-	_, err = data.Db.Exec("DELETE FROM sessions WHERE session_id = ?", CSC)
+	_, err = dataBase.Db.Exec("DELETE FROM sessions WHERE session_id = ?", CSC)
 	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 }

@@ -1,17 +1,14 @@
-package creation
+package handlers
 
 import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
+	"text/template"
 
-	data "main/dataBase"
-	handler "main/handler"
-	// userData "main/userData"
+	"go.mod/dataBase"
 )
 
 type Comment struct {
@@ -29,40 +26,40 @@ type Comment struct {
 func ShowComments(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("templates/ShowComment.html")
 	if err != nil {
-		handler.ChooseError(w, "Internal Server Error", 500)
+		ChooseError(w, "Internal Server Error", 500)
 		return
 	}
 
-	temp := r.FormValue("postid")
+	temp := r.URL.Query().Get("post_id")
+
 	post_id, err := strconv.Atoi(temp)
 	if err != nil {
-		handler.ChooseError(w, "Internal Server Error", 500)
+		ChooseError(w, "Internal Server Error", 500)
 		return
 	}
 
-	username := r.FormValue("writer")
-	fmt.Println(post_id, username)
+	username := r.URL.Query().Get("writer")
+
 	var toshow []Comment
 	comments_toshow, _, err := GetComments(tmpl, w, username, toshow, post_id)
 	if err != nil {
-		handler.ChooseError(w, err.Error(), 500)
+		ChooseError(w, err.Error(), 500)
 		return
 	}
 	var title, body, post_creator string
-	err = data.Db.QueryRow(`SELECT post_creator, title, body FROM posts WHERE id = ?`, post_id).Scan(&post_creator, &title, &body)
+	err = dataBase.Db.QueryRow(`SELECT post_creator, title, body FROM posts WHERE id = ?`, post_id).Scan(&post_creator, &title, &body)
 	if err != nil {
-		handler.ChooseError(w, "There is no post to this comment", 500)
+		ChooseError(w, "There is no post to this comment", 500)
 		return
 	}
 
-	// fmt.Println(comments_toshow)
 	tmpl.Execute(w, struct {
 		Post_Id     int
 		CurrentUser string
 		Title       string
 		Post_writer string
 		Body        string
-		// Length      int
+
 		Comments []Comment
 	}{
 		Post_Id:     post_id,
@@ -70,17 +67,13 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		Title:       title,
 		Post_writer: post_creator,
 		Body:        body,
-		// Length:      len(comments_toshow),
+
 		Comments: comments_toshow,
 	})
 }
 
 func CreatCommnet(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Create Comment API called")
-	fmt.Println(r.Header.Get("Accept"))
-	if handler.IsJavaScriptDisabled(r) {
-		fmt.Println("error in javascript in the create comment")
-		// userData.DeleteCookie(w, r)
+	if IsJavaScriptDisabled(r) {
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
 	}
@@ -91,79 +84,70 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	var errCode int
 
 	var userID int
-	err := data.Db.QueryRow("SELECT id FROM users WHERE username = ?", commentWriter).Scan(&userID)
+	err := dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ?", commentWriter).Scan(&userID)
 	if err != nil {
-		fmt.Println("Error finding user:", err)
+
 		message = "Unauthorized: Please log in to comment"
 		errCode = http.StatusUnauthorized
 		ResponseComments(message, w, errCode)
 		return
 	}
 
-	// Parse post ID
 	postID, err := strconv.Atoi(r.URL.Query().Get("postid"))
 	if err != nil {
-		fmt.Println("Error parsing post ID:", err)
+
 		message = "Bad Request: Invalid Post ID"
 		errCode = http.StatusBadRequest
 		ResponseComments(message, w, errCode)
 		return
 	}
 
-	// Validate comment body
-	if commentBody == "" {
-		fmt.Println("Error: Comment body is empty")
+	if commentBody == "" || len(commentBody) > 1000{
+
 		message = "Bad Request: Comment body cannot be empty"
 		errCode = http.StatusBadRequest
 		ResponseComments(message, w, errCode)
 		return
 	}
 
-	// Verify user in database
-
-	// Insert comment into database
-	_, err = data.Db.Exec("INSERT INTO comments (comment_body, comment_writer, comment_writer_id, post_commented_id) VALUES (?, ?, ?, ?)", commentBody, commentWriter, userID, postID)
+	_, err = dataBase.Db.Exec("INSERT INTO comments (comment_body, comment_writer, comment_writer_id, post_commented_id) VALUES (?, ?, ?, ?)", commentBody, commentWriter, userID, postID)
 	if err != nil {
-		fmt.Println("Error inserting comment:", err)
+
 		message = "Internal Server Error: Failed to save comment"
 		errCode = http.StatusInternalServerError
 		ResponseComments(message, w, errCode)
 		return
 	}
 
-	// Success response
 	message = "Comment created successfully"
 	errCode = http.StatusOK
 	ResponseComments(message, w, errCode)
-	// http.Redirect(w, r, "/forum", http.StatusSeeOther)
 }
 
 func ResponseComments(message string, w http.ResponseWriter, errCode int) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Construct response structure
 	response := struct {
 		Message string `json:"message"`
 	}{
 		Message: message,
 	}
 
-	// Encode the response to JSON
 	w.WriteHeader(errCode)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		fmt.Println("Error encoding response:", err)
+
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"check": false, "message": "Internal Server Error"}`))
 	}
 }
 
 func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser string, comments_toshow []Comment, id int) ([]Comment, int, error) {
-	comm_rows, err := data.Db.Query("SELECT * FROM comments WHERE post_commented_id = ?;", id)
+	comm_rows, err := dataBase.Db.Query("SELECT * FROM comments WHERE post_commented_id = ?;", id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, 0, errors.New("no Feild in data base")
+			return nil, 0, errors.New("internal server error")
 		} else {
-			return nil, 0, errors.New("internal Server Error You Droped T-he comment table restar the server")
+			return nil, 0, errors.New("internal Server Error You Droped The comment table restar the server")
 		}
 	}
 	defer comm_rows.Close()
@@ -175,16 +159,15 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 		var comment_body, comment_writer string
 		var time any
 		if err := comm_rows.Scan(&comment_id, &comment_body, &comment_writer, &userid, &post_commented_id, &time); err != nil {
-			fmt.Println(err)
-			continue
+			return nil, 0, errors.New("internal server error")
 		}
-		err = data.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?`, comment_id).Scan(&commented.Comment_likes_count)
+		err = dataBase.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?`, comment_id).Scan(&commented.Comment_likes_count)
 		if err != nil {
-			return nil, 0, errors.New("Error fetching like count")
+			return nil, 0, errors.New("internal server error")
 		}
-		err = data.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE disliked_comment_id = ?`, comment_id).Scan(&commented.Comment_dislikes_count)
+		err = dataBase.Db.QueryRow(`SELECT COUNT(*) FROM dislikes WHERE disliked_comment_id = ?`, comment_id).Scan(&commented.Comment_dislikes_count)
 		if err != nil {
-			return nil, 0, errors.New("Error fetching like count")
+			return nil, 0, errors.New("internal server error")
 		}
 		cid = comment_id
 		comments_toshow = append(comments_toshow, Comment{
