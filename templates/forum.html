@@ -129,6 +129,10 @@
         </form>
     </div>
     {{end}}
+    <div class="pagination">
+        <button type="submit">prev</button>
+        <button type="submit">next</button>
+    </div>
     <footer class="footer">
         <p>&copy; 2023 Your Website. All rights reserved.</p>
         <p>
@@ -180,8 +184,6 @@
     // Fetch reactions to prevent refresh
     const reactionForms = document.querySelectorAll(".reactions-container form");
     FetchReactions(reactionForms);
-
-    
 
 </script>
 

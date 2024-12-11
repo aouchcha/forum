@@ -134,7 +134,7 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 
 	var posts_toshow []Post
 	var comment_id, post_id int
-	for post_rows.Next() {
+	for post_rows.Next()&& i <10 {
 		var id, user_id int
 		var title, body, usernamepublished string
 		var time any
