@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"go.mod/dataBase"
 	"go.mod/handlers"
 
@@ -54,13 +54,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			handlers.ChooseError(w, "Internal Server Error", 500)
 			return
 		}
-
-		session := uuid.New().String()
+		uuid, err := uuid.NewV4()
+		if err != nil {
+			handlers.ChooseError(w, "Internal Server Error", 500)
+			return
+		}
+		session := uuid.String()
 		expiration := time.Now().Add(5 * time.Minute)
 		_, err = dataBase.Db.Exec("INSERT INTO sessions (session_id, user_id, expires_at) VALUES (?, ?, ?)", session, userID, expiration)
 		if err != nil {
 			handlers.ChooseError(w, "Internal Server Error", 500)
-
 			return
 		}
 
