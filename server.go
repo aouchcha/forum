@@ -11,7 +11,7 @@ import (
 	"go.mod/userdata"
 )
 
-var port = "9845"
+var port = "8080"
 
 func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
