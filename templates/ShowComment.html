@@ -69,6 +69,10 @@
             </div>
         </div>
         {{end}}
+        <div class="pn">
+            <button id="prev" class="sidebarbtn">Previous</button>
+            <button id="next" class="sidebarbtn">Next</button>
+        </div>
     </div>
     <a href="/forum"><button class="bttn">Return</button></a>
     <footer class="footer">
@@ -85,7 +89,41 @@
 </body>
 
 <script type="module">
-    import { getCookie,FetchCommentsReactions, timeAffi } from "../style/js/forum.js";
+    import {getCookie,FetchCommentsReactions, timeAffi } from "../style/js/forum.js";
+    const next = document.querySelector('#next')
+    const prev = document.querySelector('#prev')
+    // console.log();
+    
+    next.addEventListener('click',  () => {
+        let pageindex = `{{ .PageIndex }}`
+        let DBL =  `{{.DataLength}}`
+        console.log(pageindex, DBL);
+        
+        const url = new URL(location.pathname+location.search,location.origin)
+        if (pageindex < DBL) {
+            url.searchParams.set("page",parseInt(pageindex)+1)
+        }
+        const path = url.toString()
+        window.location.href = path
+    })
+
+    prev.addEventListener('click',  (e) => {
+        e.preventDefault()
+        // console.log(prev.innerHTML)
+        let pageindex = `{{ .PageIndex }}`
+        // console.log(pageindex);
+        
+        const url = new URL(location.pathname+location.search,location.origin)
+        if (pageindex > 1) {
+            url.searchParams.set("page",parseInt(pageindex)-1)
+        }
+        
+        const path = url.toString()
+        console.log(path);
+        
+        window.location.href = path
+    })
+
     const Forms = document.querySelectorAll('.reaction_section form')
     FetchCommentsReactions(Forms)
     //time affichage 
