@@ -80,8 +80,8 @@
                     </div>
                     <button type="submit" class="" id="filter">Filter</button>
                 </div>
+            </form>
         </div>
-        </form>
     </div>
     {{if not .Posts}}
     <h1>No Posts Available!</h1>
@@ -129,6 +129,11 @@
         </form>
     </div>
     {{end}}
+    <div class="pn">
+        <button id="prev" class="sidebarbtn">Previous</button>
+    <button id="next" class="sidebarbtn">Next</button>
+    </div>
+
     <footer class="footer">
         <p>&copy; 2023 Your Website. All rights reserved.</p>
         <p>
@@ -143,6 +148,45 @@
     </footer>
 </body>
 <script type="module">
+    const next = document.querySelector('#next')
+    const prev = document.querySelector('#prev')
+    // console.log();
+    
+    next.addEventListener('click',  (e) => {
+        e.preventDefault()
+
+        // console.log(next.innerHTML)
+        let pageindex = `{{ .PageIndex }}`
+        let DBL =  `{{.DataLength}}`
+        // console.log(pageindex);
+        const url = new URL(location.pathname+location.search,location.origin)
+        if (pageindex < DBL) {
+            url.searchParams.set("page",parseInt(pageindex)+1)
+        }
+        
+        const path = url.toString()
+        console.log(path);
+        
+        window.location.href = path
+    })
+
+    prev.addEventListener('click',  (e) => {
+        e.preventDefault()
+        // console.log(prev.innerHTML)
+        let pageindex = `{{ .PageIndex }}`
+        // console.log(pageindex);
+        
+        const url = new URL(location.pathname+location.search,location.origin)
+        if (pageindex > 1) {
+            url.searchParams.set("page",parseInt(pageindex)-1)
+        }
+        
+        const path = url.toString()
+        console.log(path);
+        
+        window.location.href = path
+    })
+
     import { toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';
 
     const commentButtons = document.getElementsByClassName("bttn");

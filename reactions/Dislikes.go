@@ -2,6 +2,7 @@ package reactions
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,9 +15,8 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 		handlers.ChooseError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	fmt.Println("PATH:", r.URL.Path)
 	if handlers.IsJavaScriptDisabled(r) {
-
-
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
 	}
@@ -36,7 +36,7 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 		if err != sql.ErrNoRows {
 			_, err = dataBase.Db.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
 			if err != nil {
-		
+
 				handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 				return
 			}
@@ -44,8 +44,7 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 
 		_, err = dataBase.Db.Exec("INSERT INTO dislikes (user_id, post_id, username) VALUES (?, ?, ?)", user_id, postid, user)
 		if err != nil {
-	
-	
+
 			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -54,7 +53,7 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 
 		_, err = dataBase.Db.Exec("DELETE FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user)
 		if err != nil {
-	
+
 			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -63,7 +62,6 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 
 func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 	if handlers.IsJavaScriptDisabled(r) {
-
 
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
@@ -79,11 +77,11 @@ func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 	err = dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&User_id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-	
+
 			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		} else {
-	
+
 			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -98,7 +96,7 @@ func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 		if err != sql.ErrNoRows {
 			_, err = dataBase.Db.Exec("DELETE FROM likes WHERE user_id = ? AND username = ? AND liked_comment_id = ?", User_id, User, Disliked_comment_id)
 			if err != nil {
-		
+
 				handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 				return
 			}
@@ -107,7 +105,7 @@ func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 
 		_, err = dataBase.Db.Exec("INSERT INTO dislikes (user_id, disliked_comment_id, username) VALUES (?,?,?)", User_id, Disliked_comment_id, User)
 		if err != nil {
-	
+
 			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
@@ -115,7 +113,7 @@ func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 	} else {
 		_, err = dataBase.Db.Exec("DELETE FROM dislikes WHERE user_id = ? AND username = ? AND disliked_comment_id = ?", User_id, User, Disliked_comment_id)
 		if err != nil {
-	
+
 			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}

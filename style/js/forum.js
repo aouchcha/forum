@@ -193,7 +193,7 @@ export function FetchCommentsReactions(Forms) {
 
                 }
             } catch (error) {
-
+                alert(error)
             }
         })
     })

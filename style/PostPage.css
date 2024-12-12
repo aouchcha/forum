@@ -20,6 +20,12 @@ body {
     flex-direction: row;
 }
 
+.pn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between   ;
+}
+
 .sidebar {
     top: 0;
     left: 0;
@@ -53,8 +59,8 @@ body {
 }
 
 .sidebarbtn {
-    right: 0;
-    margin-left: auto;
+    /* right: 0; */
+    /* margin-left: auto; */
     width: 90px;
     height: 40px;
     background-color: #24327b;
