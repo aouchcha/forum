@@ -78,6 +78,7 @@ header {
     /* display: grid; */
     /* box-sizing: border-box; */
     /* overflow-y: hidden; */
+    padding: 1%;
     text-align: center;
     background: linear-gradient(to bottom right, #060764, #2e2e2e);
     color: #F0FFFF;

@@ -23,7 +23,6 @@
         <div class="user">
             <h2><strong>Mr</strong> {{.Currenuser}}</h2>
             <img src="/style/programmer.png" alt="{{.Currenuser}}">
-            <!-- <h3><strong>User ID :</strong> {{.Curr_id}}</h3> -->
             <form action="/logout" method="post" id="logout">
                 <button type="submit" class="sidebarbtn">
                     <i class="glyphicon glyphicon-log-out"></i>
@@ -35,10 +34,9 @@
             <button class="sidebarbtn" id=filter_butt>☰
                 FILTER</button>
         </div>
-        <div class="zone01">
-            <!-- <img src="/style/zone01oujda.png" alt="zone01oujda"> -->
+        
             <h1><strong>Welcome To Forum </strong></h1>
-        </div>
+        
         <div>
             <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create"> <i
                         class="material-icons"></i>
@@ -150,7 +148,6 @@
 <script type="module">
     const next = document.querySelector('#next')
     const prev = document.querySelector('#prev')
-    // console.log();
     
     next.addEventListener('click',  () => {
         let pageindex = `{{ .PageIndex }}`
@@ -165,9 +162,7 @@
 
     prev.addEventListener('click',  (e) => {
         e.preventDefault()
-        // console.log(prev.innerHTML)
         let pageindex = `{{ .PageIndex }}`
-        // console.log(pageindex);
         
         const url = new URL(location.pathname+location.search,location.origin)
         if (pageindex > 1) {
@@ -175,7 +170,6 @@
         }
         
         const path = url.toString()
-        console.log(path);
         
         window.location.href = path
     })

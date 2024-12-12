@@ -3,11 +3,11 @@ package handlers
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"text/template"
-	"math"
+
 	"go.mod/dataBase"
 )
 
@@ -34,7 +34,6 @@ type Reactions struct {
 var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("url", r.URL.Path)
 	var page int
 	if r.URL.Query().Get("page") == "" {
 		page = 1
@@ -47,28 +46,23 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println("Page Query", page)
 	var offset int
 	var DBlength int
 	err := dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts").Scan(&DBlength)
-	fmt.Println("Data Base Length", DBlength)
 	if err != nil {
 		ChooseError(w, "!Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	if page < 1 || page > int(math.Ceil(float64(DBlength/10)+1)) {
-		// ChooseError(w, "Bage Request You are in the last page", 400)
-		// return
 		if page < 1 {
-			page  = 1
-		}else {
-			page = int(math.Ceil(float64(DBlength/10)+1))
+			page = 1
+		} else {
+			page = int(math.Ceil(float64(DBlength/10) + 1))
 		}
 		offset = DBlength - (DBlength - (10 * (page - 1)))
 	} else {
 		offset = DBlength - (DBlength - (10 * (page - 1)))
 	}
-	fmt.Println("OffSet", offset)
 
 	tmpl, err := template.ParseFiles("templates/forum.html")
 	if err != nil {
@@ -79,7 +73,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	var CurrentUser, CurrentSession string
 	var session_id string
 	cat_to_filter := r.FormValue("categories")
-	fmt.Println("Categorie", cat_to_filter)
+
 	cookie1, err := r.Cookie("session_token")
 	if err != nil {
 		ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
@@ -127,7 +121,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		comment_id: comment_id,
 		Post_id:    post_id,
 		PageIndex:  page,
-		DataLength: int(math.Ceil(float64(DBlength)/10)),
+		DataLength: int(math.Ceil(float64(DBlength) / 10)),
 		Posts:      posts_toshow,
 	})
 	if err != nil {
@@ -154,14 +148,12 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 				WHERE c.categorie = ? ORDER BY id DESC LIMIT 10 OFFSET ?`, cat_to_filter, offset)
 		}
 	} else {
-		fmt.Println("ANA F ASC")
 		post_rows, err = dataBase.Db.Query("SELECT * FROM posts ORDER BY id DESC LIMIT 10 OFFSET ?", offset)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, 0, 0, errors.New("no Feild in dataBase base")
 		} else {
-			fmt.Println(err)
 			return nil, 0, 0, errors.New("internal server error you deleted a table from the dataBase base shut down the server and restar it again")
 		}
 	}
@@ -211,10 +203,5 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 	if err := post_rows.Err(); err != nil {
 		return nil, 0, 0, errors.New("error during iteration on each row in the dataBasebase")
 	}
-	// for i := 0; i < len(posts_toshow)-1; i++ {
-	// 	for j := i + 1; j < len(posts_toshow); j++ {
-	// 		posts_toshow[i], posts_toshow[j] = posts_toshow[j], posts_toshow[i]
-	// 	}
-	// }
 	return posts_toshow, comment_id, post_id, nil
 }

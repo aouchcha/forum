@@ -7,29 +7,6 @@ export function toggleSidebar(sidebar) {
     }
 }
 
-// export function PaginationButtons(next, prev) {
-//     next.addEventListener('click',  () => {
-//         let pageindex = `{{ .PageIndex }}`
-//         let DBL =  `{{.DataLength}}`
-//         const url = new URL(location.pathname+location.search,location.origin)
-//         if (pageindex < DBL) {
-//             url.searchParams.set("page",parseInt(pageindex)+1)
-//         }
-//         const path = url.toString()
-//         // window.location.href = path
-//     })
-
-//     prev.addEventListener('click',  () => {
-//         let pageindex = `{{ .PageIndex }}`
-//         const url = new URL(location.pathname+location.search,location.origin)
-//         if (pageindex > 1) {
-//             url.searchParams.set("page",parseInt(pageindex)-1)
-//         }
-//         const path = url.toString()
-//         // window.location.href = path
-//     })
-
-// }
 
 export function getCookie(cname) {
     let name = cname + "=";

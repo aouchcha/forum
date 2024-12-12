@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -42,7 +41,6 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 
 	username := r.URL.Query().Get("writer")
 
-	fmt.Println("url", r.URL.Path)
 	var page int
 	if r.URL.Query().Get("page") == "" {
 		page = 1
@@ -55,18 +53,14 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println("Page Query", page)
 	var offset int
 	var DBlength int
 	err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM comments").Scan(&DBlength)
-	fmt.Println("Data Base Length", DBlength)
 	if err != nil {
 		ChooseError(w, "!Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	if page < 1 || page > int(math.Ceil(float64(DBlength/5)+1)) {
-		// ChooseError(w, "Bage Request You are in the last page", 400)
-		// return
 		if page < 1 {
 			page = 1
 		} else {
@@ -96,18 +90,18 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		Title       string
 		Post_writer string
 		Body        string
-		PageIndex  int
-		DataLength int
-		Comments []Comment
+		PageIndex   int
+		DataLength  int
+		Comments    []Comment
 	}{
 		Post_Id:     post_id,
 		CurrentUser: username,
 		Title:       title,
 		Post_writer: post_creator,
 		Body:        body,
-		PageIndex: page,
-		DataLength: int(math.Ceil(float64(DBlength)/5)),
-		Comments: comments_toshow,
+		PageIndex:   page,
+		DataLength:  int(math.Ceil(float64(DBlength) / 5)),
+		Comments:    comments_toshow,
 	})
 }
 
@@ -184,11 +178,8 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 	comm_rows, err := dataBase.Db.Query("SELECT * FROM comments WHERE post_commented_id = ? ORDER BY comment_id DESC LIMIT 5 OFFSET ?", id, offset)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			fmt.Println("aNA hNA 1", err)
 			return nil, 0, errors.New("internal server error")
 		} else {
-			fmt.Println("aNA hNA 2", err)
-
 			return nil, 0, errors.New("internal Server Error You Droped The comment table restar the server")
 		}
 	}
@@ -224,10 +215,5 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 			Post_commented_id:      id,
 		})
 	}
-	// for i := 0; i < len(comments_toshow)-1; i++ {
-	// 	for j := i + 1; j < len(comments_toshow); j++ {
-	// 		comments_toshow[i], comments_toshow[j] = comments_toshow[j], comments_toshow[i]
-	// 	}
-	// }
 	return comments_toshow, cid, nil
 }
