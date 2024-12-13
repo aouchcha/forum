@@ -91,8 +91,8 @@
             <h2>{{.Usernamepublished}}</h2>
         </div>
         <span id="temps">{{.Time}}</span> ago
-        <h1>Title: {{.Title}}</h1>
-        <p> content : {{.Body}}</p>
+        <pre><h1>Title: {{.Title}}</h1></pre>
+        <pre> content : {{.Body}}</pre>
         <div class="reactions-container">
             <form id="like_post"
                 action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
@@ -115,7 +115,7 @@
             <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
                 <br>
                 <div class="bb">
-                    <textarea name="comments" id="comments" placeholder="Add your comments..." maxlength="1000"></textarea>
+                    <textarea name="comments" id="comments" placeholder="Add your comment with a length under 1000 char ...." maxlength="1000"></textarea>
                     <br>
                     <button type="submit" class="bttn" id="comment">Comment</button>
                 </div>
@@ -133,7 +133,7 @@
     </div>
 
     <footer class="footer">
-        <p>&copy; 2023 Your Website. All rights reserved.</p>
+        <p>&copy; 2024 Your Website. All rights reserved.</p>
         <p>
             Github :
         </p>
@@ -155,9 +155,11 @@
         const url = new URL(location.pathname+location.search,location.origin)
         if (pageindex < DBL) {
             url.searchParams.set("page",parseInt(pageindex)+1)
+            const path = url.toString()
+            window.location.href = path
+        }else{
+            alert("This is the last page")
         }
-        const path = url.toString()
-        window.location.href = path
     })
 
     prev.addEventListener('click',  (e) => {
@@ -167,11 +169,13 @@
         const url = new URL(location.pathname+location.search,location.origin)
         if (pageindex > 1) {
             url.searchParams.set("page",parseInt(pageindex)-1)
+            const path = url.toString()
+            
+            window.location.href = path
+        }else{
+            alert("There is no more data to show")
         }
         
-        const path = url.toString()
-        
-        window.location.href = path
     })
 
     import { toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';

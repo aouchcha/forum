@@ -10,6 +10,7 @@ import (
 )
 
 func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
+
 	if r.URL.Path == "/api/likes" {
 
 		cookie, err := r.Cookie("session_token")
@@ -21,14 +22,14 @@ func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
 
 		post_id := r.URL.Query().Get("postid")
 		comment_id := r.URL.Query().Get("comment_id")
-		
+
 		LikeCount, DislikeCount, err = getLikeAndDislikeCount(post_id, comment_id)
 		if err != nil {
 			ResponseReaction(w, 400, 0, 0)
 			return
 		}
 		ResponseReaction(w, 200, LikeCount, DislikeCount)
-	}
+	} 
 }
 
 func ResponseReaction(w http.ResponseWriter, ErrCode, LikeCount, DislikeCount int) {
@@ -55,28 +56,22 @@ func ResponseReaction(w http.ResponseWriter, ErrCode, LikeCount, DislikeCount in
 func getLikeAndDislikeCount(post_id, comment_id string) (int, int, error) {
 	var LikeCount, DislikeCount int
 	if post_id != "" && comment_id == "" {
-		// fmt.Println("ANA hna 1")
 		err := dataBase.Db.QueryRow("SELECT COUNT(*) FROM likes WHERE post_id = ?", post_id).Scan(&LikeCount)
 		if err != nil {
-			// fmt.Println("Error fetching like count:", err)
 			return 0, 0, errors.New("Internal Server Error")
 		}
 		err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM dislikes WHERE post_id = ?", post_id).Scan(&DislikeCount)
 		if err != nil {
-			// fmt.Println("Error fetching dislike count:", err)
 			return 0, 0, errors.New("Internal Server Error")
 		}
 	} else if post_id == "" && comment_id != "" {
-		// fmt.Println("ANA hna 2")
 
 		err := dataBase.Db.QueryRow("SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?", comment_id).Scan(&LikeCount)
 		if err != nil {
-			// fmt.Println("Error fetching like count:", err)
 			return 0, 0, errors.New("Internal Server Error")
 		}
 		err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM dislikes WHERE disliked_comment_id = ?", comment_id).Scan(&DislikeCount)
 		if err != nil {
-			// fmt.Println("Error fetching dislike count:", err)
 			return 0, 0, errors.New("Internal Server Error")
 		}
 	} else {

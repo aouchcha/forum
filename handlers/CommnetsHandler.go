@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 
 	"go.mod/dataBase"
@@ -25,14 +27,19 @@ type Comment struct {
 }
 
 func ShowComments(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/ShowComment.html")
+	if r.URL.Path != "/showcomments" {
+		ChooseError(w, "PAge Not Found", http.StatusNotFound)
+		return
+	}
+	
+	tmpl, err := template.ParseFiles("templates/showcomments.html")
 	if err != nil {
 		ChooseError(w, "Internal Server Error", 500)
 		return
 	}
 
 	temp := r.URL.Query().Get("post_id")
-
+	fmt.Println("temp," , temp)
 	post_id, err := strconv.Atoi(temp)
 	if err != nil {
 		ChooseError(w, "Internal Server Error", 500)
@@ -106,11 +113,21 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreatCommnet(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/create_comment" {
+		ChooseError(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		ChooseError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	if IsJavaScriptDisabled(r) {
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
 	}
-	commentBody := r.FormValue("comments")
+	commentBody := strings.TrimLeft(r.FormValue("comments"), " ")
 	commentWriter := r.URL.Query().Get("writer")
 
 	var message string
@@ -119,7 +136,6 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 	var userID int
 	err := dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ?", commentWriter).Scan(&userID)
 	if err != nil {
-
 		message = "Unauthorized: Please log in to comment"
 		errCode = http.StatusUnauthorized
 		ResponseComments(message, w, errCode)
@@ -128,16 +144,16 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 
 	postID, err := strconv.Atoi(r.URL.Query().Get("postid"))
 	if err != nil {
-
 		message = "Bad Request: Invalid Post ID"
 		errCode = http.StatusBadRequest
 		ResponseComments(message, w, errCode)
 		return
 	}
+	
 
-	if commentBody == "" || len(commentBody) > 500 {
-
-		message = "Bad Request: Comment body cannot be empty"
+	if commentBody == "" || ContentLength(commentBody) > 1000 {
+		fmt.Println("ann hna ")
+		message = "Bad Request: Comment body cannot be empty and can't depasse 500 char"
 		errCode = http.StatusBadRequest
 		ResponseComments(message, w, errCode)
 		return
@@ -145,7 +161,6 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 
 	_, err = dataBase.Db.Exec("INSERT INTO comments (comment_body, comment_writer, comment_writer_id, post_commented_id) VALUES (?, ?, ?, ?)", commentBody, commentWriter, userID, postID)
 	if err != nil {
-
 		message = "Internal Server Error: Failed to save comment"
 		errCode = http.StatusInternalServerError
 		ResponseComments(message, w, errCode)
@@ -216,4 +231,14 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 		})
 	}
 	return comments_toshow, cid, nil
+}
+
+func ContentLength(s string) int {
+	var content_length int
+	for _, char := range s {
+		if char != '\r' {
+			content_length++
+		}
+	}
+	return content_length
 }

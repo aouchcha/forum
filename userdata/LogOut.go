@@ -20,6 +20,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	DeleteCookie(w, r)
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	return
 }
 
 func DeleteCookie(w http.ResponseWriter, r *http.Request) {

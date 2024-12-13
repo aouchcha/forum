@@ -9,7 +9,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		ChooseError(w, "Page Not Found", 404)
 		return
 	}
-	if r.Method == "Post" {
+	if r.Method != http.MethodGet {
 		ChooseError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}

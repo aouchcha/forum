@@ -16,7 +16,8 @@ var port = "8080"
 func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var userID int
-
+		fmt.Println("wesh wesh")
+		fmt.Println(r.URL.Path)
 		cookie, err := r.Cookie("session_token")
 		if err != nil || cookie.Value == "" {
 			http.Redirect(w, r, "/login", http.StatusFound)
@@ -47,6 +48,38 @@ func middleware(next http.HandlerFunc, allowGuest bool) http.HandlerFunc {
 func auth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var expiresAt time.Time
+		fmt.Println("wesh wesh 2")
+		fmt.Println(r.URL.Path)
+		OurRoots := map[string]bool{
+			"/forum":            true,
+			"/":                 true,
+			"/login":            true,
+			"/guest":            true,
+			"/register":         true,
+			"/logout":           true,
+			"/style/":           true,
+			"/showcomments":     true,
+			"/create_post":      true,
+			"/InsertPost":       true,
+			"/PostsLikes":       true,
+			"/CommentsLikes":    true,
+			"/CommentsDisLikes": true,
+			"/api/likes":        true,
+			"/create_comment":   true,
+			"/NoJs":             true,
+		}
+		if !OurRoots[r.URL.Path] {
+			handlers.ChooseError(w, "Page Not Found", http.StatusNotFound)
+			return
+		}
+		// isexist := strings.TrimLeft(r.URL.Path, "/")+".html"
+		// // templates/create_post.html
+		// _, err := os.Stat("templates/"+isexist)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	handlers.ChooseError(w,"Page Not Found", http.StatusNotFound)
+		// 	return
+		// }
 
 		cookie, err := r.Cookie("session_token")
 		if err != nil || cookie.Value == "" || cookie.Value == "guest" {
@@ -57,7 +90,6 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 			"SELECT expires_at FROM sessions WHERE session_id = ?;",
 			cookie.Value,
 		).Scan(&expiresAt)
-		fmt.Println(expiresAt)
 		if err != nil || time.Now().After(expiresAt) {
 			next(w, r)
 			return

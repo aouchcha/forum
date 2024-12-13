@@ -11,11 +11,15 @@ import (
 )
 
 func PostsDislikes(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/PostsDislikes" {
+		handlers.ChooseError(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
+
 	if r.Method != http.MethodPost {
 		handlers.ChooseError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	fmt.Println("PATH:", r.URL.Path)
 	if handlers.IsJavaScriptDisabled(r) {
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
@@ -61,15 +65,24 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 }
 
 func CommentsDislike(w http.ResponseWriter, r *http.Request) {
-	if handlers.IsJavaScriptDisabled(r) {
+	if r.URL.Path != "/CommentsDisLikes" {
+		handlers.ChooseError(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
 
+	if r.Method != http.MethodPost {
+		handlers.ChooseError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if handlers.IsJavaScriptDisabled(r) {
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
 	}
 	User := r.URL.Query().Get("user")
+	fmt.Println("USER", User)
 	Disliked_comment_id, err := strconv.Atoi(r.URL.Query().Get("comment_id"))
+	fmt.Println("Disliked_comment_id", )
 	if err != nil {
-
 		handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

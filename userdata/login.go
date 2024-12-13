@@ -38,7 +38,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		err := dataBase.Db.QueryRow("SELECT id, password FROM users WHERE username = ?", username).Scan(&userID, &hashed)
 		if err != nil {
 			handlers.ChooseError(w, "Invalid credentials (Wrong username)", http.StatusUnauthorized)
-
 			return
 		}
 

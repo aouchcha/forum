@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -34,6 +35,18 @@ type Reactions struct {
 var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/forum" {
+		fmt.Println("ana hna")
+		ChooseError(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		ChooseError(w, "Method Not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+
 	var page int
 	if r.URL.Query().Get("page") == "" {
 		page = 1

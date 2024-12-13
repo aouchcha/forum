@@ -1,6 +1,7 @@
 package userdata
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -51,17 +52,30 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var existingID bool
-		dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ? OR email = ?", username, email).Scan(&existingID)
-		if existingID {
-
-			handlers.ChooseError(w, "Username or email already taken", http.StatusConflict)
+		var existing int
+		// dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ? ", username).Scan(&existingID)
+		// if existingID {
+		// 	handlers.ChooseError(w, "Username already taken", http.StatusConflict)
+		// 	return
+		// }
+		// dataBase.Db.QueryRow("SELECT id FROM users WHERE email = ? ", email).Scan(&existingID)
+		// if existingID {
+		// 	handlers.ChooseError(w, "email already taken", http.StatusConflict)
+		// 	return
+		// }
+		err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?", username, email).Scan(&existing)
+		if err != nil {
+			handlers.ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		fmt.Println("NUM OF ROWS :", existing)
+		if existing != 0 {
+			handlers.ChooseError(w, "The username or the passweord alreday taken", http.StatusConflict)
 			return
 		}
 
 		hashedPassword, err := HashPassword(password)
 		if err != nil {
-
 			handlers.ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
@@ -70,8 +84,7 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
             INSERT INTO users (email, username, password)
             VALUES (?, ?, ?)`, email, username, hashedPassword)
 		if err != nil {
-
-			handlers.ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
+			handlers.ChooseError(w, "The NAme or email already taken", http.StatusInternalServerError)
 			return
 		}
 		http.Redirect(w, r, "/forum", http.StatusSeeOther)

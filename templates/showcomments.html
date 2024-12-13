@@ -36,8 +36,8 @@
             <img src="/style/programmer.png" alt="{{.Post_writer}}">
             <h2>{{.Post_writer}}</h2>
         </div>
-        <h1>Title: {{.Title}}</h1>
-        <p> content : {{.Body}}</p>
+        <pre>Title: {{.Title}}</pre>
+        <pre> content : {{.Body}}</pre>
     </div>
     <div class="comment_container">
         {{if not .Comments}}
@@ -49,7 +49,7 @@
                 <img src="/style/programmer.png" alt="{{.Comment_writer}}">
                 {{.Comment_writer}}
             </h4>
-            <p>{{.Comment_body}}</p>
+            <pre>{{.Comment_body}}</pre>
             <sub><span id="temps">{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">
                 <br>
@@ -76,7 +76,7 @@
     </div>
     <a href="/forum"><button class="bttn">Return</button></a>
     <footer class="footer">
-        <p>&copy; 2023 Your Website. All rights reserved.</p>
+        <p>&copy; 2024 Your Website. All rights reserved.</p>
         <p>
             Github :
         </p>
@@ -100,9 +100,11 @@
         const url = new URL(location.pathname+location.search,location.origin)
         if (pageindex < DBL) {
             url.searchParams.set("page",parseInt(pageindex)+1)
+            const path = url.toString()
+            window.location.href = path
+        }else {
+            alert("No more data to see")
         }
-        const path = url.toString()
-        window.location.href = path
     })
 
     prev.addEventListener('click',  (e) => {
@@ -112,11 +114,14 @@
         const url = new URL(location.pathname+location.search,location.origin)
         if (pageindex > 1) {
             url.searchParams.set("page",parseInt(pageindex)-1)
+            const path = url.toString()
+            
+            window.location.href = path
+        }else{
+            alert("No more data to see")
+
         }
         
-        const path = url.toString()
-        
-        window.location.href = path
     })
 
     const Forms = document.querySelectorAll('.reaction_section form')
