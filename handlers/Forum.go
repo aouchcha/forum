@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -36,8 +36,12 @@ var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
-		fmt.Println("ana hna")
 		ChooseError(w, "Page Not Found", http.StatusNotFound)
+		return
+	}
+
+	if r.Header.Get("X-Requested-With") == "XMLHttpRequest" {
+		handleAjaxPostLoad(w, r)
 		return
 	}
 
@@ -45,7 +49,6 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		ChooseError(w, "Method Not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
 
 	var page int
 	if r.URL.Query().Get("page") == "" {
@@ -59,22 +62,11 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var offset int
 	var DBlength int
 	err := dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts").Scan(&DBlength)
 	if err != nil {
 		ChooseError(w, "!Internal Server Error", http.StatusInternalServerError)
 		return
-	}
-	if page < 1 || page > int(math.Ceil(float64(DBlength/10)+1)) {
-		if page < 1 {
-			page = 1
-		} else {
-			page = int(math.Ceil(float64(DBlength/10) + 1))
-		}
-		offset = DBlength - (DBlength - (10 * (page - 1)))
-	} else {
-		offset = DBlength - (DBlength - (10 * (page - 1)))
 	}
 
 	tmpl, err := template.ParseFiles("templates/forum.html")
@@ -110,7 +102,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser, offset)
+	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser, 0, 5)
 	if err != nil {
 		if err.Error() == "Bad Request" {
 			ChooseError(w, err.Error(), http.StatusBadRequest)
@@ -128,14 +120,16 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		PageIndex  int
 		DataLength int
 		Posts      []Post
+		IsInitial  bool
 	}{
 		Currenuser: CurrentUser,
 		Curr_id:    postt.CurrentUser_id,
 		comment_id: comment_id,
 		Post_id:    post_id,
 		PageIndex:  page,
-		DataLength: int(math.Ceil(float64(DBlength) / 10)),
+		DataLength: int(math.Ceil(float64(DBlength) / 5)),
 		Posts:      posts_toshow,
+		IsInitial:  true,
 	})
 	if err != nil {
 		ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
@@ -143,31 +137,47 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string, offset int) ([]Post, int, int, error) {
+func handleAjaxPostLoad(w http.ResponseWriter, r *http.Request) {
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	cat_to_filter := r.URL.Query().Get("categories")
+	CurrentUser := r.URL.Query().Get("user")
+
+	offset := page * 5
+	posts_toshow, _, _, err := GetPosts(cat_to_filter, nil, w, CurrentUser, offset, 5)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(posts_toshow)
+}
+
+func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string, offset int, limit int) ([]Post, int, int, error) {
 	var post_rows *sql.Rows
 	var err error
 	if cat_to_filter != "all" && cat_to_filter != "" {
 		if cat_to_filter == "myposts" {
-			post_rows, err = dataBase.Db.Query(`SELECT * FROM posts WHERE post_creator = ? ORDER BY id DESC LIMIT 10 OFFSET ?`, CurrentUser, offset)
+			post_rows, err = dataBase.Db.Query(`SELECT * FROM posts WHERE post_creator = ? ORDER BY id DESC LIMIT ? OFFSET ?`, CurrentUser, limit, offset)
 		} else if cat_to_filter == "likedposts" {
 			post_rows, err = dataBase.Db.Query(`
 				SELECT p.* FROM posts p
 				JOIN likes li ON p.id = li.post_id 
-				WHERE li.username = ? ORDER BY id DESC LIMIT 10 OFFSET ?`, CurrentUser, offset)
+				WHERE li.username = ? ORDER BY id DESC LIMIT ? OFFSET ?`, CurrentUser, limit, offset)
 		} else {
 			post_rows, err = dataBase.Db.Query(`
 				SELECT p.* FROM posts p
 				JOIN categories c ON p.id = c.post_id
-				WHERE c.categorie = ? ORDER BY id DESC LIMIT 10 OFFSET ?`, cat_to_filter, offset)
+				WHERE c.categorie = ? ORDER BY id DESC LIMIT ? OFFSET ?`, cat_to_filter, limit, offset)
 		}
 	} else {
-		post_rows, err = dataBase.Db.Query("SELECT * FROM posts ORDER BY id DESC LIMIT 10 OFFSET ?", offset)
+		post_rows, err = dataBase.Db.Query("SELECT * FROM posts ORDER BY id DESC LIMIT ? OFFSET ?", limit, offset)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, 0, 0, errors.New("no Feild in dataBase base")
+			return nil, 0, 0, errors.New("no Field in database")
 		} else {
-			return nil, 0, 0, errors.New("internal server error you deleted a table from the dataBase base shut down the server and restar it again")
+			return nil, 0, 0, errors.New("internal server error you deleted a table from the database shut down the server and restart it again")
 		}
 	}
 	defer post_rows.Close()
@@ -209,12 +219,12 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			Title:             title,
 			Body:              body,
 			Time:              time,
-
-			CommentsLength: Length,
+			CommentsLength:    Length,
 		})
 	}
 	if err := post_rows.Err(); err != nil {
-		return nil, 0, 0, errors.New("error during iteration on each row in the dataBasebase")
+		return nil, 0, 0, errors.New("error during iteration on each row in the database")
 	}
 	return posts_toshow, comment_id, post_id, nil
 }
+

@@ -127,98 +127,22 @@
         </form>
     </div>
     {{end}}
-    <div class="pn">
-        <button id="prev" class="sidebarbtn">Previous</button>
-        <button id="next" class="sidebarbtn">Next</button>
-    </div>
 
-    <footer class="footer">
-        <p>&copy; 2024 Your Website. All rights reserved.</p>
-        <p>
-            Github :
-        </p>
-        <div class="href">
-            <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
-            <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
-            | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
-            | <a href="https://github.com/maynaou">Mouhssine Aynaou</a>
-        </div>
-    </footer>
+
 </body>
-<script type="module">
-    const next = document.querySelector('#next')
-    const prev = document.querySelector('#prev')
-    
-    next.addEventListener('click',  () => {
-        let pageindex = `{{ .PageIndex }}`
-        let DBL =  `{{.DataLength}}`
-        const url = new URL(location.pathname+location.search,location.origin)
-        if (pageindex < DBL) {
-            url.searchParams.set("page",parseInt(pageindex)+1)
-            const path = url.toString()
-            window.location.href = path
-        }else{
-            alert("This is the last page")
-        }
-    })
+            <footer class="footer">
+    <p>&copy; 2024 Your Website. All rights reserved.</p>
+    <p>
+        Github :
+    </p>
+    <div class="href">
+        <a href="https://github.com/aouchcha">Achraf Ouchchat</a> |
+        <a href="https://github.com/ItCHIRO29">Ismail ICHI</a>
+        | <a href="https://github.com/hadogen/">Yahya Houssaini</a>
+        | <a href="https://github.com/maynaou">Mouhssine Aynaou</a>
+    </div>
+</footer>;
 
-    prev.addEventListener('click',  (e) => {
-        e.preventDefault()
-        let pageindex = `{{ .PageIndex }}`
-        
-        const url = new URL(location.pathname+location.search,location.origin)
-        if (pageindex > 1) {
-            url.searchParams.set("page",parseInt(pageindex)-1)
-            const path = url.toString()
-            
-            window.location.href = path
-        }else{
-            alert("There is no more data to show")
-        }
-        
-    })
-
-    import { toggleSidebar, getCookie, timeAffi, FetchComments, FetchReactions } from '../style/js/forum.js';
-
-    const commentButtons = document.getElementsByClassName("bttn");
-    const reactions = document.getElementsByClassName("react");
-    const createButton = document.getElementById("Create");
-    const logoutform = document.querySelector('.user form button')
-    //side bar settings
-    const sidebar = document.getElementById('sidebar');
-    const filter_butt = document.getElementById('filter_butt')
-    filter_butt.addEventListener('click', () => toggleSidebar(sidebar))
-    
-    const username = getCookie("session_token");
-
-    if (username === 'guest') {
-        for (const button of commentButtons) {
-            button.disabled = true;
-        }
-        for (const reaction of reactions) {
-            reaction.disabled = true;
-        }
-        createButton.disabled = true;
-        logoutform.innerHTML = "Sign In"
-        let sideContent = sidebar.querySelector('form').querySelector('div').querySelector('.mbappe')
-        sideContent.remove()
-    }
-
-    // Format time elements
-    const times = document.querySelectorAll('#temps');
-    times.forEach(ele => ele.innerHTML = timeAffi(ele.textContent));
-
-    // Fetch Comments Data
-    const commentForms = document.querySelectorAll(".comment_container form");
-    FetchComments(commentForms);
-
-    // Fetch reactions to prevent refresh
-    const reactionForms = document.querySelectorAll(".reactions-container form");
-    FetchReactions(reactionForms);
-
-    
-
-</script>
 
 
 

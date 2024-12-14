@@ -5,8 +5,8 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background-color: #000000;
-    overflow: hidden;
+    background: url(hello.jpg) no-repeat;
+    background-size: cover;
 }
 
 .container {

@@ -3,7 +3,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #080000;
+background: url(hello.jpg) no-repeat;
+background-size: cover;
 }
 .login-container {
     margin-top: 100px;
