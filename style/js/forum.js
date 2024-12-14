@@ -346,7 +346,7 @@ function loadMorePosts() {
       .then((response) => response.json())
       .then((posts) => {
         document.getElementById("loading-indicator")?.remove();
-        if (posts == null ) {
+        if (posts == null) {
           window.removeEventListener("scroll", checkScrollPosition);
           return;
         }
@@ -382,7 +382,7 @@ function loadMorePosts() {
         document.getElementById("loading-indicator")?.remove();
         isLoading = false;
       });
-  }, 2000);
+  }, 1000);
 }
 
 function checkScrollPosition() {

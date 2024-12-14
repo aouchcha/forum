@@ -33,6 +33,7 @@ type Reactions struct {
 }
 
 var postt Post
+var CurrentUser string
 
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
@@ -75,7 +76,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var CurrentUser, CurrentSession string
+	var CurrentSession string
 	var session_id string
 	cat_to_filter := r.FormValue("categories")
 
@@ -140,7 +141,6 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 func handleAjaxPostLoad(w http.ResponseWriter, r *http.Request) {
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	cat_to_filter := r.URL.Query().Get("categories")
-	CurrentUser := r.URL.Query().Get("user")
 
 	offset := page * 5
 	posts_toshow, _, _, err := GetPosts(cat_to_filter, nil, w, CurrentUser, offset, 5)
