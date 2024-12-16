@@ -194,6 +194,7 @@
     if (username === 'guest') {
         for (const button of commentButtons) {
             button.disabled = true;
+            // window.location.href = "/login"
         }
         for (const reaction of reactions) {
             reaction.disabled = true;

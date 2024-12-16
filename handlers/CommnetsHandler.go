@@ -46,13 +46,12 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//////////////////////////////////////////// Get the userid and the username values from the session /////////////////////////////////////////////////////////
+	// Get the userid and the username values from the session
 	cookie, _ := r.Cookie("session_token")
 	var username string
 	dataBase.Db.QueryRow("SELECT username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&username)
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/////////////////////////////////// Fix The number of pages /////////////////////////////////////////////////////
+	// Fix The number of pages
 	var page int
 	if r.URL.Query().Get("page") == "" {
 		page = 1
@@ -60,7 +59,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		var err error
 		page, err = strconv.Atoi(r.URL.Query().Get("page"))
 		if err != nil {
-			ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
+			ChooseError(w, "Page Not found", 404)
 			return
 		}
 	}
@@ -82,7 +81,6 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 	} else {
 		offset = DBlength - (DBlength - (5 * (page - 1)))
 	}
-	///////////////////////////////////////////////////////////////////////////////////////
 
 	var toshow []Comment
 	comments_toshow, _, err := GetComments(tmpl, w, username, toshow, post_id, offset)
@@ -96,7 +94,6 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		ChooseError(w, "There is no post to this comment", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("Username :", username)
 	tmpl.Execute(w, struct {
 		Post_Id     string
 		CurrentUser string
@@ -134,13 +131,15 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	commentBody := strings.TrimLeft(r.FormValue("comments"), " ")
-	//////////////////////////////////////////// Get the userid and the username values from the session /////////////////////////////////////////////////////////
+	// Get the userid and the username values from the session
 	cookie, _ := r.Cookie("session_token")
 	var userID int
 	var commentWriter string
-	dataBase.Db.QueryRow("SELECT id, username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&userID, &commentWriter)
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	err9 := dataBase.Db.QueryRow("SELECT id, username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&userID, &commentWriter)
+	if err9 != nil {
+		ChooseError(w, "You must login first", http.StatusUnauthorized)
+		return
+	}
 	var message string
 	var errCode, Check int
 	temp := helpers.Unhash(r.URL.Query().Get("postid"))
@@ -191,7 +190,7 @@ func ResponseComments(message string, w http.ResponseWriter, errCode int) {
 
 	w.WriteHeader(errCode)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-
+		fmt.Println("Error encoding response:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"check": false, "message": "Internal Server Error"}`))
 	}
@@ -217,6 +216,10 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 		if err := comm_rows.Scan(&comment_id, &comment_body, &comment_writer, &userid, &post_commented_id, &time); err != nil {
 			return nil, 0, errors.New("internal server error")
 		}
+		// if comment_writer != "" {
+		// 	ChooseError(w, "You are not allowed to see this comment", http.StatusForbidden)
+		// 	return nil, 0, errors.New("internal server error")
+		// }
 		err = dataBase.Db.QueryRow(`SELECT COUNT(*) FROM likes WHERE liked_comment_id = ?`, comment_id).Scan(&commented.Comment_likes_count)
 		if err != nil {
 			return nil, 0, errors.New("internal server error")

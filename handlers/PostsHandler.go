@@ -31,7 +31,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		ChooseError(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
-	err = tmpl.Execute(w, struct{
+	err = tmpl.Execute(w, struct {
 		Username string
 	}{
 		Username: username,
@@ -71,7 +71,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//////////////////////////////// Getting the username and his id to create the post //////////////////////////////////////////////
+	// Getting the username and his id to create the post
 	cookie, _ := r.Cookie("session_token")
 	var CurrentUser string
 	err := dataBase.Db.QueryRow("SELECT username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&CurrentUser)
@@ -94,7 +94,7 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//////////////////////////////////// Getting the post id to add the categorie ///////////////////////////////////////////////////////////////
+	// Getting the post id to add the categorie
 	var Post_id int
 
 	err = dataBase.Db.QueryRow("SELECT id FROM posts WHERE post_creator = ? AND title = ? AND body = ? AND user_id = ?", CurrentUser, title, body, id).Scan(&Post_id)

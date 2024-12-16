@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -53,7 +52,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		var err error
 		page, err = strconv.Atoi(r.URL.Query().Get("page"))
 		if err != nil {
-			ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
+			ChooseError(w, "Page not Found", 404)
 			return
 		}
 	}
@@ -118,7 +117,6 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	fmt.Println("Number of pages", int(math.Ceil(float64(DBlength)/10)))
 	err = tmpl.Execute(w, struct {
 		Currenuser string
 		comment_id int

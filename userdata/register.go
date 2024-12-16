@@ -1,7 +1,6 @@
 package userdata
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -53,22 +52,11 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var existing int
-		// dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ? ", username).Scan(&existingID)
-		// if existingID {
-		// 	handlers.ChooseError(w, "Username already taken", http.StatusConflict)
-		// 	return
-		// }
-		// dataBase.Db.QueryRow("SELECT id FROM users WHERE email = ? ", email).Scan(&existingID)
-		// if existingID {
-		// 	handlers.ChooseError(w, "email already taken", http.StatusConflict)
-		// 	return
-		// }
 		err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?", username, email).Scan(&existing)
 		if err != nil {
 			handlers.ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("NUM OF ROWS :", existing)
 		if existing != 0 {
 			handlers.ChooseError(w, "The username or the email alreday taken", http.StatusConflict)
 			return

@@ -44,6 +44,7 @@ export function FetchComments(commentForms) {
         cForm.addEventListener("submit", async (e) => {
             e.preventDefault()
             const path = e.currentTarget.getAttribute("action")
+            // console.log("path", path)
             const formData = new FormData(e.currentTarget)
             const TextA = e.currentTarget.querySelector("textarea")
             try {
@@ -56,7 +57,7 @@ export function FetchComments(commentForms) {
                         case 400:
                             throw new Error("Bad Request");
                         case 401:
-                            throw new Error("Anothorized");
+                            throw new Error("Forbidden: You need to log in to perform this action.");
                         case 404:
                             throw new Error("Page Not Found");
                         case 500:

@@ -213,11 +213,13 @@ header {
 }
 
 .comment_container textarea {
-    /* height: 100%; */
     width: 100%;
     border: solid 1px black;
+    resize: none;
 }
-
+textarea {
+    resize: none;
+}
 .href {
     border: none;
     background-color: transparent;
