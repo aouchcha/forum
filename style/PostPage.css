@@ -108,6 +108,9 @@ header {
     justify-content: space-evenly;
     padding: 1%;
 }
+.reactions-container {
+    display: flex;
+}
 
 .react {
     height: 30px;

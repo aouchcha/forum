@@ -56,14 +56,12 @@
                 <form
                     action="/CommentsLikes?comment_id={{.Comment_id}}"
                     method="post" id="Comment_Like">
-                    <button type="submit" class="react" name="reaction" value="likeComment">👍
-                        {{.Comment_likes_count}}</button>
+                    <button type="submit" class="react" name="reaction" value="likeComment">👍🏻 {{.Comment_likes_count}}</button>
                 </form>
                 <form
                     action="/CommentsDisLikes?comment_id={{.Comment_id}}"
                     method="post" id="Comment_Dislike">
-                    <button type="submit" class="react" name="reaction" value="dislike">👎
-                        {{.Comment_dislikes_count}}</button>
+                    <button type="submit" class="react" name="reaction" value="dislike">👎🏻 {{.Comment_dislikes_count}}</button>
                 </form>
             </div>
         </div>

@@ -98,16 +98,17 @@
                 action="/PostsLikes?Liked_Post_id={{.Postid}}"
                 method="post">
                 <button type="submit" class="react" name="reaction" value="like">
-                    <i class="fa fa-thumbs-o-up">
+                    <!-- <i class="fa fa-thumbs-o-up"> -->
                     </i>
-                    {{.LikesCounter}}</button>
+                    👍🏻 {{.LikesCounter}}</button>
 
             </form>
             <form id="dislike_post"
                 action="/PostsDislikes?Disliked_Post_id={{.Postid}}"
                 method="post">
-                <button type="submit" class="react" name="reaction" value="dislike"><i class="fa fa-thumbs-o-down"></i>
-                    {{.DislikeCounter}}</button>
+                <button type="submit" class="react" name="reaction" value="dislike">
+                    <!-- <i class="fa fa-thumbs-o-down"></i> -->
+                    👎🏻 {{.DislikeCounter}}</button>
 
             </form>
         </div>

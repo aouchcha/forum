@@ -66,7 +66,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 
 	var offset int
 	var DBlength int
-	err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM comments").Scan(&DBlength)
+	err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM comments WHERE post_commented_id = ? ", post_id).Scan(&DBlength)
 	if err != nil {
 		ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
 		return
