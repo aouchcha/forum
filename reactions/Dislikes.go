@@ -2,15 +2,16 @@ package reactions
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"go.mod/dataBase"
 	"go.mod/handlers"
+	"go.mod/helpers"
 )
 
 func PostsDislikes(w http.ResponseWriter, r *http.Request) {
+	//////////////////////////////////////Check if the request is good////////////////////////////////////////////////////////////
 	if r.URL.Path != "/PostsDislikes" {
 		handlers.ChooseError(w, "Page Not Found", http.StatusNotFound)
 		return
@@ -24,14 +25,33 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
 	}
-	user := r.URL.Query().Get("user")
-	postid := r.URL.Query().Get("Disliked_Post_id")
-	user_id, err := strconv.Atoi(r.URL.Query().Get("user_id"))
-	if err != nil {
-		handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	//////////////////////////////////////////// Get the userid and the username values from the session /////////////////////////////////////////////////////////
+	cookie, _ := r.Cookie("session_token")
+	var user string
+	var user_id int
+	dataBase.Db.QueryRow("SELECT id, username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&user_id, &user)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////// Get The Post id from the url query ////////////////////////////////////////////////////////////////
+	temp := helpers.Unhash(r.URL.Query().Get("Disliked_Post_id"))
+	postid, err := strconv.Atoi(temp)
+	if err != nil {
+		handlers.ChooseError(w, "Bad Request You Chnaged In The Url Query", http.StatusBadRequest)
 		return
 	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////// check if the post id is valid (The user didn't cange it from inspect)////////////////////////////////////////////////
+	var Check int
+	err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts WHERE id = ?", postid).Scan(&Check)
+	if err != nil || Check == 0 {
+		return
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////// add the reaction to the DB ////////////////////////////////////////////////////////////////////
 	var exists bool
 	err = dataBase.Db.QueryRow("SELECT id FROM dislikes WHERE user_id = ? AND post_id = ? AND username = ?", user_id, postid, user).Scan(&exists)
 	if err == sql.ErrNoRows {
@@ -62,9 +82,11 @@ func PostsDislikes(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 func CommentsDislike(w http.ResponseWriter, r *http.Request) {
+	//////////////////////////////////////Check if the request is good////////////////////////////////////////////////////////////
 	if r.URL.Path != "/CommentsDisLikes" {
 		handlers.ChooseError(w, "Page Not Found", http.StatusNotFound)
 		return
@@ -78,27 +100,33 @@ func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/NoJs", http.StatusSeeOther)
 		return
 	}
-	User := r.URL.Query().Get("user")
-	fmt.Println("USER", User)
-	Disliked_comment_id, err := strconv.Atoi(r.URL.Query().Get("comment_id"))
-	fmt.Println("Disliked_comment_id", )
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////// Get the userid and the username values from the session /////////////////////////////////////////////////////////
+	cookie, _ := r.Cookie("session_token")
+	var User string
+	var User_id int
+	dataBase.Db.QueryRow("SELECT id, username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&User_id, &User)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////// Get The comment id from query ////////////////////////////////////////////
+	temp := helpers.Unhash(r.URL.Query().Get("comment_id"))
+	Disliked_comment_id, err := strconv.Atoi(temp)
 	if err != nil {
-		handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
+		handlers.ChooseError(w, "Bad Request You Chnaged In The Url Query", http.StatusBadRequest)
 		return
 	}
-	var User_id int
-	err = dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ?", User).Scan(&User_id)
-	if err != nil {
-		if err == sql.ErrNoRows {
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
-			return
-		} else {
-
-			handlers.ChooseError(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
+	////////////////////////////////// Check if the comment id is valid (already we have it in the data base in case the user change it from the inspect)///////////////////////////////////
+	var Check int
+	err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM comments WHERE comment_id = ?", Disliked_comment_id).Scan(&Check)
+	if err != nil || Check == 0 {
+		return
 	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////// add the reaction to the DB ////////////////////////////////////////////////////////////////////
 	var Exist bool
 
 	err = dataBase.Db.QueryRow("SELECT id FROM dislikes WHERE user_id = ? AND username = ? AND disliked_comment_id = ?", User_id, User, Disliked_comment_id).Scan(&Exist)
@@ -131,4 +159,5 @@ func CommentsDislike(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

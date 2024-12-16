@@ -12,12 +12,13 @@ import (
 	"text/template"
 
 	"go.mod/dataBase"
+	"go.mod/helpers"
 )
 
 type Comment struct {
 	Curr_commenter_id      int
 	Curr_commenter         string
-	Comment_id             int
+	Comment_id             string
 	Comment_body           string
 	Comment_writer         string
 	Post_commented_id      int
@@ -28,26 +29,30 @@ type Comment struct {
 
 func ShowComments(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/showcomments" {
-		ChooseError(w, "PAge Not Found", http.StatusNotFound)
+		ChooseError(w, "Page Not Found", http.StatusNotFound)
 		return
 	}
-	
+
 	tmpl, err := template.ParseFiles("templates/showcomments.html")
 	if err != nil {
 		ChooseError(w, "Internal Server Error", 500)
 		return
 	}
 
-	temp := r.URL.Query().Get("post_id")
-	fmt.Println("temp," , temp)
+	temp := helpers.Unhash(r.URL.Query().Get("post_id"))
 	post_id, err := strconv.Atoi(temp)
 	if err != nil {
-		ChooseError(w, "Internal Server Error", 500)
+		ChooseError(w, "Bad Request You change in the post id", 500)
 		return
 	}
 
-	username := r.URL.Query().Get("writer")
+	//////////////////////////////////////////// Get the userid and the username values from the session /////////////////////////////////////////////////////////
+	cookie, _ := r.Cookie("session_token")
+	var username string
+	dataBase.Db.QueryRow("SELECT username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&username)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/////////////////////////////////// Fix The number of pages /////////////////////////////////////////////////////
 	var page int
 	if r.URL.Query().Get("page") == "" {
 		page = 1
@@ -64,7 +69,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 	var DBlength int
 	err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM comments").Scan(&DBlength)
 	if err != nil {
-		ChooseError(w, "!Internal Server Error", http.StatusInternalServerError)
+		ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	if page < 1 || page > int(math.Ceil(float64(DBlength/5)+1)) {
@@ -77,6 +82,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 	} else {
 		offset = DBlength - (DBlength - (5 * (page - 1)))
 	}
+	///////////////////////////////////////////////////////////////////////////////////////
 
 	var toshow []Comment
 	comments_toshow, _, err := GetComments(tmpl, w, username, toshow, post_id, offset)
@@ -87,12 +93,12 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 	var title, body, post_creator string
 	err = dataBase.Db.QueryRow(`SELECT post_creator, title, body FROM posts WHERE id = ?`, post_id).Scan(&post_creator, &title, &body)
 	if err != nil {
-		ChooseError(w, "There is no post to this comment", 500)
+		ChooseError(w, "There is no post to this comment", http.StatusBadRequest)
 		return
 	}
-
+	fmt.Println("Username :", username)
 	tmpl.Execute(w, struct {
-		Post_Id     int
+		Post_Id     string
 		CurrentUser string
 		Title       string
 		Post_writer string
@@ -101,7 +107,7 @@ func ShowComments(w http.ResponseWriter, r *http.Request) {
 		DataLength  int
 		Comments    []Comment
 	}{
-		Post_Id:     post_id,
+		Post_Id:     helpers.Hash(post_id),
 		CurrentUser: username,
 		Title:       title,
 		Post_writer: post_creator,
@@ -128,31 +134,33 @@ func CreatCommnet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	commentBody := strings.TrimLeft(r.FormValue("comments"), " ")
-	commentWriter := r.URL.Query().Get("writer")
+	//////////////////////////////////////////// Get the userid and the username values from the session /////////////////////////////////////////////////////////
+	cookie, _ := r.Cookie("session_token")
+	var userID int
+	var commentWriter string
+	dataBase.Db.QueryRow("SELECT id, username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&userID, &commentWriter)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	var message string
-	var errCode int
-
-	var userID int
-	err := dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ?", commentWriter).Scan(&userID)
-	if err != nil {
-		message = "Unauthorized: Please log in to comment"
-		errCode = http.StatusUnauthorized
-		ResponseComments(message, w, errCode)
-		return
-	}
-
-	postID, err := strconv.Atoi(r.URL.Query().Get("postid"))
+	var errCode, Check int
+	temp := helpers.Unhash(r.URL.Query().Get("postid"))
+	postID, err := strconv.Atoi(temp)
 	if err != nil {
 		message = "Bad Request: Invalid Post ID"
 		errCode = http.StatusBadRequest
 		ResponseComments(message, w, errCode)
 		return
 	}
-	
+
+	err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts WHERE id = ?", postID).Scan(&Check)
+	if err != nil || Check == 0 {
+		message = "Bad Request: Invalid Post ID"
+		errCode = http.StatusBadRequest
+		ResponseComments(message, w, errCode)
+		return
+	}
 
 	if commentBody == "" || ContentLength(commentBody) > 1000 {
-		fmt.Println("ann hna ")
 		message = "Bad Request: Comment body cannot be empty and can't depasse 500 char"
 		errCode = http.StatusBadRequest
 		ResponseComments(message, w, errCode)
@@ -219,7 +227,7 @@ func GetComments(tmpl *template.Template, w http.ResponseWriter, CurrentUser str
 		}
 		cid = comment_id
 		comments_toshow = append(comments_toshow, Comment{
-			Comment_id:             comment_id,
+			Comment_id:             helpers.Hash(comment_id),
 			Curr_commenter:         CurrentUser,
 			Curr_commenter_id:      commented.Curr_commenter_id,
 			Comment_body:           comment_body,

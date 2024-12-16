@@ -38,7 +38,7 @@
             <h1><strong>Welcome To Forum </strong></h1>
         
         <div>
-            <a href="/create_post?postid={{.Post_id}}&user={{.Currenuser}}"><button class="bttn" id="Create"> <i
+            <a href="/create_post"><button class="bttn" id="Create"> <i
                         class="material-icons"></i>
                     Create Post </button></a>
         </div>
@@ -95,7 +95,7 @@
         <pre> content : {{.Body}}</pre>
         <div class="reactions-container">
             <form id="like_post"
-                action="/PostsLikes?Liked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                action="/PostsLikes?Liked_Post_id={{.Postid}}"
                 method="post">
                 <button type="submit" class="react" name="reaction" value="like">
                     <i class="fa fa-thumbs-o-up">
@@ -104,7 +104,7 @@
 
             </form>
             <form id="dislike_post"
-                action="/PostsDislikes?Disliked_Post_id={{.Postid}}&user_id={{.CurrentUser_id}}&user={{.CurrentUsser}}"
+                action="/PostsDislikes?Disliked_Post_id={{.Postid}}"
                 method="post">
                 <button type="submit" class="react" name="reaction" value="dislike"><i class="fa fa-thumbs-o-down"></i>
                     {{.DislikeCounter}}</button>
@@ -112,7 +112,7 @@
             </form>
         </div>
         <div class="comment_container">
-            <form action="/create_comment?postid={{.Postid}}&writer={{.CurrentUsser}}" method="post">
+            <form action="/create_comment?postid={{.Postid}}" method="post">
                 <br>
                 <div class="bb">
                     <textarea name="comments" id="comments" placeholder="Add your comment with a length under 1000 char ...." maxlength="1000"></textarea>
@@ -122,7 +122,7 @@
             </form>
             <br>
         </div>
-        <form action="/showcomments?post_id={{.Postid}}&writer={{.CurrentUsser}}" method="post" class="jj">
+        <form action="/showcomments?post_id={{.Postid}}" method="post" class="jj">
             <button type="submit" class="href">See All Comments({{.CommentsLength}})</button>
         </form>
     </div>

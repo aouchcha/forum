@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 	"text/template"
 
@@ -25,15 +24,16 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		ChooseError(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
-	post_id := r.URL.Query().Get("postid")
-	username := r.URL.Query().Get("user")
-
-	err = tmpl.Execute(w, struct {
-		Post_id  string
+	cookie, _ := r.Cookie("session_token")
+	var username string
+	err = dataBase.Db.QueryRow("SELECT username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&username)
+	if err != nil {
+		ChooseError(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	err = tmpl.Execute(w, struct{
 		Username string
 	}{
-		Post_id:  post_id,
 		Username: username,
 	})
 	if err != nil {
@@ -53,9 +53,6 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	CurrentUser := r.URL.Query().Get("user")
-	Post_id, _ := strconv.Atoi(r.URL.Query().Get("postid"))
-
 	title := strings.TrimLeft(r.FormValue("title"), " ")
 	body := strings.TrimLeft(r.FormValue("body"), " ")
 
@@ -73,9 +70,19 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		ChooseError(w, "you insered an empty field or more chars than the max", 400)
 		return
 	}
+
+	//////////////////////////////// Getting the username and his id to create the post //////////////////////////////////////////////
+	cookie, _ := r.Cookie("session_token")
+	var CurrentUser string
+	err := dataBase.Db.QueryRow("SELECT username FROM users INNER JOIN sessions ON users.id = sessions.user_id WHERE sessions.session_id = ?", cookie.Value).Scan(&CurrentUser)
+	if err != nil {
+		ChooseError(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	row := dataBase.Db.QueryRow("SELECT id FROM users WHERE username = ?", CurrentUser)
+
 	var id int
-	err := row.Scan(&id)
+	err = row.Scan(&id)
 	if err != nil {
 		ChooseError(w, "You have chnaged the value of the query and this user didn't exist", http.StatusBadRequest)
 		return
@@ -87,11 +94,15 @@ func InsertPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//////////////////////////////////// Getting the post id to add the categorie ///////////////////////////////////////////////////////////////
+	var Post_id int
+
 	err = dataBase.Db.QueryRow("SELECT id FROM posts WHERE post_creator = ? AND title = ? AND body = ? AND user_id = ?", CurrentUser, title, body, id).Scan(&Post_id)
 	if err != nil {
 		ChooseError(w, "Internal Server Error", 500)
 		return
 	}
+
 	for _, categorie := range categories {
 		_, err = dataBase.Db.Exec("INSERT INTO categories(post_id, categorie) VALUES (?, ?)", Post_id, categorie)
 		if err != nil {

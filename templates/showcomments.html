@@ -19,12 +19,11 @@
 <body style="background-color: aliceblue;">
     <header>
         <div class="user">
-            <img src="/style/programmer.png" alt="{{.CurrentUser}}">
             <h2>User : {{.CurrentUser}}</h2>
+            <!-- <img src="/style/programmer.png" alt="{{.CurrentUser}}"> -->
             <form action="/logout" method="post">
                 <button id="logout" type="submit" class="bttn">Log Out</button>
             </form>
-            <br>
             <a href="/forum"><button class="bttn">Return</button></a>
         </div>
         <br>
@@ -53,15 +52,15 @@
             <sub><span id="temps">{{.Comment_time}}</span> ago </sub>
             <div class="reaction_section">
                 <br>
-                <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}">
+                <!-- <input id="commentidvalue" type="hidden" name="commentid" value="{{.Comment_id}}"> -->
                 <form
-                    action="/CommentsLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    action="/CommentsLikes?comment_id={{.Comment_id}}"
                     method="post" id="Comment_Like">
                     <button type="submit" class="react" name="reaction" value="likeComment">👍
                         {{.Comment_likes_count}}</button>
                 </form>
                 <form
-                    action="/CommentsDisLikes?post_id={{.Post_commented_id}}&user={{.Curr_commenter}}&comment_id={{.Comment_id}}"
+                    action="/CommentsDisLikes?comment_id={{.Comment_id}}"
                     method="post" id="Comment_Dislike">
                     <button type="submit" class="react" name="reaction" value="dislike">👎
                         {{.Comment_dislikes_count}}</button>

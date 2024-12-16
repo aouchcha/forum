@@ -96,10 +96,10 @@ func init() {
 	const LikesTable string = `
 	CREATE TABLE IF NOT EXISTS likes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-	user_id INTEGER ,             
+	user_id INTEGER NOT NULL,             
     post_id INTEGER ,
 	liked_comment_id INTEGER ,             
-    username TEXT ,
+    username TEXT NOT NULL,
 	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (liked_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE, 
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE  

@@ -70,7 +70,7 @@ func HandleRegistration(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Println("NUM OF ROWS :", existing)
 		if existing != 0 {
-			handlers.ChooseError(w, "The username or the passweord alreday taken", http.StatusConflict)
+			handlers.ChooseError(w, "The username or the email alreday taken", http.StatusConflict)
 			return
 		}
 

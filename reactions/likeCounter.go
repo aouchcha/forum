@@ -7,10 +7,10 @@ import (
 	"strconv"
 
 	"go.mod/dataBase"
+	"go.mod/helpers"
 )
 
 func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
-
 	if r.URL.Path == "/api/likes" {
 
 		cookie, err := r.Cookie("session_token")
@@ -19,17 +19,33 @@ func LikesCounterWithApi(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var LikeCount, DislikeCount int
+		var post_id, comment_id string
+		if r.URL.Query().Get("postid") != "" {
+			post_id = helpers.Unhash(r.URL.Query().Get("postid"))
+		} else {
+			comment_id = helpers.Unhash(r.URL.Query().Get("comment_id"))
+		}
+		var Check int
 
-		post_id := r.URL.Query().Get("postid")
-		comment_id := r.URL.Query().Get("comment_id")
-
+		if post_id == "" && comment_id != "" {
+			err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM comments WHERE comment_id = ?", comment_id).Scan(&Check)
+		} else if comment_id == "" && post_id != "" {
+			err = dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts WHERE id = ?", post_id).Scan(&Check)
+		} else {
+			ResponseReaction(w, http.StatusBadRequest, 0, 0)
+			return
+		}
+		if err != nil || Check == 0 {
+			ResponseReaction(w, http.StatusNotFound, 0, 0)
+			return
+		}
 		LikeCount, DislikeCount, err = getLikeAndDislikeCount(post_id, comment_id)
 		if err != nil {
 			ResponseReaction(w, 400, 0, 0)
 			return
 		}
 		ResponseReaction(w, 200, LikeCount, DislikeCount)
-	} 
+	}
 }
 
 func ResponseReaction(w http.ResponseWriter, ErrCode, LikeCount, DislikeCount int) {

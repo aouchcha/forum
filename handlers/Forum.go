@@ -10,12 +10,13 @@ import (
 	"text/template"
 
 	"go.mod/dataBase"
+	"go.mod/helpers"
 )
 
 type Post struct {
 	LikesCounter      int
 	DislikeCounter    int
-	Postid            int
+	Postid            string
 	Usernamepublished string
 	CurrentUsser      string
 	CurrentUser_id    int
@@ -36,7 +37,6 @@ var postt Post
 
 func Forum(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/forum" {
-		fmt.Println("ana hna")
 		ChooseError(w, "Page Not Found", http.StatusNotFound)
 		return
 	}
@@ -45,7 +45,6 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		ChooseError(w, "Method Not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-
 
 	var page int
 	if r.URL.Query().Get("page") == "" {
@@ -110,7 +109,7 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	posts_toshow, comment_id, post_id, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser, offset)
+	posts_toshow, comment_id, _, err := GetPosts(cat_to_filter, tmpl, w, CurrentUser, offset)
 	if err != nil {
 		if err.Error() == "Bad Request" {
 			ChooseError(w, err.Error(), http.StatusBadRequest)
@@ -119,20 +118,16 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
+	fmt.Println("Number of pages", int(math.Ceil(float64(DBlength)/10)))
 	err = tmpl.Execute(w, struct {
 		Currenuser string
-		Curr_id    int
 		comment_id int
-		Post_id    int
 		PageIndex  int
 		DataLength int
 		Posts      []Post
 	}{
 		Currenuser: CurrentUser,
-		Curr_id:    postt.CurrentUser_id,
 		comment_id: comment_id,
-		Post_id:    post_id,
 		PageIndex:  page,
 		DataLength: int(math.Ceil(float64(DBlength) / 10)),
 		Posts:      posts_toshow,
@@ -200,17 +195,14 @@ func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWrit
 			return nil, 0, 0, errors.New("internal server error (we can't get the number of comments that we have)")
 		}
 		posts_toshow = append(posts_toshow, Post{
-			Postid:            id,
+			Postid:            helpers.Hash(id),
 			LikesCounter:      likee.LikeCount,
 			DislikeCounter:    dislikee.DislikeCount,
 			Usernamepublished: usernamepublished,
-			CurrentUsser:      CurrentUser,
-			CurrentUser_id:    postt.CurrentUser_id,
 			Title:             title,
 			Body:              body,
 			Time:              time,
-
-			CommentsLength: Length,
+			CommentsLength:    Length,
 		})
 	}
 	if err := post_rows.Err(); err != nil {

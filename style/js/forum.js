@@ -54,15 +54,13 @@ export function FetchComments(commentForms) {
                 if (!res.ok) {
                     switch (res.status) {
                         case 400:
-                            throw new Error("Bad Request: Please check your input.");
+                            throw new Error("Bad Request");
                         case 401:
-                            throw new Error("Forbidden: You need to log in to perform this action.");
+                            throw new Error("Anothorized");
                         case 404:
-                            throw new Error("Not Found: The requested resource could not be found.");
+                            throw new Error("Page Not Found");
                         case 500:
-                            throw new Error("Server Error: Please try again later.");
-                        default:
-                            throw new Error(`Unexpected Error: ${res.status} ${res.statusText}`);
+                            throw new Error("Internal Server Error");
                     }
                 }
                 const div = document.createElement("div")
@@ -76,8 +74,6 @@ export function FetchComments(commentForms) {
                 TextA.value = ""
             } catch (error) {
                 alert(error)
-
-
                 if (error.message == "Forbidden: You need to log in to perform this action.") {
                     window.location.href = '/login'
                 }
@@ -174,13 +170,15 @@ export function FetchCommentsReactions(Forms) {
 
             let icon = button.textContent.split(' ')[0];
             let icon2 = TheOtherButton.innerHTML.split(' ')[0];
-            try {
+            
                 await fetch(ActionPath, {
                     method: "POST",
                 })
                 const ApiPath = `/api/likes?comment_id=${Comment_id}`;
                 const response = await getdata(ApiPath)
                 const likeCount = response.LikeCount
+                console.log(likeCount);
+                
                 const DislikeCount = response.DislikeCount;
                 if (choice == "Comment_Like") {
                     button.textContent = icon + " " + likeCount;
@@ -193,9 +191,7 @@ export function FetchCommentsReactions(Forms) {
 
 
                 }
-            } catch (error) {
-                alert(error)
-            }
+            
         })
     })
 }
@@ -226,5 +222,6 @@ async function getdata(path) {
         if (error.message == "Forbidden: You need to log in to perform this action.") {
             window.location.href = '/login'
         }
+        return
     }
 }
