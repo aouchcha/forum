@@ -139,52 +139,40 @@ func Forum(w http.ResponseWriter, r *http.Request) {
 
 func GetPosts(cat_to_filter string, tmpl *template.Template, w http.ResponseWriter, CurrentUser string, page int) ([]Post, int, int, int, error) {
 	//////////////////////////////////////////////////////////////////
-	var offset int
-	var DBlength int
+	var offset, DBlength int
+	// var DBlength int
 
 	///////////////////////////////////////////////////////////////////
 	var post_rows *sql.Rows
 	var err, err1 error
 	//pagination
 	//////////////
+	fmt.Println("cat_to_filter :", cat_to_filter)
 	if cat_to_filter != "all" && cat_to_filter != "" {
 		if cat_to_filter == "myposts" {
 			err1 = dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts").Scan(&DBlength)
-			if page < 1 || page > int(math.Ceil(float64(DBlength/10)+1)) {
-				if page < 1 {
-					page = 1
-				} else {
-					page = int(math.Ceil(float64(DBlength/10) + 1))
-				}
-				offset = DBlength - (DBlength - (10 * (page - 1)))
-			} else {
-				offset = DBlength - (DBlength - (10 * (page - 1)))
-			}
+			offset = helpers.Pagination(page, DBlength)
+
 			post_rows, err = dataBase.Db.Query(`SELECT * FROM posts WHERE post_creator = ? ORDER BY id DESC LIMIT 10 OFFSET ?`, CurrentUser, offset)
 		} else if cat_to_filter == "likedposts" {
 			err1 = dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts p JOIN likes li ON p.id = li.post_id WHERE li.username = ?", CurrentUser).Scan(&DBlength)
-			if page < 1 || page > int(math.Ceil(float64(DBlength/10)+1)) {
-				if page < 1 {
-					page = 1
-				} else {
-					page = int(math.Ceil(float64(DBlength/10) + 1))
-				}
-				offset = DBlength - (DBlength - (10 * (page - 1)))
-			} else {
-				offset = DBlength - (DBlength - (10 * (page - 1)))
-			}
+			offset = helpers.Pagination(page, DBlength)
+
 			post_rows, err = dataBase.Db.Query(`
 				SELECT p.* FROM posts p
 				JOIN likes li ON p.id = li.post_id 
 				WHERE li.username = ? ORDER BY id DESC LIMIT 10 OFFSET ?`, CurrentUser, offset)
 		} else {
 			err1 = dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts p JOIN categories c ON p.id = c.post_id WHERE c.categorie = ?", cat_to_filter).Scan(&DBlength)
+			offset = helpers.Pagination(page, DBlength)
 			post_rows, err = dataBase.Db.Query(`
 				SELECT p.* FROM posts p
 				JOIN categories c ON p.id = c.post_id
 				WHERE c.categorie = ? ORDER BY id DESC LIMIT 10 OFFSET ?`, cat_to_filter, offset)
 		}
 	} else {
+		err1 = dataBase.Db.QueryRow("SELECT COUNT(*) FROM posts").Scan(&DBlength)
+		offset = helpers.Pagination(page, DBlength)
 		post_rows, err = dataBase.Db.Query("SELECT * FROM posts ORDER BY id DESC LIMIT 10 OFFSET ?", offset)
 	}
 	if err != nil || err1 != nil {
